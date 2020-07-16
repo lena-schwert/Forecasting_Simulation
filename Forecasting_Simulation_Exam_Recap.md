@@ -1,12 +1,22 @@
 ## Key Insights
 
 - **Why does differencing actually work to make a non-stationary time series stationary?**
+  
   - insight from Chap 4 HW 3 (week 10): e.g.for a random walk, the absolute values are very different over time, but the **differences between subsequent values are not!**
-  - see below, left: random walk, right: 1-times differenced, looks way more stationary
-
+- see below, left: random walk, right: 1-times differenced, looks way more stationary
+  
   ![image-20200620191114648](image-20200620191114648.png)
 
++ Effect on the variance of random variables when the variables are scaled by a factor, $a$ : since variance is in term of squared factor of the variables, the new variance = $a^2 \times$ old variance
 
+  ```R
+  w1 <- rnorm(100000, mean = 0, sd = 2)  
+  var(w1) # 4 
+  var(2*w1) # 2^2*4 = 16  
+  var(0.5*w1) # 0.5^2*4 = 1
+  w2 <- rnorm(100000, mean = 0, sd = 1)
+  var(0.5*w1+2*w2) # 0.5^2*4 + 2^2+1 = 5
+  ```
 
 
 
@@ -14,7 +24,56 @@
 
 ### Why are time series interesting to analyze?
 
-### Transformations (logarithmic + Box-Cox)
+### Ergodicity
+
++ A process is considered ergodic when its statistic properties can be derived from a single and long realization (time series observations) of the hypothetical model 
+  + statistic properties: sample moments (mean, variance, skewness & kurtosis)
++ In social science simulation, we always need to assume ergodicity because e.g. real life event can only occur once and we only get a single realization of the process   
++ Egordicity is a sub-class of stationary 
+  + All ergodic process is stationary but not all stationary process are ergodic 
++ Example of an ergodic process: Throwing coins -> we get the same statistic properties of the process when we throw 1000 different coins in one experiment vs. when we throw a single coin repeatedly for 1000 times 
++ Example of a non-ergodic process: Finding the most visited place -> observing the places visited by 1000 different people in a day vs. observing the places a person visited in 1000 days (We'll get different statistic properties!) 
+
+### Decomposition 
+
+$n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
+
+#### Additive 
+
++ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0  
+
+#### Multiplicative 
+
++ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 
+
+#### Alternative Multiplicative 
+
++ $n_t \cdot s_t + r_t$; mean of $s_t$ should be 1 and mean of $r_t$ should be 0 
+
+### Transformations
+
+#### logarithmic
+
++ transform multiplicative model to additive model
+  + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
+
++ A well-known example in economics: log return 
+  + Return is defined as, $R_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}}-1$
+  + Gross return is $R_t + 1 = \frac{P_t}{P_{t-1}}$ 
+  + log return = log of gross return, $r_t = ln(R_t + 1) = ln(\frac{P_t}{P_{t-1}})=ln(P_t) - ln(P_{t-1})$
+    + benefits of using log return: 
+      1. if $ln(P_t)$ is a random walk then $\Delta ln(P_t)$ will be stationary (Chap 4 HW 3.R - Apple Stock price) 
+      2. log return has nice properties: breakdown the multiplicative model of gross return in $k$ periods into additive model: $[R_t+1]_k = \frac{P_t}{P_{t-1}}\cdot\frac{P_{t-1}}{P_{t-2}}\cdot\frac{P_{t-2}}{P_{t-3}}\dots \frac{P_{t-k+1}}{P_{t-k}} \Rightarrow ln(\frac{P_t}{P_{t-1}}\cdot\frac{P_{t-1}}{P_{t-2}}\cdot\frac{P_{t-2}}{P_{t-3}}\dots \frac{P_{t-k+1}}{P_{t-k}})$
+         $\Rightarrow ln((R_t +1)\cdot (R_{t-1}+1)\dots (R_{t-k+1}+1)) = ln(R_t +1) +  ln(R_{t-1}+1)+ \dots + ln(R_{t-k+1}+1)$ 
+         $\Rightarrow r_t + r_{t-1} + \dots + r_{t-k+1}$ (summation of log return in $k$ periods = multiplicative of gross return in $k$ periods)  
+      3. if returns are independent, then log returns are independent -> uncorrelatedness can be checked with `acf()` and variance of the additive model can be calculated easily:  $var([r_t]_k) = var(r_t) + var(r_{t-1})+ \dots + var(r_{t-k+1})$ but the variance of multiplicative model of gross return is NOT simply $var([R_t+1]_k) = var(R_t+1) \cdot var(R_{t-1}+1) \dots var(R_{t-k+1}+1)$
+
+#### Box-Cox 
+
++ $$x_t = B(y_t, \lambda)=\left\{\begin{array}{ll} ln \left(y_{t}\right) & \text { if } \lambda=0 \\ \left(y_{t}^{\lambda}-1\right) / \lambda & \text { otherwise } \end{array}\right.$$
++ to fix the non-normality of the residuals (remove heteroskedasticity/skewness in the residuals)
+  + to make the pattern across the data more consistent -> more accurate forecast with data in normality 
+  + address limitation of logarithmatic transformation: $y_t$ has to be positive 
 
 ### Exponential Smoothing
 
@@ -52,7 +111,104 @@
 
 ### Cointegration
 
++ If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
+
++ Cointegrating relation is a **mean reverting process**. (converges to a mean value) The long term forecast of the cointegrated series are linearly related. 
+
++ Rank$(\Pi)$ tell us the no. of cointegrating relations. 
+
+### VAR 
+
++ a multivariate model with multiple no. of AR($p$): $X_{t} = A_0 +A_1X_{t-1} +...+ A_pX_{t-p} + R_t$ series up to $k$
+$\Rightarrow X_t =A_0 + A_iX_{t-i} + R_t$ where $A_i$ is a $k \times k$ matrix, with coefficients in each row e.g. $\alpha_{11,1}, \alpha_{12,1}, ...,\alpha_{1k,1}$ expresses granger causality of all other series e.g. $x_{2t},...,x_{kt}$ for this corresponding series in the row, e.g. $x_{1t}$ 
+$$
+\left[\begin{array}{c}
+\mathbf{x}_{1t} \\
+\mathbf{x}_{2t} \\
+\vdots \\
+\mathbf{x}_{kt}
+\end{array}\right]=\left[\begin{array}{c}
+\alpha_1 \\
+\alpha_2 \\
+\vdots \\
+\alpha_k
+\end{array}\right]+\left[\begin{array}{ccccc}
+\alpha_{11,i} & \alpha_{12,i} & \cdots & \alpha_{1k,i} \\
+\alpha_{21,i} & \alpha_{22,i} & \cdots & \alpha_{2k,i} \\
+\vdots & \vdots & \ddots & \vdots \\
+\alpha_{k1,i} & \alpha_{k2,i} & \cdots & \alpha_{kk,i} \\
+\end{array}\right]\left[\begin{array}{c}
+\mathbf{x}_{1t-i} \\
+\mathbf{x}_{2t-i} \\
+\vdots \\
+\mathbf{x}_{kt-i}
+\end{array}\right]+\left[\begin{array}{c}
+\mathbf{r}_{1t} \\
+\mathbf{r}_{2t} \\
+\vdots \\
+\mathbf{r}_{kt} \\
+\end{array}\right]
+$$
+$i = p =$ no. of lags; $k =$ no. of series in the system; first index of $\alpha$ = $k^{th}$ series, second index of $\alpha$ 
++ from this eqn, we can see that no. of parameters of the model: $k+k^2 \times p$
++ no. of lag define the how many $A_i$ matrices we'll have 
++ no. of series define the size of $A_i$ matrices -> always a $k\times k$ matrix 
++ $R_t$ is a zero mean white noise process with a positive definite covariance matrix: $R_t$~ $(0,\Sigma_R)$ where $\Sigma_R = \mathbb{E}[R_t R_t']$
+  + $R_t$ can be generated from cholesky decomposition or simply by adding two i.i.d generated white noise and combine with one of the white noise series 
+
+*e.g. for a VAR model with 3 series of lag order=2:*
++ $k=3$ -> $X_t, A_0, R_t$ will column vector of 3 ; 2 $A_i$ -> $A_1$, $A_2$ where each is a $3 \times 3$ matrix 
++ total no. of parameters = 3 + 9x2 = 21 parameters 
+
+**To check the stability in a VAR model**: 
+
++ $\text{det}\left(I_{k}-A_{1} z-\cdots-A_{p} z^{p}\right)=0$ lie outside of the unit circle (> 1 in absolute value)
+
 ### VECM
+
+Given a VAR($p$) of I(1): 
+$X_t = A_0 + A_1 X_{t-1} + ... + A_p X_{t-p} + R$
+
+There always exists an **error correction** representation of the form:
+$\Delta X_{t}=A_{0}+\Pi X_{t-1}+\Gamma_{1} \Delta X_{t-1}+\cdots+\Gamma_{p-1} \Delta X_{t-p+1}+R_{t}$
+
+where
+$\Pi=-\left(I_{k}-A_{1}-\cdots-A_{p}\right), \Gamma_{i}=-\left(A_{i+1}+\cdots+A_{p}\right)$
+e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
+
+**Interpretation of VECM:**
+
++ if $\Pi=0$, all $\lambda(\Pi)=0$, rank=0 -> **no cointegration**; Non-stationary of I(1) vanishes by taking the differences -> we **fit $\Delta X_t$**
++ if $\Pi$ has full rank, $k$, then VAR($p$) is stationary, cannot be I(1) -> **fit VAR model directly**
++ if rank$(\Pi) =m$, $0<m<k$ -> the case of cointegration, we write $\Pi=\alpha\beta'; (k \times k) =(k \times m)[(k \times m)']$ -> **fit VECM($p-1$) model**
+
+### Johansen Test 
+
++ A procedure to determine the rank of $\Pi$ and whether there is a trend in the cointegrating relations  
+
++ $H_1^*$ -> $A_0 = \alpha \cdot\beta_0, B=0$: no trend in levels, no trend in cointegrating relations -> **(ecdet="constant")**
+`z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="const",K=2)`
++ $H_1$ -> $A_0 \neq 0 , B=0$: linear trend in levels, no trend in cointegrating relations, drift in differences -> **(ecdet="none")**
+`z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="none",K=2)`
++ $H^*$ -> $A_0 \neq 0, B= \alpha \cdot \beta_1$: linear trend in levels, linear trend in cointegrating relations, drift in differences -> **(ecdet="trend")**
+`z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="trend",K=2)`
+
+#### Checking the cointegrating rank and the presence of trend in the series
+
++ Check the hypotheses, $H^*_1$ and $H_1$ starting from rank =0 in an alternating order up to the full rank, $k$. 
++ Stop the test when the test statistic is smaller than the significant level (cannot reject the $H_0$) so we accept the $H_0$ which is under the assumption that the rank we are testing is the true rank.  
+
+> When the series has an obvious trend, skip $H_1^*$ and proceed to $H_1$ but we can't know whether the cointegrating relations have a trend, so test $H_1$ against $H^*$
+
+#### Checking whether the cointegrating relations are stationary with no trend
+
+**Testing $H_1$ against $H^*$**: 
+
++ Hypothesis: no trend in cointegrating relations
++ teststat is chi-square distributed 
++ The likelihood ratio test statistic:
+  $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
+  + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
 
 ## Definitions
 
@@ -60,7 +216,7 @@
 
   - returns the value of one/$k$ time step(s) before t
 
-  - equivalent to backshift operator $\bold B$ 
+  - equivalent to backshift operator $\mathbf{B}$ 
 
   - can be used an arbitrary, k times –> $L^kx_t = x_{t-k}$
 
@@ -97,9 +253,16 @@
 
 ## The Formula Vault
 
+- standard deviation: $\sigma= \sqrt{ \text{variance}}$
+
+- Variance of a sample: $\sum(x-\bar{x})^2/(n-1)$
+
 - expected value
-- covariance
+
+- Covariance($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
+
 - correlation
+
 - standard error
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}\iff \nabla x_t = (1-L)x_t$ 
@@ -146,9 +309,21 @@
     rewritten as $\alpha(L)x_t= \alpha_o+\theta(L)w_t$ 
 
 - ARIMA
+
 - **Seasonal $ARIMA(p,d,q)(P,D,Q)_s$**
-- **VAR(p)**
-- **VECM (= vector error correction model)**
+
+- **VAR(p)**: $X_t =A_0 + A_iX_{t-i} + R_t$
+
+  - $k$ is the no. of series in the system
+  - $i$ is the no. of lag
+  - $X_t$, $X_{t-i}$, $A_0$ and $R_t$ is a $k$-dimension column vector 
+  - $A_i$ is a $k \times k$ matrix 
+
+- **VECM (= vector error correction model)**: $\Delta X_{t}=A_{0}+\Pi X_{t-1}+\Gamma_{1} \Delta X_{t-1}+\cdots+\Gamma_{p-1} \Delta X_{t-p+1}+R_{t}$
+
+  + $\Pi=-\left(I_{k}-A_{1}-\cdots-A_{p}\right), \Gamma_{i}=-\left(A_{i+1}+\cdots+A_{p}\right)$
+  + $\Pi = \alpha \cdot \beta'$ 
+  + cointegrating relations: $\beta'X_{t-i}$
 
 ## Documentation of Key R Functions
 
@@ -158,6 +333,25 @@
   - `start()`
   - `end()`
   - `frequency()` 
+  - `fix()`: show the structure (data of the time series), Tsp attribute and the class attribute 
+
+- creating a times series object 
+
+  - `y<-structure(c(4,5,6,7), tsp=c(2017.75, 2018.5, 4), class="ts")` 
+    - `.Tsp=c(2017.75, 2018.5, 4)` is valid as well 
+  - Tsp attribute tells us the start time & end time (in time units) and the frequency: `attr(ts, "tsp")` but not `attr(ts, ".Tsp")`! 
+    - start time & end time in time units are calculated as `time + i/f`, where `i` is the period of that time -1 
+      - `start(y)` # 2017 4 -> 2017+ 3/4 = 2017.75
+      - `end(y)` # 2018 3 ->  2018 + 2/4 = 2018.5
+  - convert from other data type to a time series object: `ts()`
+    - `ts(x, start = c(2020, 1), freq = 12)`
+
+- Quick check on the trend & seasonal effect of a time series object 
+
+  - `aggregate(ts)`: sum up all observations by each period (e.g. aggegate each month data across multiple years)
+  - `cycle(ts)`: give the position in the cycle (e.g. Jan=1, Feb=2, etc.)
+  - `window()`: extract all observations of particular period across years e.g. `window(AP, start=c(1949,7), end=c(1957,7) freq=TRUE)`
+    - if end argument is not specified -> include up to the last year available in the data
 
 - `decompose()`
 
