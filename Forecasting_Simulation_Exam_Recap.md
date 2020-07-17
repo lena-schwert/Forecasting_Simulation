@@ -109,6 +109,22 @@ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over 
 
 ### VAR(p)
 
+
+
+
+
+- generate correlated residuals using the Cholesky decomposition
+
+  –> we want to obtain residual (vectors) from a given covariance matrix
+
+  [Why it works: math stackexchange](https://math.stackexchange.com/questions/163470/generating-correlated-random-numbers-why-does-cholesky-decomposition-work)
+
+  ```R
+  L <- t(chol(covR)) #lower triangular matrix
+  ```
+
+  - this can then be used to generate the respective time series
+
 ### Cointegration
 
 + If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
@@ -250,6 +266,12 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
   - drift = intercept = $\alpha_0$ 
   - (deterministic) trend, indicated by $\beta t$ in the AR(p) model equations
+  
+- **Cholesky decomposition**
+
+  - method to decompose a positive-definite matrix into a lower triangular matrix (and its transpose)
+  - speeds up solving linear equation systems
+  - $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
 
 ## The Formula Vault
 
