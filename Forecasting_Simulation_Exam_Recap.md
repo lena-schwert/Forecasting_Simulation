@@ -18,7 +18,13 @@
   var(0.5*w1+2*w2) # 0.5^2*4 + 2^2+1 = 5
   ```
 
+- Granger causality is expressed by the $\alpha$ coefficients and has nothing to do with the residuals
 
+- 
+
+- when constructing time series, we generate them with correlated residuals because this is a realistic possibility when you a have multiple time series to analyze
+
+  
 
 ## Summary
 
@@ -107,7 +113,7 @@ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over 
 
 ### Seasonal ARIMA
 
-### VAR(p)
+
 
 
 
@@ -125,15 +131,9 @@ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over 
 
   - this can then be used to generate the respective time series
 
-### Cointegration
 
-+ If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
 
-+ Cointegrating relation is a **mean reverting process**. (converges to a mean value) The long term forecast of the cointegrated series are linearly related. 
-
-+ Rank$(\Pi)$ tell us the no. of cointegrating relations. 
-
-### VAR 
+### VAR(p)
 
 + a multivariate model with multiple no. of AR($p$): $X_{t} = A_0 +A_1X_{t-1} +...+ A_pX_{t-p} + R_t$ series up to $k$
 $\Rightarrow X_t =A_0 + A_iX_{t-i} + R_t$ where $A_i$ is a $k \times k$ matrix, with coefficients in each row e.g. $\alpha_{11,1}, \alpha_{12,1}, ...,\alpha_{1k,1}$ expresses granger causality of all other series e.g. $x_{2t},...,x_{kt}$ for this corresponding series in the row, e.g. $x_{1t}$ 
@@ -176,13 +176,34 @@ $i = p =$ no. of lags; $k =$ no. of series in the system; first index of $\alpha
 + $k=3$ -> $X_t, A_0, R_t$ will column vector of 3 ; 2 $A_i$ -> $A_1$, $A_2$ where each is a $3 \times 3$ matrix 
 + total no. of parameters = 3 + 9x2 = 21 parameters 
 
-**To check the stability in a VAR model**: 
+**To check the stationarity of a VAR model**: 
 
 + $\text{det}\left(I_{k}-A_{1} z-\cdots-A_{p} z^{p}\right)=0$ lie outside of the unit circle (> 1 in absolute value)
 
+  –> this indicates that the matrix $\Pi$ has full rank
+
+### Example Code
+
+- **estimating the lag order p of a VAR model**
+
+  ```R
+  ord<-VAR(zt,type="both",ic="SC", lag.max=8)
+  ```
+
+  - `lag.max`: specify a maximum lag 
+  - `ic="SC"` gives you lower lag orders than `ic = "AIC"`
+  - `ord$p`: gives you the lag order
+
+### Cointegration
+
++ If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
++ Cointegrating relation is a **mean reverting process**. (converges to a mean value) The long term forecast of the cointegrated series are linearly related. 
++ If it is true that $\text{det}\left(I_{k}-A_{1} z-\cdots-A_{p} z^{p}\right)=0$, some or all variables are integrated, therefore I(1) series.
++ Rank$(\Pi)$ tell us the no. of cointegrating relations. 
+
 ### VECM
 
-Given a VAR($p$) of I(1): 
+Given a VAR($p$) that is I(1): 
 $X_t = A_0 + A_1 X_{t-1} + ... + A_p X_{t-p} + R$
 
 There always exists an **error correction** representation of the form:
@@ -194,8 +215,8 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 **Interpretation of VECM:**
 
-+ if $\Pi=0$, all $\lambda(\Pi)=0$, rank=0 -> **no cointegration**; Non-stationary of I(1) vanishes by taking the differences -> we **fit $\Delta X_t$**
-+ if $\Pi$ has full rank, $k$, then VAR($p$) is stationary, cannot be I(1) -> **fit VAR model directly**
++ if $\Pi=0$, all $\lambda(\Pi)=0$, rank=0 -> **no cointegration**; Non-stationary of I(1) vanishes by taking the differences -> we **fit VAR model on $\Delta X_t$** 
++ if $\Pi$ has full rank, $k$, then VAR($p$) is stationary, cannot be I(1) -> **fit VAR model directly on $X_t$** 
 + if rank$(\Pi) =m$, $0<m<k$ -> the case of cointegration, we write $\Pi=\alpha\beta'; (k \times k) =(k \times m)[(k \times m)']$ -> **fit VECM($p-1$) model**
 
 ### Johansen Test 
@@ -203,11 +224,11 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 + A procedure to determine the rank of $\Pi$ and whether there is a trend in the cointegrating relations  
 
 + $H_1^*$ -> $A_0 = \alpha \cdot\beta_0, B=0$: no trend in levels, no trend in cointegrating relations -> **(ecdet="constant")**
-`z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="const",K=2)`
+`z.vecm <- my.ca.jo(z, type = "trace", spec = "transitory",ecdet="const",K=2)`
 + $H_1$ -> $A_0 \neq 0 , B=0$: linear trend in levels, no trend in cointegrating relations, drift in differences -> **(ecdet="none")**
-`z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="none",K=2)`
+`z.vecm <- my.ca.jo(z, type = "trace", spec = "transitory",ecdet="none",K=2)`
 + $H^*$ -> $A_0 \neq 0, B= \alpha \cdot \beta_1$: linear trend in levels, linear trend in cointegrating relations, drift in differences -> **(ecdet="trend")**
-`z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="trend",K=2)`
+`z.vecm <- my.ca.jo(z, type = "trace", spec = "transitory",ecdet="trend",K=2)`
 
 #### Checking the cointegrating rank and the presence of trend in the series
 
@@ -224,7 +245,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 + teststat is chi-square distributed 
 + The likelihood ratio test statistic:
   $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
-  + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
+  + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $\ln(1) = 0$ so we'll sum up a value that is close to zero –> test statistic will be small hence cannot reject $H_0$  
 
 ## Definitions
 
@@ -250,15 +271,15 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
   - is most importantly **used to make a non-stationary time series stationary**
 
-- **stochastic trend**
-
-  - see Enders, p. 181
-
 - **order of integration $d$** 
 
   = a time series needs to be differenced $d$ times to be stationary
 
   - In case we <u>can not</u> reject $H(d-1)$, the order of integration is $d$. 
+
+- **stochastic trend**
+
+  - see Enders, p. 181
 
 - **deterministic trend**
 
@@ -281,7 +302,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - expected value
 
-- Covariance($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
+- Covariance of two variables ($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
 
 - correlation
 
@@ -483,7 +504,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
     - where the restriction matrix has one column for each lag term + intercept (xl1, yl1, intercept)
 
-    - values are interpreted by rowk, here row 1 = 1,2,
+    - values are interpreted by row, here row 1 = 1,2,
 
 - Check for Granger causality with `vars::causality()` 
 
@@ -492,3 +513,20 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 *week 13*
 
 - `ur.ca()`
+- `my.ca.jo()` (= modified `vars::ca.jo()`)
+  - **implements the Johansen test**
+  - x: input, matrix of the k original time series
+  - type = c("eigen", "trace"): choose the type of test statistic, **we always use "trace"** 
+  - spec=c("longrun", "transitory"): choose the type of the VECM representation, **we always use "transitory"**
+  - ecdet = c("none", "const", "trend")
+    - "const": $H_1^*$
+    - "none": $H_1$
+    - "trend": $H^*$ 
+  - K: integer, specifying the lag order p of the VAR(p) model
+  - season:
+  - dummy:
+- `cajorls()s`
+- `Bcoef()`
+  - x: input, a fitted VAR object
+  - outputs matrix of coefficients from a fitted VAR model for easy access
+- `vec2var()`
