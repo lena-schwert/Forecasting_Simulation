@@ -37,6 +37,7 @@
   –> leverage this in business/science/policy scenarios!
 
 - **general assumption: observations from the past can be extrapolated to be used for predictions of the future!**  
+  - the tools that are used are from statistics 
 
 ### Ergodicity
 
@@ -76,26 +77,42 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 
 #### Additive Model
 
-+ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0 (so the level is overall not influenced)
++ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0 (so that the level is overall not influenced)
+
+  ```R
+  plot(decompose(x, type = "additive"))
+  ```
 
 #### Multiplicative Model
 
-+ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 (so the level is overall not influenced)
++ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 (so that the level is overall not influenced)
+
+  ```R
+  plot(decompose(x, type = "multiplicative"))
+  ```
 
 #### Alternative Multiplicative 
 
-+ $n_t \cdot s_t + r_t$; mean of $s_t$ should be 1 and mean of $r_t$ should be 0 
++ $n_t \cdot s_t + r_t$; mean of $s_t$ should be 1 and mean of $r_t$ should be 0 (so that the level is overall not influenced)
 
-- **other **
+### Mathematical Transformation 
 
-### Transformations
+- **intuition: Why do you transform a time series?**
+  - **ultimate goal of modeling:** find a simple model that fits the data, because simpler models = better forecasts
+  - different types of transformation can **remove different unwanted properties in the data**
 
-#### logarithmic
+#### Logarithmic
 
-+ transform multiplicative model to additive model
-  + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
++ transforms a multiplicative model to an additive model
 
+  $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$  
+
++ **use case:** if the time series shows exponential growth, it is better to fit log(time series) as a model, as the time series will be more linear!
+  
+  = the transformation will make logarithmic behaviour look linearly!
+  
 + A well-known example in economics: log return 
+  
   + Return is defined as, $R_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}}-1$
   + Gross return is $R_t + 1 = \frac{P_t}{P_{t-1}}$ 
   + log return = log of gross return, $r_t = ln(R_t + 1) = ln(\frac{P_t}{P_{t-1}})=ln(P_t) - ln(P_{t-1})$
@@ -106,12 +123,37 @@ $r_t$: residuals (= what is not explained by the other components; should have c
          $\Rightarrow r_t + r_{t-1} + \dots + r_{t-k+1}$ (summation of log return in $k$ periods = multiplicative of gross return in $k$ periods)  
       3. if returns are independent, then log returns are independent -> uncorrelatedness can be checked with `acf()` and variance of the additive model can be calculated easily:  $var([r_t]_k) = var(r_t) + var(r_{t-1})+ \dots + var(r_{t-k+1})$ but the variance of multiplicative model of gross return is NOT simply $var([R_t+1]_k) = var(R_t+1) \cdot var(R_{t-1}+1) \dots var(R_{t-k+1}+1)$
 
+- **Caution:** doing the logarithmic transformation changes the distribution of the data points!
+
+  –> *02_02a Logarithmic Transformation.pdf*
+
 #### Box-Cox 
 
 + $$x_t = B(y_t, \lambda)=\left\{\begin{array}{ll} ln \left(y_{t}\right) & \text { if } \lambda=0 \\ \left(y_{t}^{\lambda}-1\right) / \lambda & \text { otherwise } \end{array}\right.$$
-+ to fix the non-normality of the residuals (remove heteroskedasticity/skewness in the residuals)
+
+  + logarithmic + power transformation
+  + the parameter **$\lambda$ determines the type of transformation**
+  + for $\lambda = 1, y_t$ will not be transformed
+  + $\lambda$ is a hyperparameter that needs to be estimated
+
++ **use case:** this transformation is used **to fix the non-normality of the residuals (remove heteroskedasticity/skewness in the residuals)**
+  
   + to make the pattern across the data more consistent -> more accurate forecast with data in normality 
   + address limitation of logarithmatic transformation: $y_t$ has to be positive 
+  
++ from this: <img src="image-20200718150501570.png" alt="image-20200718150501570" style="zoom:50%;" /> to this: <img src="image-20200718150543865.png" alt="image-20200718150543865" style="zoom:50%;" />
+
+  –> if all the peaks have the same height, the data is "simpler"
+
++ **Caution:** OLS can not be used to estimate $\lambda$!
+
+  + $\text{Given: } y_t > 1, \lambda \rightarrow-\infty\Rightarrow y_t \rightarrow 1, B(y_t, \lambda) \rightarrow 0 \forall t$ 
+
+    –> the sum of squared error will be = zero!
+
+    –> the suggested transformation **would transform the time series to a horizontal line that goes through the origin!**
+
+  + instead, the profile likelihood is used
 
 ### Exponential Smoothing
 
@@ -331,17 +373,17 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 ## The Formula Vault
 
+- expected value $\mathbb{E}[x]$ 
+
+- variance of a sample: $var(x)=\sum_{i=1}^n(x-\bar{x})^2/(n-1)$
+
 - standard deviation: $\sigma= \sqrt{ \text{variance}}$
 
-- Variance of a sample: $\sum(x-\bar{x})^2/(n-1)$
+- covariance of two variables $cov(x,y)= \sum_{i=1}^n(x-\bar{x})(y-\bar{y})/(n-1)$
 
-- expected value
+- correlation $corr(x,y)= \frac{cov(x,y)}{\sigma_x\sigma_y}$ 
 
-- Covariance of two variables ($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
-
-- correlation
-
-- standard error
+- standard error $\sigma_\mu = \frac{\sigma}{\sqrt{n}}$
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}\iff \nabla x_t = (1-L)x_t$ 
 
@@ -393,7 +435,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 - **VAR(p)**: $X_t =A_0 + A_iX_{t-i} + R_t$
 
   - $k$ is the no. of series in the system
-  - $i$ is the no. of lag
+  - $i$ is the no. of lags
   - $X_t$, $X_{t-i}$, $A_0$ and $R_t$ is a $k$-dimension column vector 
   - $A_i$ is a $k \times k$ matrix 
 
@@ -432,7 +474,12 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 *Chapter 2*
 
-- `decompose()`
+- `decompose()` splits a time series into trend, seasonal + residual component (put it inside `plot()`)
+
+  - type = c("additive", "multiplicative")
+    - "additive"
+    - "multiplicative"
+  - if the random part looks ruly random, the decomposition can capture all the effects in the data
 
 - `acf()` plots the autocorrelogram of a time series
 
