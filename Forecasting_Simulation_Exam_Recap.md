@@ -30,31 +30,63 @@
 
 ### Why are time series interesting to analyze?
 
+- data = measurements of one or more variables over time, data points have a regular interval, e.g. daily, monthly, quarterly
+
+- if the model is good enough to approximate the ground truth in data, you can make forecasts that will be approximately true
+
+  –> leverage this in business/science/policy scenarios!
+
+- **general assumption: observations from the past can be extrapolated to be used for predictions of the future!**  
+
 ### Ergodicity
 
-+ A process is considered ergodic when its statistic properties can be derived from a single and long realization (time series observations) of the hypothetical model 
++ A process is considered ergodic when its **statistic properties can be derived from a single and long realization** (= time series observations) of the hypothetical model .
+  
   + statistic properties: sample moments (mean, variance, skewness & kurtosis)
-+ In social science simulation, we always need to assume ergodicity because e.g. real life event can only occur once and we only get a single realization of the process   
+  
++ In social science simulation or econometrics, we always need to assume ergodicity because e.g. real life event/stock market crash can only occur once and we only get a single realization of that event.  
+
 + Egordicity is a sub-class of stationary 
-  + All ergodic process is stationary but not all stationary process are ergodic 
-+ Example of an ergodic process: Throwing coins -> we get the same statistic properties of the process when we throw 1000 different coins in one experiment vs. when we throw a single coin repeatedly for 1000 times 
-+ Example of a non-ergodic process: Finding the most visited place -> observing the places visited by 1000 different people in a day vs. observing the places a person visited in 1000 days (We'll get different statistic properties!) 
+  
+  + ergodic models $\sub$ stationary models $\neq$ dynamic models
+  
+    –> stationarity = "data points do not change noticeably over time"
+  
+  + **All ergodic processes are stationary** but not all stationary process are ergodic!
+  
++ **Example of an ergodic process**: Throwing coins -> we get the same statistic properties of the process when we throw 1000 different coins in one experiment vs. when we throw a single coin repeatedly for 1000 times 
+
++ **Example of a non-ergodic process**: Finding the most visited place -> observing the places visited by 1000 different people in a day vs. observing the places a person visited in 1000 days (We'll get different statistic properties!) 
 
 ### Decomposition 
 
-$n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
+- **intuition:** the behaviour of a time series can be explained with different components, that - all taken together - result in the observed values
 
-#### Additive 
+  –> **this is a theoretical approach to explain why a time series behaves how it behaves**
 
-+ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0  
+$n_t$: level (= the underlying value of a time series **not considering any fluctuations**) 
 
-#### Multiplicative 
+$s_t$: seasonal (= fluctuations that occur in a fixed period)
 
-+ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 
+$r_t$: residuals (= what is not explained by the other components; should have constant variance over time –> homoskedasticity) 
+
+- **other possible components**
+  - trend (= steady in/decrease of the level)
+  - cycle (= fluctuations that are more irregular than seasonality, period length might be unknown)
+
+#### Additive Model
+
++ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0 (so the level is overall not influenced)
+
+#### Multiplicative Model
+
++ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 (so the level is overall not influenced)
 
 #### Alternative Multiplicative 
 
 + $n_t \cdot s_t + r_t$; mean of $s_t$ should be 1 and mean of $r_t$ should be 0 
+
+- **other **
 
 ### Transformations
 
@@ -247,21 +279,15 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
   + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $\ln(1) = 0$ so we'll sum up a value that is close to zero –> test statistic will be small hence cannot reject $H_0$  
 
-## Definitions
+## Definitions (A-Z)
 
-- **lag operator** $L = x_{t-1}$
+- **Cholesky decomposition**
 
-  - returns the value of one/$k$ time step(s) before t
+  - method to decompose a positive-definite matrix into a lower triangular matrix (and its transpose)
+  - speeds up solving linear equation systems
+  - $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
 
-  - equivalent to backshift operator $\mathbf{B}$ 
-
-  - can be used an arbitrary, k times –> $L^kx_t = x_{t-k}$
-
-  - is most importantly used to **calculate autocorrelation of a time series**
-
-  - **lagging a time series reduces n (= number of observations)** 
-
-  - another application: create the lagged time series for model fit using `lm()`
+- **deterministic trend**
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}$
 
@@ -270,6 +296,28 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
     –> the resulting time series depicts relative changes and no absolute values!
 
   - is most importantly **used to make a non-stationary time series stationary**
+
+- **drift vs. trend**
+
+  - drift = intercept = $\alpha_0$ 
+  - (deterministic) trend, indicated by $\beta t$ in the AR(p) model equations
+  
+- **lag operator** $L = x_{t-1}$
+
+  - returns the value of one/$k$ time step(s) before t
+  - equivalent to backshift operator $\mathbf{B}$ 
+  - can be used an arbitrary, k times –> $L^kx_t = x_{t-k}$
+  - is most importantly used to **calculate autocorrelation of a time series**
+  - **lagging a time series reduces n (= number of observations)** 
+  - another application: create the lagged time series for model fit using `lm()`
+
+- **moment** (in statistics)
+
+  - a quantitative property of a function/distribution/sample of data points
+  - first: expected value/mean
+  - second: varaince
+  - third: skewness
+  - fourth: kurtosis
 
 - **order of integration $d$** 
 
@@ -280,19 +328,6 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 - **stochastic trend**
 
   - see Enders, p. 181
-
-- **deterministic trend**
-
-- **drift vs. trend**
-
-  - drift = intercept = $\alpha_0$ 
-  - (deterministic) trend, indicated by $\beta t$ in the AR(p) model equations
-  
-- **Cholesky decomposition**
-
-  - method to decompose a positive-definite matrix into a lower triangular matrix (and its transpose)
-  - speeds up solving linear equation systems
-  - $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
 
 ## The Formula Vault
 
@@ -370,17 +405,17 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 ## Documentation of Key R Functions
 
-- examining a time series object
+*Chapter 1*
 
-  - `class()`
+- **examining a time series object**
+- `class()`- should return 
   - `start()`
   - `end()`
-  - `frequency()` 
+  - `frequency()` - What is the periodicity of measurements, e.g. how many per year? - 12 = monthly
   - `fix()`: show the structure (data of the time series), Tsp attribute and the class attribute 
-
-- creating a times series object 
-
-  - `y<-structure(c(4,5,6,7), tsp=c(2017.75, 2018.5, 4), class="ts")` 
+  
+- **creating a times series object** 
+- `y <- structure(c(4,5,6,7), tsp=c(2017.75, 2018.5, 4), class="ts")` 
     - `.Tsp=c(2017.75, 2018.5, 4)` is valid as well 
   - Tsp attribute tells us the start time & end time (in time units) and the frequency: `attr(ts, "tsp")` but not `attr(ts, ".Tsp")`! 
     - start time & end time in time units are calculated as `time + i/f`, where `i` is the period of that time -1 
@@ -388,13 +423,14 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
       - `end(y)` # 2018 3 ->  2018 + 2/4 = 2018.5
   - convert from other data type to a time series object: `ts()`
     - `ts(x, start = c(2020, 1), freq = 12)`
-
-- Quick check on the trend & seasonal effect of a time series object 
-
-  - `aggregate(ts)`: sum up all observations by each period (e.g. aggegate each month data across multiple years)
+  
+- **Quick check on the trend & seasonal effect of a time series object** 
+- `aggregate(ts)`: sum up all observations by each period (e.g. monthly data –> yearly data)
   - `cycle(ts)`: give the position in the cycle (e.g. Jan=1, Feb=2, etc.)
-  - `window()`: extract all observations of particular period across years e.g. `window(AP, start=c(1949,7), end=c(1957,7) freq=TRUE)`
+  - `window()`: subset from observations of a particular period across years e.g. `window(AP, start=c(1949,7), end=c(1957,7) freq=TRUE)`
     - if end argument is not specified -> include up to the last year available in the data
+
+*Chapter 2*
 
 - `decompose()`
 
