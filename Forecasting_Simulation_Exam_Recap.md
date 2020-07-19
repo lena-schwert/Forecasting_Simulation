@@ -24,8 +24,7 @@
 
 ### Why are time series interesting to analyze?
 
-<<<<<<< HEAD
-=======
+
 - data = measurements of one or more variables over time, data points have a regular interval, e.g. daily, monthly, quarterly
 
 - if the model is good enough to approximate the ground truth in data, you can make forecasts that will be approximately true
@@ -34,7 +33,7 @@
 
 - **general assumption: observations from the past can be extrapolated to be used for predictions of the future!**  
 
->>>>>>> parent of 50d7819... update Lena: recapped chapter 2
+
 ### Ergodicity
 
 + A process is considered ergodic when its statistic properties can be derived from a single and long realization (time series observations) of the hypothetical model 
@@ -56,25 +55,12 @@
 + $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
 + use `decompose()` function to analyze all the components (trend, seasonal and random)
   + we compare the fit of either the `additive` or `multiplicative` type by analyzing the random component (should look random without any trend and with the same variance over time)
-+ 
-
-#### Additive 
-
-+ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0  
-
-#### Multiplicative 
-
-<<<<<<< HEAD
-+ use it when **seasonal effects tends to increase as the trend increases** 
-+ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 
-+ if the random variables is modelled by a multiplicative factor & the variable is positive 
-  + use log to transform to additive decomposition
-=======
-$r_t$: residuals (= what is not explained by the other components; should have constant variance over time –> homoskedasticity) 
-
-- **other possible components**
++ - **other possible components**
   - trend (= steady in/decrease of the level)
   - cycle (= fluctuations that are more irregular than seasonality, period length might be unknown)
+
+$r_t$: residuals (= what is not explained by the other components; should have constant variance over time –> homoskedasticity) 
+
 
 #### Additive Model
 
@@ -83,13 +69,17 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 #### Multiplicative Model
 
 + $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 (so the level is overall not influenced)
->>>>>>> parent of 50d7819... update Lena: recapped chapter 2
++ use it when **seasonal effects tends to increase as the trend increases** 
++ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 
++ if the random variables is modelled by a multiplicative factor & the variable is positive 
+  + use log to transform to additive decomposition
+
 
 #### Alternative Multiplicative 
 
 + $n_t \cdot s_t + r_t$; mean of $s_t$ should be 1 and mean of $r_t$ should be 0 
 
-<<<<<<< HEAD
+
 ### Transformations
 
 #### logarithmic
@@ -97,9 +87,7 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 + transform multiplicative model to additive model
   
 + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
-  
-=======
-- **other **
+
 
 ### Transformations
 
@@ -108,7 +96,7 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 + transform multiplicative model to additive model
   + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
 
->>>>>>> parent of 50d7819... update Lena: recapped chapter 2
+
 + A well-known example in economics: log return 
   + Return is defined as, $R_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}}-1$
   + Gross return is $R_t + 1 = \frac{P_t}{P_{t-1}}$ 
@@ -120,7 +108,7 @@ $r_t$: residuals (= what is not explained by the other components; should have c
          $\Rightarrow r_t + r_{t-1} + \dots + r_{t-k+1}$ (summation of log return in $k$ periods = multiplicative of gross return in $k$ periods)  
       3. if returns are independent, then log returns are independent -> uncorrelatedness can be checked with `acf()` and variance of the additive model can be calculated easily:  $var([r_t]_k) = var(r_t) + var(r_{t-1})+ \dots + var(r_{t-k+1})$ but the variance of multiplicative model of gross return is NOT simply $var([R_t+1]_k) = var(R_t+1) \cdot var(R_{t-1}+1) \dots var(R_{t-k+1}+1)$
 
-<<<<<<< HEAD
+
 + When we apply log transformation, the expectation & variance of the transformed value is not the function of the expectation & variance of the untransformed value! -> due to Jenson's inequality 
   + let $x_t := ln(r_t)$ ~ $N(0, \sigma^2)$ , the transformed value, $r_t = exp(x_t)$ `x = rnorm(1000, sd=2)`, ` r = exp(x)` 
   + `mean(r)` $\neq$ `exp(mean(x))` and `var(r)^0.5` $\neq$ `exp(var(x))^0.5` 
@@ -133,8 +121,6 @@ $r_t$: residuals (= what is not explained by the other components; should have c
   
   + when a normally distributed variables undergo a tranformation with function that is convex, its distribution becomes right skewed (with fat right tail) as the convex function stretches the distribition of $r_t$ as $x_t$ increases -> recall how exponential function looks like (y value increases drastically as x value increase in small scale) 		
 
-=======
->>>>>>> parent of 50d7819... update Lena: recapped chapter 2
 #### Box-Cox 
 
 + $$x_t = B(y_t, \lambda)=\left\{\begin{array}{ll} ln \left(y_{t}\right) & \text { if } \lambda=0 \\ \left(y_{t}^{\lambda}-1\right) / \lambda & \text { otherwise } \end{array}\right.$$
@@ -326,11 +312,9 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - expected value
 
-<<<<<<< HEAD
-- Covariance($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
-=======
+
 - Covariance of two variables ($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
->>>>>>> parent of 50d7819... update Lena: recapped chapter 2
+
 
 - correlation
 
@@ -419,16 +403,12 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - Quick check on the trend & seasonal effect of a time series object 
 
-<<<<<<< HEAD
   - `aggregate(ts)`: sum up all observations by each period (e.g. aggegate each month data across multiple years)
   - `cycle(ts)`: give the position in the cycle (e.g. Jan=1, Feb=2, etc.)
   - `window()`: extract all observations of particular period across years e.g. `window(AP, start=c(1949,7), end=c(1957,7) freq=TRUE)`
     - if end argument is not specified -> include up to the last year available in the data
 
-- `decompose()`: default type is addictive; `decompose(ts, type="mult")` 
-=======
-- `decompose()`
->>>>>>> parent of 50d7819... update Lena: recapped chapter 2
+- `decompose()`: default type is addictive; `decompose(ts, type="mult")`
 
 - `acf()` plots the autocorrelogram of a time series
 
