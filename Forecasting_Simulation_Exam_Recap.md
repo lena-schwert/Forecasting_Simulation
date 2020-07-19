@@ -117,7 +117,7 @@ $r_t$: residuals (= what is not explained by the other components; should have c
       + Jensen's inequality theorem says for all convex function,$f$ $\Rightarrow \mathbb{E[f(x)]} \ge f(\mathbb{E}[x])$
       + since exponential function is a convex function, $\mathbb{E}[r_t]$ must be larger than 1 
   
-  ![log-normal distribution](/Users/jiayan/Documents/GitHub/Forecasting_Simulation/log-normal distribution.png)
+  ![log-normal distribution](log-normal distribution.png)
   
   + when a normally distributed variables undergo a tranformation with function that is convex, its distribution becomes right skewed (with fat right tail) as the convex function stretches the distribition of $r_t$ as $x_t$ increases -> recall how exponential function looks like (y value increases drastically as x value increase in small scale) 		
 
