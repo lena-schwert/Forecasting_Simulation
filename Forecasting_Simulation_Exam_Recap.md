@@ -38,10 +38,14 @@
 
 ### Decomposition 
 
++ as a tool to understanding a time series
+  + find out the possible cause of variation 
+  + figure out the structure of a time seris 
+  + prelimary step before selecting/applying a forecasting method 
 + $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
-
 + use `decompose()` function to analyze all the components (trend, seasonal and random)
   + we compare the fit of either the `additive` or `multiplicative` type by analyzing the random component (should look random without any trend and with the same variance over time)
++ 
 
 #### Additive 
 
@@ -49,7 +53,10 @@
 
 #### Multiplicative 
 
++ use it when **seasonal effects tends to increase as the trend increases** 
 + $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 
++ if the random variables is modelled by a multiplicative factor & the variable is positive 
+  + use log to transform to additive decomposition
 
 #### Alternative Multiplicative 
 
