@@ -12,7 +12,7 @@
   
 - see below, left: random walk, right: 1-times differenced, looks way more stationary
   
-  <img src="image-20200620191114648.png" alt="image-20200620191114648" style="zoom:67%;" />
+  ![image-20200620191114648](image-20200620191114648.png)
 
 + Effect on the variance of random variables when the variables are scaled by a factor, $a$ : since variance is in term of squared factor of the variables, the new variance = $a^2 \times$ old variance
 
