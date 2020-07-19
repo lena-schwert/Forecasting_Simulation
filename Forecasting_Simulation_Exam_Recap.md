@@ -28,15 +28,20 @@
 
 + A process is considered ergodic when its statistic properties can be derived from a single and long realization (time series observations) of the hypothetical model 
   + statistic properties: sample moments (mean, variance, skewness & kurtosis)
+  + For a single realization, if we manage to stationarize it we'll obtain ergodicity
 + In social science simulation, we always need to assume ergodicity because e.g. real life event can only occur once and we only get a single realization of the process   
 + Egordicity is a sub-class of stationary 
-  + All ergodic process is stationary but not all stationary process are ergodic 
+  + All ergodic process must be stationary but not all stationary process are ergodic 
+  + a time series with linear trend is not stationary and hence it is not ergodic 
 + Example of an ergodic process: Throwing coins -> we get the same statistic properties of the process when we throw 1000 different coins in one experiment vs. when we throw a single coin repeatedly for 1000 times 
 + Example of a non-ergodic process: Finding the most visited place -> observing the places visited by 1000 different people in a day vs. observing the places a person visited in 1000 days (We'll get different statistic properties!) 
 
 ### Decomposition 
 
-$n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
++ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
+
++ use `decompose()` function to analyze all the components (trend, seasonal and random)
+  + we compare the fit of either the `additive` or `multiplicative` type by analyzing the random component (should look random without any trend and with the same variance over time)
 
 #### Additive 
 
@@ -55,8 +60,9 @@ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over 
 #### logarithmic
 
 + transform multiplicative model to additive model
-  + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
-
+  
++ $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
+  
 + A well-known example in economics: log return 
   + Return is defined as, $R_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}}-1$
   + Gross return is $R_t + 1 = \frac{P_t}{P_{t-1}}$ 
@@ -67,6 +73,18 @@ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over 
          $\Rightarrow ln((R_t +1)\cdot (R_{t-1}+1)\dots (R_{t-k+1}+1)) = ln(R_t +1) +  ln(R_{t-1}+1)+ \dots + ln(R_{t-k+1}+1)$ 
          $\Rightarrow r_t + r_{t-1} + \dots + r_{t-k+1}$ (summation of log return in $k$ periods = multiplicative of gross return in $k$ periods)  
       3. if returns are independent, then log returns are independent -> uncorrelatedness can be checked with `acf()` and variance of the additive model can be calculated easily:  $var([r_t]_k) = var(r_t) + var(r_{t-1})+ \dots + var(r_{t-k+1})$ but the variance of multiplicative model of gross return is NOT simply $var([R_t+1]_k) = var(R_t+1) \cdot var(R_{t-1}+1) \dots var(R_{t-k+1}+1)$
+
++ When we apply log transformation, the expectation & variance of the transformed value is not the function of the expectation & variance of the untransformed value! -> due to Jenson's inequality 
+  + let $x_t := ln(r_t)$ ~ $N(0, \sigma^2)$ , the transformed value, $r_t = exp(x_t)$ `x = rnorm(1000, sd=2)`, ` r = exp(x)` 
+  + `mean(r)` $\neq$ `exp(mean(x))` and `var(r)^0.5` $\neq$ `exp(var(x))^0.5` 
+    + the correct formula is `mean(r)` = `exp(var(x)/2)` and `var(r)^0.5` = `(exp(var(x))*(exp(var(x))-1))^0.5`
+    + $\mathbb{E}[r_t] = \mathbb{E}[exp(x_t)] \neq exp(\mathbb{E}[x_t]) = 1$ but $\mathbb{E[r_t]} = exp(\sigma^2/2)$
+      + Jensen's inequality theorem says for all convex function,$f$ $\Rightarrow \mathbb{E[f(x)]} \ge f(\mathbb{E}[x])$
+      + since exponential function is a convex function, $\mathbb{E}[r_t]$ must be larger than 1 
+  
+  ![log-normal distribution](/Users/jiayan/Documents/GitHub/Forecasting_Simulation/log-normal distribution.png)
+  
+  + when a normally distributed variables undergo a tranformation with function that is convex, its distribution becomes right skewed (with fat right tail) as the convex function stretches the distribition of $r_t$ as $x_t$ increases -> recall how exponential function looks like (y value increases drastically as x value increase in small scale) 		
 
 #### Box-Cox 
 
@@ -157,7 +175,7 @@ $i = p =$ no. of lags; $k =$ no. of series in the system; first index of $\alpha
   + $R_t$ can be generated from cholesky decomposition or simply by adding two i.i.d generated white noise and combine with one of the white noise series 
 
 *e.g. for a VAR model with 3 series of lag order=2:*
-+ $k=3$ -> $X_t, A_0, R_t$ will column vector of 3 ; 2 $A_i$ -> $A_1$, $A_2$ where each is a $3 \times 3$ matrix 
++ $k=3$ -> $X_t, A_0, R_t$ will be a column vector of 3 ; 2 $A_i$ -> $A_1$, $A_2$ where each is a $3 \times 3$ matrix 
 + total no. of parameters = 3 + 9x2 = 21 parameters 
 
 **To check the stability in a VAR model**: 
@@ -185,7 +203,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 ### Johansen Test 
 
 + A procedure to determine the rank of $\Pi$ and whether there is a trend in the cointegrating relations  
-
+  + First, 
 + $H_1^*$ -> $A_0 = \alpha \cdot\beta_0, B=0$: no trend in levels, no trend in cointegrating relations -> **(ecdet="constant")**
 `z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="const",K=2)`
 + $H_1$ -> $A_0 \neq 0 , B=0$: linear trend in levels, no trend in cointegrating relations, drift in differences -> **(ecdet="none")**
@@ -353,7 +371,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   - `window()`: extract all observations of particular period across years e.g. `window(AP, start=c(1949,7), end=c(1957,7) freq=TRUE)`
     - if end argument is not specified -> include up to the last year available in the data
 
-- `decompose()`
+- `decompose()`: default type is addictive; `decompose(ts, type="mult")` 
 
 - `acf()` plots the autocorrelogram of a time series
 
