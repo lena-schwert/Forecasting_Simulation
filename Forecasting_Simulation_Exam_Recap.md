@@ -117,7 +117,7 @@
 
 + transforms a multiplicative model to an additive model
   
-+ $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$  
+  + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$  
 
 
 + **use case:** if the time series shows exponential growth, it is better to fit log(time series) as a model, as the time series will be more linear!
@@ -182,7 +182,10 @@
 ### Exponential Smoothing
 
 - **intuition:** the smoothing effect results from using past observations to calculate the smoothed version of the current one
-- if $\alpha\approx 1$, you give a lot of weight to the most recent observation
+- model without considering trend and seasonality, just model the current level using the past level value with the smoothing parameter, $\alpha \in (0,1)$ 
+  -  if $\alpha\approx 1$, you give a lot of weight to the most recent observation
+    - decreases exponentially as obs. go further in the past 
+  - $n_0 = x_1$; $n_1 = \alpha x_1 + (1 - \alpha) n_0$  ->  derive the $k$-step ahead forecast equation [03_02_ExponentialSmoothing.pdf]
 - can be seen as a simplification of Holt-Winters
 
 ### Holt-Winters Model
@@ -383,10 +386,8 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - standard error
 
-- **Exponential Smoothing**
+- **Exponential Smoothing**: $n_{t}=(1-\alpha)^{t-1} \cdot x_{1}+\sum_{i=0}^{t-2}(1-\alpha)^{i} \cdot \alpha \cdot x_{t-i}$
 
-
-  - 
 
 - **Holt-Winters model**
 
