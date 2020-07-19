@@ -182,6 +182,7 @@
 ### Exponential Smoothing
 
 - **intuition:** the smoothing effect results from using past observations to calculate the smoothed version of the current one
+- best for data without clear trend/seasonality
 - model without considering trend and seasonality, just model the current level using the past level value with the smoothing parameter, $\alpha \in (0,1)$ 
   -  if $\alpha\approx 1$, you give a lot of weight to the most recent observation
     - decreases exponentially as obs. go further in the past 
