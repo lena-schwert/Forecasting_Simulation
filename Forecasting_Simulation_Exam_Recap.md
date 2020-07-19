@@ -43,6 +43,7 @@
 + Egordicity is a sub-class of stationary 
   + All ergodic process must be stationary but not all stationary process are ergodic 
   + a time series with linear trend is not stationary and hence it is not ergodic 
++ **In all our analysis we need to assume ergodicity, because otherwise we can't derive anything meningful from a single observation with our statistical tools!**
 + Example of an ergodic process: Throwing coins -> we get the same statistic properties of the process when we throw 1000 different coins in one experiment vs. when we throw a single coin repeatedly for 1000 times 
 + Example of a non-ergodic process: Finding the most visited place -> observing the places visited by 1000 different people in a day vs. observing the places a person visited in 1000 days (We'll get different statistic properties!) 
 
@@ -52,9 +53,22 @@
   + find out the possible cause of variation 
   + figure out the structure of a time seris 
   + prelimary step before selecting/applying a forecasting method 
-+ $n_t$: level, $s_t$: seasonal, $r_t$: residuals (should have same variance over time - homoskedasticity) 
+  
++ $n_t$: level (= the underlying value of a time series **not considering any fluctuations**) 
+
+  $s_t$: seasonal (= fluctuations that occur in a fixed period)
+
+  $r_t$: residuals (= what is not explained by the other components; should have constant variance over time –> homoskedasticity) 
+
+- **other possible components**
+  
+  - trend (= steady in/decrease of the level)
+  - cycle (= fluctuations that are more irregular than seasonality, period length might be unknown)
+  
 + use `decompose()` function to analyze all the components (trend, seasonal and random)
+  
   + we compare the fit of either the `additive` or `multiplicative` type by analyzing the random component (should look random without any trend and with the same variance over time)
+  
 + - **other possible components**
   - trend (= steady in/decrease of the level)
   - cycle (= fluctuations that are more irregular than seasonality, period length might be unknown)
@@ -64,40 +78,50 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 
 #### Additive Model
 
-+ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0 (so the level is overall not influenced)
++ $n_t + s_t + r_t$; mean of $s_t$ and $r_t$ should be 0 (so that the level is overall not influenced)
+
+    ```R
+  plot(decompose(x, type = "additive"))
+    ```
 
 #### Multiplicative Model
 
-+ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 (so the level is overall not influenced)
++ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 (so that the level is overall not influenced)
+
+    ```R
+  plot(decompose(x, type = "multiplicative"))
+    ```
+
 + use it when **seasonal effects tends to increase as the trend increases** 
-+ $n_t \cdot s_t \cdot r_t$; mean of $s_t$ and $r_t$ should be 1 
+
 + if the random variables is modelled by a multiplicative factor & the variable is positive 
-  + use log to transform to additive decomposition
+  
+  + use $\log$ to transform to additive decomposition
 
 
 #### Alternative Multiplicative 
 
 + $n_t \cdot s_t + r_t$; mean of $s_t$ should be 1 and mean of $r_t$ should be 0 
 
+### Mathematical Transformations
 
-### Transformations
+- **intuition: Why do you transform a time series?**
+  - **ultimate goal of modeling:** find a simple model that fits the data, because simpler models = better forecasts
+  - different types of transformation can **remove different unwanted properties in the data**
 
-#### logarithmic
+#### Logarithmic
 
-+ transform multiplicative model to additive model
++ transforms a multiplicative model to an additive model
   
-+ $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
++ $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$  
 
 
-### Transformations
-
-#### logarithmic
-
-+ transform multiplicative model to additive model
-  + $x_t = n_t \cdot s_t \cdot e_t \Rightarrow y_t = ln(x_t) = ln(n_t) + ln(s_t) + ln(e_t)$ 
-
-
++ **use case:** if the time series shows exponential growth, it is better to fit log(time series) as a model, as the time series will be more linear!
+  
+  = the transformation will make logarithmic behaviour look linearly!
+  
 + A well-known example in economics: log return 
+  
   + Return is defined as, $R_t = \frac{P_t - P_{t-1}}{P_{t-1}} = \frac{P_t}{P_{t-1}}-1$
   + Gross return is $R_t + 1 = \frac{P_t}{P_{t-1}}$ 
   + log return = log of gross return, $r_t = ln(R_t + 1) = ln(\frac{P_t}{P_{t-1}})=ln(P_t) - ln(P_{t-1})$
@@ -110,6 +134,9 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 
 
 + When we apply log transformation, the expectation & variance of the transformed value is not the function of the expectation & variance of the untransformed value! -> due to Jenson's inequality 
+  
+  –> **doing the logarithmic transformation changes the distribution of the data points!**
+  
   + let $x_t := ln(r_t)$ ~ $N(0, \sigma^2)$ , the transformed value, $r_t = exp(x_t)$ `x = rnorm(1000, sd=2)`, ` r = exp(x)` 
   + `mean(r)` $\neq$ `exp(mean(x))` and `var(r)^0.5` $\neq$ `exp(var(x))^0.5` 
     + the correct formula is `mean(r)` = `exp(var(x)/2)` and `var(r)^0.5` = `(exp(var(x))*(exp(var(x))-1))^0.5`
@@ -124,13 +151,45 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 #### Box-Cox 
 
 + $$x_t = B(y_t, \lambda)=\left\{\begin{array}{ll} ln \left(y_{t}\right) & \text { if } \lambda=0 \\ \left(y_{t}^{\lambda}-1\right) / \lambda & \text { otherwise } \end{array}\right.$$
+
+  + logarithmic + power transformation
+    + the parameter **$\lambda$ determines the type of transformation**
+    + for $\lambda = 1, y_t$ will not be transformed
+    + $\lambda$ is a hyperparameter that needs to be estimated
+
 + to fix the non-normality of the residuals (remove heteroskedasticity/skewness in the residuals)
   + to make the pattern across the data more consistent -> more accurate forecast with data in normality 
   + address limitation of logarithmatic transformation: $y_t$ has to be positive 
+  
++ from this: <img src="image-20200718150501570.png" alt="image-20200718150501570" style="zoom:50%;" /> to this: <img src="image-20200718150543865.png" alt="image-20200718150543865" style="zoom:50%;" />
+
+  –> if all the peaks have the same height, the data is "simpler"
+
++ **Caution:** OLS can not be used to estimate $\lambda$!
+
+  + $\text{Given: } y_t > 1, \lambda \rightarrow-\infty\Rightarrow y_t \rightarrow 1, B(y_t, \lambda) \rightarrow 0 \forall t$ 
+
+    –> the sum of squared error will be = zero!
+
+    –> the suggested transformation **would transform the time series to a horizontal line that goes through the origin!**
+
+  + instead, the profile likelihood is used
 
 ### Exponential Smoothing
 
+- **intuition:** the smoothing effect results from using past observations to calculate the smoothed version of the current one
+- if $\alpha\approx 1$, you give a lot of weight to the most recent observation
+- can be seen as a simplification of Holt-Winters
+
 ### Holt-Winters Model
+
+- contains three components: level, trend, season
+
+  –> one smoothing parameter for each of the components
+
+
+
+
 
 ### White Noise
 
@@ -320,6 +379,19 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - standard error
 
+- **Exponential Smoothing**
+
+
+  - 
+
+- **Holt-Winters model**
+
+
+  - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
+
+    - 
+  - **multiplicative model**
+
 - **difference operator** $\nabla x_t = x_t-x_{t-1}\iff \nabla x_t = (1-L)x_t$ 
 
   - also: $\nabla^2 x_t= \nabla(\nabla x_t)= \nabla x_t-\nabla x_{t-1}$  
@@ -413,6 +485,12 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 - `acf()` plots the autocorrelogram of a time series
 
 - `HoltWinters()`
+
+  - x
+  - alpha, beta, gamma
+    - if `beta = FALSE`, exponential smoothing is done
+    - if `gamma = FALSE`, no sesonality is fitted
+  - seasonal = c("additive", "multiplicative")
 
 - create white noise: `w <- rnorm(n, sd = 20)`
 
