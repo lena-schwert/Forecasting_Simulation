@@ -191,15 +191,22 @@
 
 ### Holt-Winters Model
 
-- to capture seasonality 
+- to capture seasonality by smoothing with the consideration of trend and season of period 
 
 - contains three components: level, trend, season
 
   –> one smoothing parameter for each of the components, $\alpha, \beta, \gamma$ 
+  
+  + get maximal smoothing when the smoothing parameter = 1; minimal smoothing when they are = 0
 
 + use additive method when -> seasonal variations are constant through the series 
-
+  + seasonally adjust the level by subtracting the seasonal component (of last period) 
+  + forecast formula: adding the seasonal part 
 + use multiplicative method when -> seasonal variations are changing **in propotion to the level of the series**
+  + seasonally adjust the level by dividing the seasonal component (of last period) 
+  + forecast formula: multiplying the seasonal part  
++ maximal and minimal smoothing of the trend component in both additive and multiplicative are the same
+  + trend component has the same formula for both model
 
 
 
@@ -397,10 +404,18 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 - **Holt-Winters model**
 
 
-  - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
+    - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
 
-    - 
-  - **multiplicative model**
+      - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
+        $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
+        $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+      - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
+    - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
+
+        - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
+          $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
+          $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+        - forecast: $\hat{x}_{t+k \mid t}=(n_{t}+k \cdot v_{t})s_{t-p+[(k-1) \bmod p]+1}$
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}\iff \nabla x_t = (1-L)x_t$ 
 
