@@ -191,11 +191,15 @@
 
 ### Holt-Winters Model
 
+- to capture seasonality 
+
 - contains three components: level, trend, season
 
-  –> one smoothing parameter for each of the components
+  –> one smoothing parameter for each of the components, $\alpha, \beta, \gamma$ 
 
++ use additive method when -> seasonal variations are constant through the series 
 
++ use multiplicative method when -> seasonal variations are changing **in propotion to the level of the series**
 
 
 
