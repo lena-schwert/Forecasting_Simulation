@@ -1,8 +1,8 @@
 ## Key Insights
 
 - **How to differentiate additive model and multiplicative model with the plot of decompose function?**
-  - the seasonal and random component should oscillating around zero for an additive model
-  - the seasonal and random component should oscillating around one for a multiplicative model 
+  - the seasonal and random component should be oscillating around zero for an additive model
+  - the seasonal and random component should be oscillating around one for a multiplicative model 
 
 ![additive model](additive model.png)
 
