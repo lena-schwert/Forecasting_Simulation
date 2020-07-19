@@ -1,8 +1,17 @@
 ## Key Insights
 
+- **How to differentiate additive model and multiplicative model with the plot of decompose function?**
+  - the seasonal and random component should oscillating around zero for an additive model
+  - the seasonal and random component should oscillating around one for a multiplicative model 
+
+![additive model](additive model.png)
+
+![multiplicative model](multiplicative model.png)
+
 - **Why does differencing actually work to make a non-stationary time series stationary?**
   
   - insight from Chap 4 HW 3 (week 10): e.g.for a random walk, the absolute values are very different over time, but the **differences between subsequent values are not!**
+  
 - see below, left: random walk, right: 1-times differenced, looks way more stationary
   
   ![image-20200620191114648](image-20200620191114648.png)
@@ -82,7 +91,7 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 
     ```R
   plot(decompose(x, type = "additive"))
-    ```
+  ```
 
 #### Multiplicative Model
 
@@ -90,7 +99,7 @@ $r_t$: residuals (= what is not explained by the other components; should have c
 
     ```R
   plot(decompose(x, type = "multiplicative"))
-    ```
+  ```
 
 + use it when **seasonal effects tends to increase as the trend increases** 
 
