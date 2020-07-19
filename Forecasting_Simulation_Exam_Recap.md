@@ -4,9 +4,7 @@
   - the seasonal and random component should be oscillating around zero for an additive model
   - the seasonal and random component should be oscillating around one for a multiplicative model 
 
-![additive model](additive model.png)
-
-![multiplicative model](multiplicative model.png)
+<img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="multiplicative model.png" alt="multiplicative model" style="zoom:50%;" /><img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="multiplicative model.png" alt="multiplicative model" style="zoom:50%;" />
 
 - **Why does differencing actually work to make a non-stationary time series stationary?**
   
@@ -14,7 +12,7 @@
   
 - see below, left: random walk, right: 1-times differenced, looks way more stationary
   
-  ![image-20200620191114648](image-20200620191114648.png)
+  <img src="image-20200620191114648.png" alt="image-20200620191114648" style="zoom:67%;" />
 
 + Effect on the variance of random variables when the variables are scaled by a factor, $a$ : since variance is in term of squared factor of the variables, the new variance = $a^2 \times$ old variance
 
@@ -205,20 +203,159 @@
 + use multiplicative method when -> seasonal variations are changing **in propotion to the level of the series**
   + seasonally adjust the level by dividing the seasonal component (of last period) 
   + forecast formula: multiplying the seasonal part  
-+ maximal and minimal smoothing of the trend component in both additive and multiplicative are the same
-  + trend component has the same formula for both model
+  –> one smoothing parameter for each of the components, $\alpha, \beta, \gamma \in [0,1]$  
 
+  - if = 0 the respective component will be maximally, if = 1 it will be minimally smoothed
 
+  ![image-20200719211904751](image-20200719211904751.png)
+
++ use additive method when -> seasonal variations are constant through the series 
+
++ use multiplicative method when -> seasonal variations are changing **in proportion to the level of the series**
 
 ### White Noise
 
+- white noise = the simplest stochastic model
+
+  –> **it is not a proper model, but what the residuals/randomness in a model should look like!**
+
+- a time series is called white noise if **its data points are i.i.d. distributed with mean = 0**
+
+- **model equation:** $w_t \sim \mathcal{N}(0,\sigma^2)$ 
+
+- **properties**
+
+  - **expected value** $\mu= E[w_t]=0$ is calculated as $m_n= \frac{1}{n}\sum_{t=1}^n w_t$ 
+
+    –> theoretically, mean = average should be zero!
+
+  - **covariance** $\gamma_k = Cov[w_t,w_{t+k}]= \left\{\begin{array}{ll} \sigma^2 & \text { for } k=0\\ 0 & \text { for }  k\neq0\end{array}\right.$ is calculated as $c_{k,n}= \frac{1}{n}\sum_{t=1}^{n-k}(w_t-m_n)(w_{t+k}-m_n)$ 
+
+    –> theoretically, there should be no covariance between different white noise data points = statistically independent!
+
+  - **correlation** $\rho_k = Cor[w_t,w_{t+k}]= \frac{\gamma_k}{\sigma^2}= \left\{\begin{array}{ll} 1 & \text { for } k=0\\ 0 & \text { for }  k\neq0\end{array}\right.$ is calculated as $r_{k,n}= \frac{c_{k,n}}{c_{0,n}}$  
+
+    –> there should be no autocorrelation in the time series!
+
+- in practice, the mean is usually never == 0, so you **test whether the mean is significantly different from zero using the covariance!**
+
+  –> use the autocorrelation plot obtained with `acf()`
+
+#### Code Snippets
+
+- **How to create white noise**: `w <- rnorm(n, sd = 20)`
+  - we create it sampling from a normal distribution with mean zero
+  - parameters to specify: standard deviation `sd`, number of samples `n`
+- **How to check whether the mean is significantly different from zero:**
+  - calculates the correlation between the time series and a lagged version of itsself!
+  - y-axis = ACF, x-axis = lag (–> How many steps was the time series shifted?)
+  - **at lag 0, ACF = 1 (this is always the case, because it is a convention!)**
+  - What does the dashed line tell us? How would you calculate it?
+    - It shows the allowed bound of our null hypothesis! - it's $1.96/\sqrt{n} $!
+
 ### Random Walk
 
-### AR(p)
+- example for a **non-stationary, non-ergodic** model, due to its properties!
+
+- **random walk of order 1**: $x_t = x_{t-1}+w_t$ 
+
+  –> **intuition:** "the value of tomorrow is equal to the value of today + a random value"
+
+  = **long-memory process**
+
+- **random walk (generalized):** $x_t = $
+
+- **properties**
+
+  - **expected value** $\mu= E[x_t]=E[x_0+\sum_{i=1}^tw_i]= x_0$
+
+    –> the expected value is equal to the first value of the time series
+
+  - **covariance** $\gamma_k = Cov[x_t,x_{t+k}] = \sum_{i=j}Cov[w_i,w_j]=t\sigma^2$
+
+    –> the covariance is time dependent and thus becomes infinitely large for $t \rightarrow \infty$ 
+
+    ![image-20200719224851031](image-20200719224851031.png)
+
+  - **correlation** $\gamma_k = Cor[x_t,x_{t+k}] = \frac{1}{\sqrt{1+k/t}}$ 
+
+    –> for large t, the denominator is $\approx 0$ and autocorrelation approaches 1, **so values of a time series heavily depend on previous ones!** 
+
+- **random walk with drift:** $x_t = \vartheta+x_{t-1}+w_t$
+
+  - the drift implies that the value of the time series is constantly in/decreasing over time
+  - **only difference in property:** **expected value** $\mu= E[x_t]= x_0+\vartheta t$
+
+- the **difference operator**  makes a random walk stationary!
+
+#### Code Snippets
+
+- **How to identify a random walk using `acf()`**
+  -  the autocorrelations will be very high for all lags!
+
+### AR(1)
+
+- simplest auto-regressive model
+
+
+
+- **model equation** $x_t=\alpha_0+\alpha_1 x_{t-1}+w_t$
+
+  - $|\alpha_1|<1$: auto-regressive process
+  - $\alpha_1 = 1$ : random walk with drift
+  - $\alpha_1 = 1$: random walk
+  - $\alpha_1>1$: explosive process
+
+- **properties**
+
+  - **mean** $\mu(t)= E[x_t]= \alpha_0\cdot \frac{1-\alpha_1^t}{1-\alpha_1}+\alpha_1^t\cdot x_0 \xrightarrow{t\rightarrow\infty} \frac{\alpha_0}{1-\alpha_1}$ 
+
+    –> mean will go to zero for large values of t
+
+  - **covariance** $\gamma_k(t) \xrightarrow{t\rightarrow\infty} \frac{\alpha_1^k\cdot \sigma^2}{1-\alpha_1^2}$ 
+
+  - **correlation** $\rho_k(t)= \frac{\gamma_k(t)}{\gamma_0(t)}= \alpha_1^k$  
+
+    with $\gamma_0(t) \rightarrow \frac{\sigma^2}{1-\alpha_1})$ 
+
+  –> time series is asymptotically stationary
 
 #### Parameter Estimation (ML, OLS) 
 
+- use ordinary least squares (OLS)
+
+  - minimize the sum of squared errors
+  - $SSE = \sum_t(x_t-(\alpha_0+\alpha_1\cdot x_{t-1}))^2$
+  - find parameters such that $\frac{\part}{\part\alpha_1}SSE=0$
+  - **translates to:** "minimize the squared sum of the difference between the data points and an AR(1) model"
+
+  $$
+  \begin{align}
+  \frac{\part}{\part\alpha}SSE=0\\
+  \frac{\part}{\part\alpha}\sum_t(x_t-\alpha\cdot x_{t-1})^2 = 0\\
+  -2\sum_t....
+  \end{align}
+  $$
+
+  
+
+  - **there will be a bias $\neq 0$ in the parameter estimate!** 
+
+- use maximum likelihood (ML)
+
+  - "Maximize the log-densitiy of the joint Gaussian density "
+
 ### Bootstrapping
+
+- bootstrapping is **useful when you don't know the distribution of the residuals** 
+- you do sampling with replacement
+- **intuition:** you approximate the unknown distribution you sample from by taking many samples from which you can **calculate mean + standard deviation**
+- in our case, we apply bootstrapping to sample from residuals in order to calculate k-step ahead forecasts
+
+#### Code Snippets
+
+- **How to do bootstrapping with `boot()`**
+- **How to do bootstrapping with `sample()`**
 
 ### Stationarity
 
@@ -341,21 +478,15 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
   + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
 
-## Definitions
+## Definitions (A-Z)
 
-- **lag operator** $L = x_{t-1}$
+- **Cholesky decomposition**
 
-  - returns the value of one/$k$ time step(s) before t
+  - method to decompose a positive-definite matrix into a lower triangular matrix (and its transpose)
+- speeds up solving linear equation systems
+  - $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
 
-  - equivalent to backshift operator $\mathbf{B}$ 
-
-  - can be used an arbitrary, k times –> $L^kx_t = x_{t-k}$
-
-  - is most importantly used to **calculate autocorrelation of a time series**
-
-  - **lagging a time series reduces n (= number of observations)** 
-
-  - another application: create the lagged time series for model fit using `lm()`
+- **deterministic trend**
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}$
 
@@ -365,9 +496,27 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
   - is most importantly **used to make a non-stationary time series stationary**
 
-- **stochastic trend**
+- **drift vs. trend**
 
-  - see Enders, p. 181
+  - drift = intercept = $\alpha_0$ 
+  - (deterministic) trend, indicated by $\beta t$ in the AR(p) model equations
+  
+- **lag operator** $L = x_{t-1}$
+
+  - returns the value of one/$k$ time step(s) before t
+  - equivalent to backshift operator $\mathbf{B}$ 
+  - can be used an arbitrary, k times –> $L^kx_t = x_{t-k}$
+  - is most importantly used to **calculate autocorrelation of a time series**
+  - **lagging a time series reduces n (= number of observations)** 
+  - another application: create the lagged time series for model fit using `lm()`
+
+- **moment** (in statistics)
+
+  - a quantitative property of a function/distribution/sample of data points
+  - first: expected value/mean
+  - second: varaince
+  - third: skewness
+  - fourth: kurtosis
 
 - **order of integration $d$** 
 
@@ -375,30 +524,29 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
   - In case we <u>can not</u> reject $H(d-1)$, the order of integration is $d$. 
 
-- **deterministic trend**
+- **stochastic trend**
 
-- **drift vs. trend**
-
-  - drift = intercept = $\alpha_0$ 
-  - (deterministic) trend, indicated by $\beta t$ in the AR(p) model equations
+  - see Enders, p. 181
 
 ## The Formula Vault
 
+- expected value $\mathbb{E}[x]$ 
+- variance of a sample: $var(x)=\sum_{i=1}^n(x-\bar{x})^2/(n-1) = cov(x,x)$
+
 - standard deviation: $\sigma= \sqrt{ \text{variance}}$
 
-- Variance of a sample: $\sum(x-\bar{x})^2/(n-1)$
+- covariance of two variables $cov(x,y)= \sum_{i=1}^n(x-\bar{x})(y-\bar{y})/(n-1)$
 
-- expected value
+- correlation $corr(x,y)= \frac{cov(x,y)}{\sigma_x\sigma_y}$ 
+
+- standard error $\sigma_\mu = \frac{\sigma}{\sqrt{n}}$
 
 
-- Covariance of two variables ($x,y$): $\sum(x-\bar{x})(y-\bar{y})/(n-1)$
+- **Exponential Smoothing**: $x_t = n_{t-1}+r_t$
 
+  with $n_{t}=(1-\alpha)^{t-1} \cdot x_{1}+\sum_{i=0}^{t-2}(1-\alpha)^{i} \cdot \alpha \cdot x_{t-i}$
 
-- correlation
-
-- standard error
-
-- **Exponential Smoothing**: $n_{t}=(1-\alpha)^{t-1} \cdot x_{1}+\sum_{i=0}^{t-2}(1-\alpha)^{i} \cdot \alpha \cdot x_{t-i}$
+  - $\hat x_{t+k|t}= n_t$ 
 
 
 - **Holt-Winters model**
@@ -507,8 +655,6 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - `decompose()`: default type is addictive; `decompose(ts, type="mult")`
 
-- `acf()` plots the autocorrelogram of a time series
-
 - `HoltWinters()`
 
   - x
@@ -517,10 +663,9 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
     - if `gamma = FALSE`, no sesonality is fitted
   - seasonal = c("additive", "multiplicative")
 
-- create white noise: `w <- rnorm(n, sd = 20)`
+- `acf()` plots the autocorrelogram of a time series
 
-  - we create it sampling from a normal distribution with mean zero
-  - parameters to specify: standard deviation `sd`, number of samples `n`
+  
 
 - log-transform a time series:
 
