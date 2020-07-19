@@ -78,11 +78,6 @@
   
   + we compare the fit of either the `additive` or `multiplicative` type by analyzing the random component (should look random without any trend and with the same variance over time)
   
-+ - **other possible components**
-  - trend (= steady in/decrease of the level)
-  - cycle (= fluctuations that are more irregular than seasonality, period length might be unknown)
-
-$r_t$: residuals (= what is not explained by the other components; should have constant variance over time –> homoskedasticity) 
 
 
 #### Additive Model
