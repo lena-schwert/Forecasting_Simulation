@@ -267,9 +267,13 @@
 
   –> **intuition:** "the value of tomorrow is equal to the value of today + a random value"
 
-  = **long-memory process**
+  + it is the **accumulation of random deviations from prev steps** until the current time
+      + `for (t in 2:1000) x[t] <- x[t-1]+w[t]`
+      + generalized eqn: $x_t = x_0 + \sum_{i=1}^tw_i$
 
-- **random walk (generalized):** $x_t = $
+  = **long-memory process** -> due to high autocorrelation of all past obs. 
+
+  
 
 - **properties**
 
@@ -277,13 +281,13 @@
 
     –> the expected value is equal to the first value of the time series
 
-  - **covariance** $\gamma_k = Cov[x_t,x_{t+k}] = \sum_{i=j}Cov[w_i,w_j]=t\sigma^2$
+  - **autocovariance** $\gamma_k = Cov[x_t,x_{t+k}] = \sum_{i=j}Cov[w_i,w_j]=t\sigma^2$
 
     –> the covariance is time dependent and thus becomes infinitely large for $t \rightarrow \infty$ 
 
     ![image-20200719224851031](image-20200719224851031.png)
 
-  - **correlation** $\gamma_k = Cor[x_t,x_{t+k}] = \frac{1}{\sqrt{1+k/t}}$ 
+  - **autocorrelation** $\gamma_k = Cor[x_t,x_{t+k}] = \frac{1}{\sqrt{1+k/t}}$ 
 
     –> for large t, the denominator is $\approx 0$ and autocorrelation approaches 1, **so values of a time series heavily depend on previous ones!** 
 
@@ -294,10 +298,20 @@
 
 - the **difference operator**  makes a random walk stationary!
 
+  - **Differencing Operator** 
+    + Differencing turns out to be a useful operating that can transform a non-stationary ts (e.g. random walk) to a stationary ts (e.g. white noise)
+    + the difference operator is defined by: $\nabla x_t = x_t-x_{t-1}$; rewrite as $\nabla x_t=(1-\textbf{B})x_t$
+      + in general term: $\nabla^n = (1-\textbf{B})^n$
+
+    + the first-order differences of a random walk are white noise series, so we can check the acf of the differece operation -> `acf(diff(x))`
+
 #### Code Snippets
 
 - **How to identify a random walk using `acf()`**
-  -  the autocorrelations will be very high for all lags!
+  
+  - the autocorrelations will be very high for all lags!
+  
+    ![acf of rw](acf of rw.png)
 
 ### AR(1)
 
