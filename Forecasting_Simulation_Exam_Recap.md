@@ -308,8 +308,11 @@
 
 ![fa12d8f2](fa12d8f2-5236415.png)
 
-+ the drift term introduce a deterministic trend, $\vartheta t$ in the expected value in random walk with drift model -> so we observe a random walk with a slope! 
++ the drift term introduce a deterministic trend, $\vartheta$ in the expected value in random walk with drift model -> so we observe a random walk with a slope! 
   + both random walk with/without drift have autocovariance that depends on time, $t\sigma^2$ -> as time increases, deviates more from the mean (dashed line in the graph)  
++ The **variance of the random walk with/without drift increases without bound** as it increases as $t$ increases -> so only suitable for short term predictions
++ autocovariance function of a random walk with/without drift **depends on the particular time values, $t$ and $t+k$,** but **not on the lag** -> weakly stationarity 
++ The deterministic part of the model will dominate the stochastic component (come from the white noise) over the long run because the deterministic trend, $\vartheta$  is proportional to $t$; the stochastic trend depends only on the $\sigma$ which is in proportion to the $\sqrt{t}$
 
 #### Code Snippets
 
@@ -318,6 +321,9 @@
   - the autocorrelations will be very high for all lags!
   
     ![acf of rw](acf of rw.png)
+  
+    + `acf(x)` -> use with caution because random walk is not ergodic, meaning it's not stationary in mean and in the variance; random walk violate the stationarity in the variance 
+    + for large $t$ with $k$ considerably less than $t$, we have $p_k$ is nearly 1 -> we have a positive autocorrelation that decay very slown down from unity -> check definition of autocorrelation above 
 
 ### AR(1)
 
