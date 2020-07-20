@@ -229,29 +229,35 @@
 
     –> theoretically, mean = average should be zero!
 
-  - **covariance** $\gamma_k = Cov[w_t,w_{t+k}]= \left\{\begin{array}{ll} \sigma^2 & \text { for } k=0\\ 0 & \text { for }  k\neq0\end{array}\right.$ is calculated as $c_{k,n}= \frac{1}{n}\sum_{t=1}^{n-k}(w_t-m_n)(w_{t+k}-m_n)$ 
+  - **autocovariance** $\gamma_k = Cov[w_t,w_{t+k}]= \left\{\begin{array}{ll} \sigma^2 & \text { for } k=0\\ 0 & \text { for }  k\neq0\end{array}\right.$ is calculated as $c_{k,n}= \frac{1}{n}\sum_{t=1}^{n-k}(w_t-m_n)(w_{t+k}-m_n)$ 
 
-    –> theoretically, there should be no covariance between different white noise data points = statistically independent!
+    –> theoretically, there should be no autocovariance between different white noise data points = statistically independent!
 
-  - **correlation** $\rho_k = Cor[w_t,w_{t+k}]= \frac{\gamma_k}{\sigma^2}= \left\{\begin{array}{ll} 1 & \text { for } k=0\\ 0 & \text { for }  k\neq0\end{array}\right.$ is calculated as $r_{k,n}= \frac{c_{k,n}}{c_{0,n}}$  
+  - **autocorrelation** $\rho_k = Cor[w_t,w_{t+k}]= \frac{\gamma_k}{\sigma^2}= \left\{\begin{array}{ll} 1 & \text { for } k=0\\ 0 & \text { for }  k\neq0\end{array}\right.$ is calculated as $r_{k,n}= \frac{c_{k,n}}{c_{0,n}}$  
 
     –> there should be no autocorrelation in the time series!
+    
+    + use the autocorrelation plot obtained with `acf()`
 
-- in practice, the mean is usually never == 0, so you **test whether the mean is significantly different from zero using the covariance!**
+- in practice, the mean is usually never == 0, so you **test whether the mean is significantly different from zero using the covariance!** (???)
 
-  –> use the autocorrelation plot obtained with `acf()`
 
 #### Code Snippets
 
 - **How to create white noise**: `w <- rnorm(n, sd = 20)`
   - we create it sampling from a normal distribution with mean zero
   - parameters to specify: standard deviation `sd`, number of samples `n`
-- **How to check whether the mean is significantly different from zero:**
-  - calculates the correlation between the time series and a lagged version of itsself!
+- **How to check whether there is randomness in autocorrelation**:  
+  - calculates the correlation between the time series and a lagged version of itself!
   - y-axis = ACF, x-axis = lag (–> How many steps was the time series shifted?)
-  - **at lag 0, ACF = 1 (this is always the case, because it is a convention!)**
-  - What does the dashed line tell us? How would you calculate it?
-    - It shows the allowed bound of our null hypothesis! - it's $1.96/\sqrt{n} $!
+  - **at lag 0, ACF = 1 (this is always the case, because by definition $c_{0,n}/c_{0,n} =1$)**; **at other lags, ACF = 0 **
+    - in reality, ACF at other lags would not be exactly = 0 but close enough to zero 
+    - how to conclude this null hypothesis? -> hypothesis testing with significant level of 5% (the dashed line) 
+      - How would you calculate it? -> It shows the allowed bound of our null hypothesis! - it's $1.96/\sqrt{n} $!
+    - if we have a plot with lag=40, considering 5% significant level, then only at 40*0.05 = 2 lags should cross this dashed line
+- **How to check whether the mean is significantly different from zero:**
+  - if $1.96 \times \sigma/\sqrt{n}$ is larger than the mean of the series 
+  - `1.96*sd(w)/n^0.5 > mean(w)`
 
 ### Random Walk
 
@@ -484,8 +490,9 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
   - method to decompose a positive-definite matrix into a lower triangular matrix (and its transpose)
 - speeds up solving linear equation systems
-  - $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
-
+  
+- $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
+  
 - **deterministic trend**
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}$
@@ -553,13 +560,13 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 
     - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
-
+    
       - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
         $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
         $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
       - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
     - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
-
+    
         - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
           $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
           $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
