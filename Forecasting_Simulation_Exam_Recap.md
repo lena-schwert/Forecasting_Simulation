@@ -316,6 +316,15 @@
 
 #### Code Snippets
 
+- **How to generate a random walk**
+
+  ```R
+  # random walk with lag 1 without intercept
+  for (t in 2:1000) x[t] <- x[t-1]+w[t]
+  ```
+
+  
+
 - **How to identify a random walk using `acf()`**
   
   - the autocorrelations will be very high for all lags!
@@ -348,13 +357,12 @@
 
   –> time series is asymptotically stationary
 
-### AR(1) without constant term
+#### AR(1) without constant term
 
-**properties**
+- **properties**
+  - **mean** $\mu(t)= E[x_t]= \alpha^t\cdot x_0 \xrightarrow{t\rightarrow\infty} 0$ 
 
-- **mean** $\mu(t)= E[x_t]= \alpha^t\cdot x_0 \xrightarrow{t\rightarrow\infty} 0$ 
-
-  –> mean will go to zero for large values of t
+    –> mean will go to zero for large values of t
 
 #### Comparison to random walk model 
 
@@ -389,6 +397,16 @@
 - use maximum likelihood (ML)
 
   - "Maximize the log-densitiy of the joint Gaussian density "
+
+#### Code snippets
+
+- **How to generate an AR(1) process without intercept**
+
+  ```R
+  for (t in 2:1000) x[t] <- 0.7*x[t-1]+w[t]
+  ```
+
+  - it is an AR(1) process and no random walk because $\alpha = 0.7\neq1$ 
 
 ### Bootstrapping
 
@@ -451,6 +469,11 @@
 
      –> the null hypothesis is not rejected, we assume the associated model equation
 
+- **common distributions**
+  - F-distribution
+  - student-t distribution
+  - $\Chi^2$-distribution
+
 ### Testing for Stationarity (= unit roots)
 
 - **we test for stationarity using an alternative form of the AR(1)/AR(p) model equation**
@@ -458,10 +481,20 @@
   - or $\Delta x_t = \alpha_0+\delta x_{t-1}+\sum_{i=1}^{p-1}\tilde\alpha_i\Delta x_{t-1} +w_t$ AR(p), respectively 
 
 - **intuition: Do the model coefficients $\alpha_i, \alpha_0, \delta$ take on specific values (= Are their values restricted, e.g. equal to zero)?**
+- **the existence of unit roots mean that the process is non-stationary!**
+  - unit roots = restriction on the model coefficients $\alpha$
+  - for AR(1) –> $\alpha_1=1$
+  - for AR(p) –> $\sum_i \alpha_i = 1$ 
 
 - **null hypothesis:** "The parameter restrictions hold."
+
 - **alternative hypothesis:** "The parameter restrictions do not hold."
+
 - the critical values for significance of the value of the test statistic are obtained **from the student-t or the Dickey Fuller distribution**
+
+  - the Dickey-Fuller distribution is used because **its power is weak**
+
+    –> **there is only a low probability to reject the null hypothesis when it is false**
 
 - **table of test statistics**
   
@@ -482,12 +515,16 @@
     - $r$: number of restrictions (i=1,3⇒r=2;i=2⇒r=3)
     
     - $n$: number of observations
+  
 - **intuition:** we test whether the restrictions on the model coefficients, e.g. for phi1, $\alpha_0=\delta=0$ are likely to be true or not, given our time series
 
 ![image-20200720093159237](image-20200720093159237.png)
 
 - **model selection tree**
   - start at the top to do model selection
+  
+    –> we start with a general model (with trend + intercept) and then step-by-step exclude possibilities
+  
   - start at the bottom when following the Pantula principle to determine the order of integration ($\leq 3$)
 
 ![image-20200720093337261](image-20200720093337261.png)
@@ -497,16 +534,36 @@
 - **How to determine the order of integration with the Pantula principle**
 
   ```R
-  ur.df(x, type = "none")
-  ur.df(x, type = "drift")
-  ur.df(x, type = "trend")
+  # additional options: lags =, selectlags =
+  summary(ur.df(x, type = "none"))
+  summary(ur.df(x, type = "drift"))
+  summary(ur.df(x, type = "trend"))
   ```
 
   
 
 - **How to do model selection like above using `ur.df()`**
 
+  ```R
+  summary(ur.df(x, type = "trend")) # tests tau3, phi2, phi3
+  summary(ur.df(x, type = "drift")) # tests tau2, phi1
+  summary(ur.df(x, type = "none"))  # tests tau1
+  ```
+
+  - 
+
 - **How to find the model equation in the shape $x_t=\dots$ after doing model selection** 
+
+  - select the correct function call of `ur.df()`
+
+    - **CAUTION:** use the function call where the input is a stationary time series!
+
+      –> for a non-stationary process (= model selection identified a random walk) you have to fit d1x or d1x instead of x directly!
+
+  - identify which model parameters are significant using `summary(ur.df(...))`
+  - optionally: refit again using only the significant parameters with `restrict()`
+  - if fitting a differenced time series, rearrange terms of the model equstion
+  - optionally: check for unit root by calculating $\sum_i\alpha_i$
 
 ### Differencing too often (= infinite lag order)
 
