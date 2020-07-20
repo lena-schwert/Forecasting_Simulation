@@ -320,7 +320,7 @@
   
   - the autocorrelations will be very high for all lags!
   
-    ![acf of rw](acf of rw.png)
+    <img src="acf of rw.png" alt="acf of rw" style="zoom:75%;" />
   
     + `acf(x)` -> use with caution because random walk is not ergodic, meaning it's not stationary in mean and in the variance; random walk violate the stationarity in the variance 
     + for large $t$ with $k$ considerably less than $t$, we have $p_k$ is nearly 1 -> we have a positive autocorrelation that decay very slown down from unity -> check definition of autocorrelation above 
@@ -329,28 +329,41 @@
 
 - simplest auto-regressive model
 
-
-
 - **model equation** $x_t=\alpha_0+\alpha_1 x_{t-1}+w_t$
 
   - $|\alpha_1|<1$: auto-regressive process
   - $\alpha_1 = 1$ : random walk with drift
-  - $\alpha_1 = 1$: random walk
+  - $\alpha_0 = 0$ & $\alpha_1 = 1$: random walk
   - $\alpha_1>1$: explosive process
 
 - **properties**
 
   - **mean** $\mu(t)= E[x_t]= \alpha_0\cdot \frac{1-\alpha_1^t}{1-\alpha_1}+\alpha_1^t\cdot x_0 \xrightarrow{t\rightarrow\infty} \frac{\alpha_0}{1-\alpha_1}$ 
 
-    –> mean will go to zero for large values of t
+  - **autocovariance** $\gamma_k(t) \xrightarrow{t\rightarrow\infty} \frac{\alpha^k\cdot \sigma^2}{1-\alpha_1^2}$ 
 
-  - **covariance** $\gamma_k(t) \xrightarrow{t\rightarrow\infty} \frac{\alpha_1^k\cdot \sigma^2}{1-\alpha_1^2}$ 
+  - **autocorrelation** $\rho_k(t)= \frac{\gamma_k(t)}{\gamma_0(t)}= \alpha_1^k$  -> **autocorrelation decays to zero more rapidly for small $\alpha_1$**  
 
-  - **correlation** $\rho_k(t)= \frac{\gamma_k(t)}{\gamma_0(t)}= \alpha_1^k$  
-
-    with $\gamma_0(t) \rightarrow \frac{\sigma^2}{1-\alpha_1})$ 
+    with $\gamma_0(t) \rightarrow \frac{\sigma^2}{1-\alpha_1}$ 
 
   –> time series is asymptotically stationary
+
+### AR(1) without constant term
+
+**properties**
+
+- **mean** $\mu(t)= E[x_t]= \alpha^t\cdot x_0 \xrightarrow{t\rightarrow\infty} 0$ 
+
+  –> mean will go to zero for large values of t
+
+#### Comparison to random walk model 
+
++ As compared to random walk with drift, we have a $\alpha$ coefficient for the past value, $x_{t-1}$; we don't have a long memory process, so there is no smooth upward & down trend now 
++ Random walk is smoother than AR(1), which is smoother than white noise model; Autocorrelation of AR(1) decays quicker than the random walk -> AR(1) process has a closer resemblence to the white noise model than the random walk process 
+
+<img src="7c26b157.png" alt="7c26b157" style="zoom:75%;" />
+
+
 
 #### Parameter Estimation (ML, OLS) 
 
