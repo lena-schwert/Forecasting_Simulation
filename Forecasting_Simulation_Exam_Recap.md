@@ -248,7 +248,7 @@
   - we create it sampling from a normal distribution with mean zero
   - parameters to specify: standard deviation `sd`, number of samples `n`
 - **How to check whether there is randomness in autocorrelation**:  
-  - calculates the correlation between the time series and a lagged version of itself!
+  - `acf()` calculates the correlation between the time series and a lagged version of itself!
   - y-axis = ACF, x-axis = lag (–> How many steps was the time series shifted?)
   - **at lag 0, ACF = 1 (this is always the case, because by definition $c_{0,n}/c_{0,n} =1$)**; **at other lags, ACF = 0 **
     - in reality, ACF at other lags would not be exactly = 0 but close enough to zero 
@@ -273,8 +273,6 @@
 
   = **long-memory process** -> due to high autocorrelation of all past obs. 
 
-  
-
 - **properties**
 
   - **expected value** $\mu= E[x_t]=E[x_0+\sum_{i=1}^tw_i]= x_0$
@@ -283,7 +281,7 @@
 
   - **autocovariance** $\gamma_k = Cov[x_t,x_{t+k}] = \sum_{i=j}Cov[w_i,w_j]=t\sigma^2$
 
-    –> the covariance is time dependent and thus becomes infinitely large for $t \rightarrow \infty$ 
+    –> the covariance is time dependent and thus becomes infinitely large for $t \rightarrow \infty$  
 
     ![image-20200719224851031](image-20200719224851031.png)
 
@@ -293,6 +291,7 @@
 
 - **random walk with drift:** $x_t = \vartheta+x_{t-1}+w_t$
 
+  - rephrased to: $x_t = x_0+\vartheta t+\sum_{i=1}^t w_i$ 
   - the drift implies that the value of the time series is constantly in/decreasing over time
   - **only difference in property:** **expected value** $\mu= E[x_t]= x_0+\vartheta t$
 
@@ -323,15 +322,20 @@
   for (t in 2:1000) x[t] <- x[t-1]+w[t]
   ```
 
-  
-
 - **How to identify a random walk using `acf()`**
   
   - the autocorrelations will be very high for all lags!
   
-    <img src="acf of rw.png" alt="acf of rw" style="zoom:75%;" />
+    –> **this is the same for a random walk with drift!**
   
-    + `acf(x)` -> use with caution because random walk is not ergodic, meaning it's not stationary in mean and in the variance; random walk violate the stationarity in the variance 
+    <img src="acf of rw.png" alt="acf of rw" style="zoom:75%;" />
+    
+    + `acf(x)` -> use with caution because random walk is not ergodic, meaning it's not stationary in mean and in the variance; random walk violate the stationarity in the variance
+    
+    + for large values of k, we slowly approach 0
+    
+      –> look at formula for autocorrelation
+    
     + for large $t$ with $k$ considerably less than $t$, we have $p_k$ is nearly 1 -> we have a positive autocorrelation that decay very slown down from unity -> check definition of autocorrelation above 
 
 ### AR(1)
@@ -347,7 +351,7 @@
 
 - **properties**
 
-  - **mean** $\mu(t)= E[x_t]= \alpha_0\cdot \frac{1-\alpha_1^t}{1-\alpha_1}+\alpha_1^t\cdot x_0 \xrightarrow{t\rightarrow\infty} \frac{\alpha_0}{1-\alpha_1}$ 
+  - **mean** $\mu(t)= E[x_t]= \alpha_0\cdot \frac{1-\alpha_1^t}{1-\alpha_1}+\alpha_1^t\cdot x_0 \xrightarrow{t\rightarrow\infty} \frac{\alpha_0}{1-\alpha_1}$  
 
   - **autocovariance** $\gamma_k(t) \xrightarrow{t\rightarrow\infty} \frac{\alpha^k\cdot \sigma^2}{1-\alpha_1^2}$ 
 
@@ -355,11 +359,12 @@
 
     with $\gamma_0(t) \rightarrow \frac{\sigma^2}{1-\alpha_1}$ 
 
-  –> time series is asymptotically stationary
+  –> time series are (only) asymptotically stationary, because its properties have no dependence on t!
 
 #### AR(1) without constant term
 
 - **properties**
+
   - **mean** $\mu(t)= E[x_t]= \alpha^t\cdot x_0 \xrightarrow{t\rightarrow\infty} 0$ 
 
     –> mean will go to zero for large values of t
@@ -371,7 +376,17 @@
 
 <img src="7c26b157.png" alt="7c26b157" style="zoom:75%;" />
 
+- **compare white noise, random walk (with drift) and AR(1) by eyeballing**
 
+<img src="image-20200720150027761.png" alt="image-20200720150027761"  />
+
+![image-20200720150121227](image-20200720150121227.png)
+
+–> **the interval of values is quite large**
+
+![image-20200720150205036](image-20200720150205036.png)
+
+![image-20200720150225864](image-20200720150225864.png)
 
 #### Parameter Estimation (ML, OLS) 
 
