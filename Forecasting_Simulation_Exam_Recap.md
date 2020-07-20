@@ -302,8 +302,14 @@
     + Differencing turns out to be a useful operating that can transform a non-stationary ts (e.g. random walk) to a stationary ts (e.g. white noise)
     + the difference operator is defined by: $\nabla x_t = x_t-x_{t-1}$; rewrite as $\nabla x_t=(1-\textbf{B})x_t$
       + in general term: $\nabla^n = (1-\textbf{B})^n$
-
     + the first-order differences of a random walk are white noise series, so we can check the acf of the differece operation -> `acf(diff(x))`
+
+#### Comparison of random walk and random walk with drift 
+
+![fa12d8f2](fa12d8f2-5236415.png)
+
++ the drift term introduce a deterministic trend, $\vartheta t$ in the expected value in random walk with drift model -> so we observe a random walk with a slope! 
+  + both random walk with/without drift have autocovariance that depends on time, $t\sigma^2$ -> as time increases, deviates more from the mean (dashed line in the graph)  
 
 #### Code Snippets
 
