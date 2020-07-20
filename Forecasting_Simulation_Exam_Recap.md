@@ -4,7 +4,7 @@
   - the seasonal and random component should be oscillating around zero for an additive model
   - the seasonal and random component should be oscillating around one for a multiplicative model 
 
-<img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="multiplicative model.png" alt="multiplicative model" style="zoom:50%;" /><img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="multiplicative model.png" alt="multiplicative model" style="zoom:50%;" />
+<img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="additive model.png" alt="additive model" style="zoom: 80%;" />
 
 - **Why does differencing actually work to make a non-stationary time series stationary?**
   
@@ -365,9 +365,67 @@
 
 ### Stationarity
 
+- formal definitions of the types of stationarity we encounter
+- **"A time series is…"**
+  - **(weakly) stationary**
+    - "… if mean + variance of a time series are constant ($<\infty$)." 
+    - this is the most often used notion of stationarity
+  - **trend-stationary**
+    - "… if the time series is stationaryafter a constant, deterministic trend term $\beta t$ is subtracted."
+  - **difference-stationary**
+    - "…if the one-times differenced time series $\Delta x_t$ is stationary."
+  - **strictly stationary**
+    - "…if the distribution of data points across all lagged versions  $x_{t+k}$ are identical to $x_t$." 
+    - we never use this
+
+- **differencing a time series means using the difference operator like this: **
+
+  ![image-20200720092417147](image-20200720092417147.png)
+
+### Recap: Statistical Hypothesis Testing
+
 ### Testing for Stationarity (= unit roots)
 
-### Statistical Hypothesis Testing
+- **we test for stationarity using an alternative form of the AR(1)/AR(p) model equation**
+  - by rearranging we achieve: $\Delta x_t = \delta x_{t-1}+w_t$
+- **null hypothesis:**
+- **alternative hypothesis:** 
+- the critical values for significance of the value of the test statistic are obtained **from the student-t or the Dickey Fuller distribution**
+
+- **table of test statistics**
+  - where test statistics $\tau= \frac{\hat\delta}{\sqrt{\hat{ Var}[\hat\delta]}}$ 
+    - $\hat\delta$ is obtained by OLS estimation of the respective model equation
+  - where test statistics $\phi = \frac{SSE_R-SSE}{r}/\frac{SSE}{n-k}$
+    - $SSE$: sum of squared residuals of the unrestricted model
+    - $SSE_R$: sum of squared residuals of the restricted model
+    - $k$: number of parameters of the unrestricted model (i=1⇒k=2;i=2,3⇒k=3)
+    - $r$: number of restrictions (i=1,3⇒r=2;i=2⇒r=3)
+    - $n$: number of observations
+- **intuition:** we test whether the restrictions on the model coefficients, e.g. for phi1, $\alpha_0=\delta=0$ are likely to be true or not, given our time series
+
+![image-20200720093159237](image-20200720093159237.png)
+
+- **model selection tree**
+  - start at the top to do model selection
+  - start at the bottom when following the Pantula principle to determine the order of integration ($\leq 3$)
+
+![image-20200720093337261](image-20200720093337261.png)
+
+#### Code Snippets
+
+- **How to determine the order of integration with the Pantula principle**
+
+  ```R
+  ur.df(x, type = "none")
+  ur.df(x, type = "drift")
+  ur.df(x, type = "trend")
+  ```
+
+  
+
+- **How to do model selection like above using `ur.df()`**
+
+- **How to find the model equation in the shape $x_t=\dots$ after doing model selection** 
 
 ### Differencing too often (= infinite lag order)
 
