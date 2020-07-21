@@ -25,7 +25,7 @@
   var(0.5*w1+2*w2) # 0.5^2*4 + 2^2+1 = 5
   ```
 
-
++ **Why unit root causes problem in AR(p) process?** -> From its asymptotic mean properties, we can see that the mean will be unbounded when there is a unit root ($\sum_{i=1}^p \alpha_i = 1$), hence making the process non stationary -> remove the unit roots by differencing to obtain stationary process 
 
 ## Summary
 
@@ -429,6 +429,21 @@
 
   - it is an AR(1) process and no random walk because $\alpha = 0.7\neq1$ 
 
+### AR(p) model
+
++ **Key idea: current values of the series, $x_t$ can be explained as a function of $p$ past values**, $x_{t-1}, x_{t-2}, ..., x_{t-p}$ where $p$ determines the number of time step we need to step into the past in order for us to forecast the current value! 
+
++ Model eqn: $x_t = \alpha_0 + \alpha_{t-1} +...+ \alpha_px_{t-p} + w_t$
+    + with the lag operator, rewrite to: $(1- \alpha_1L - ...-\alpha_pL^p) x_t = \alpha_0 + w_t$ 
+    + $L \cdot x_t = x_{t-1}$
+    + $L^nx_t = x_{t-n}$
+    
++ Asymptotic mean of AR(p) process: let's assume that the expected value of each variable in the AR(p) process equals to $\mu$
+
+    $\Rightarrow \mu = \frac{\alpha_0}{1-\alpha_1 - \dots - \alpha_p}$
+
+    => if we have a unit root, where sum of $\alpha$s = 1, the mean will be either $-\infty$ (if $\alpha_0$ is negative) or $\infty$ (if $\alpha_0 is positive) 
+
 ### Bootstrapping
 
 - bootstrapping is **useful when you don't know the distribution of the residuals** 
@@ -440,14 +455,6 @@
 
 - **How to do bootstrapping with `boot()`**
 - **How to do bootstrapping with `sample()`**
-
-### AR(p) model
-
-+ **Key idea: current values of the series, $x_t$ can be explained as a function of $p$ past values**, $x_{t-1}, x_{t-2}, ..., x_{t-p}$ where $p$ determines the number of time step we need to step into the past in order for us to forecast the current value! 
-+ Model eqn: $x_t = \alpha_0 + \alpha_{t-1} +...+ \alpha_px_{t-p} + w_t$
-    + with the lag operator, rewrite to: $(1- \alpha_1L - ...-\alpha_pL^p) x_t = \alpha_0 + w_t$ 
-    + $L \cdot x_t = x_{t-1}$
-    + $L^nx_t = x_{t-n}$
 
 ### Stationarity
 
