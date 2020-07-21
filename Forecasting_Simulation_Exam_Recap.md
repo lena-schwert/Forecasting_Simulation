@@ -553,7 +553,7 @@
   + do Dickey-Fuller test using `ur.df()` function 
   + set the lag order using the lags argument; `lags=3` or set AIC/BIC in selectlags argument - `selectlags=BIC` -> check `ur.df` documentation for detailed usage 
 
-![image-20200720093159237](image-20200720093159237.png)
+<img src="image-20200720093159237.png" alt="image-20200720093159237" style="zoom:50%;" />
 
 - **model selection tree**
   - start at the top to do model selection
@@ -562,7 +562,7 @@
   
   - start at the bottom when following the Pantula principle to determine the order of integration ($\leq 3$)
 
-![image-20200720093337261](image-20200720093337261.png)
+<img src="image-20200720093337261.png" alt="image-20200720093337261" style="zoom:50%;" />
 
 #### Code Snippets
 
@@ -807,6 +807,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
     $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
     $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+  
   - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
 - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
 
