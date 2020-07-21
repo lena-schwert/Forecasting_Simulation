@@ -585,7 +585,23 @@
   ```
 
   - general idea: 
-    - If you find that the differenced time series is stationary, do the next test with the time series 
+    
+    - If you find that the differenced time series is stationary, do the next test with the time series that is time series
+    
+  - <u>example: identifying that a time series has order of integration 2 = I(2)</u>
+
+    1. `summary(ur.df(d3x, type = "none"))`
+
+       - all test statistics are above thecritical values for 5 % significance, the null hypotheses are rejected
+
+         –> the 3-times differenced time series is stationary
+
+    2. `summary(ur.df(d2x, type = "drift"))`
+
+       - the test statistics are not above the critical values for 5 % significance, the null hypothesis is not rejected
+       - if e.g. phi2 is large enough, conclude that the model is a random walk with drift
+
+       –> conclude that the order of integration = 2, do model selection from here on
 
 - **How to do model selection like above using `ur.df()`**
 
@@ -624,7 +640,7 @@
 
 #### Using information criteria
 
-### Checking model residuals for correlation (Ljung-Box tests)
+### Checking model residuals for autocorrelation (Ljung-Box tests)
 
 ### Checking model residuals for stability/breakpoints (Chow test)
 
