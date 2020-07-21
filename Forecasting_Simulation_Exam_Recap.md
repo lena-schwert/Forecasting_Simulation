@@ -378,15 +378,15 @@
 
 - **compare white noise, random walk (with drift) and AR(1) by eyeballing**
 
-<img src="image-20200720150027761.png" alt="image-20200720150027761"  />
+<img src="image-20200720150027761.png" alt="image-20200720150027761" style="zoom:50%;" />
 
-![image-20200720150121227](image-20200720150121227.png)
+<img src="image-20200720150121227.png" alt="image-20200720150121227" style="zoom:50%;" />
 
 –> **the interval of values is quite large**
 
-![image-20200720150205036](image-20200720150205036.png)
+<img src="image-20200720150205036.png" alt="image-20200720150205036" style="zoom:50%;" />
 
-![image-20200720150225864](image-20200720150225864.png)
+<img src="image-20200720150225864.png" alt="image-20200720150225864" style="zoom:50%;" />
 
 #### Parameter Estimation (ML, OLS) 
 
