@@ -638,8 +638,11 @@
   - optionally: check for unit root by calculating $\sum_i\alpha_i$
 
 + **How to find the model equation given a time series data:**
-  1. Determine the order of integration using Pantula principle to perform Dickey-Fuller test (walking up the model selection tree)
-  2. 
+  1. Determine the order of integration using Pantula principle to perform Dickey-Fuller test (revise order of model selection tree) => "none" (tau1) -> "drift" (tau2, phi1) -> "trend" (tau3, phi2, phi3)
+  2. Do model selection (walk down the model selection tree) => "trend" (tau3, phi2, phi3) -> "drift" (tau2, phi) -> "none" (tau1)
+     + to determine which type of process the time series is e.g. random walk with/withou drift, stationary or trend stationary 
+  3. Model estimation -> with the correct order of integration + type of series, perform a fit to get the parameter estimation and then derive the model equantion
+     + we can use either `lm` , `ur.df` or `ar` function to perform the fit  
 
 ### Differencing too often (= infinite lag order)
 
