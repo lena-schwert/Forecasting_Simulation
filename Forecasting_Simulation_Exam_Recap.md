@@ -572,6 +572,10 @@
 
 <img src="image-20200720093337261.png" alt="image-20200720093337261" style="zoom:50%;" />
 
++ **Order of Integration** 
+  + tell us how many times we need to difference a time series to get a stationary process 
+  + order of integration = no. of unit roots 
+
 #### Code Snippets
 
 - **How to determine the order of integration with the Pantula principle**
@@ -581,12 +585,13 @@
   summary(ur.df(d3x, type = "none"))
   summary(ur.df(d2x, type = "drift"))
   summary(ur.df(d1x, type = "trend"))
-  summary(ur.df(x, type = "trend"))
   ```
 
-  - general idea: 
-    
-    - If you find that the differenced time series is stationary, do the next test with the time series that is time series
+  - general idea:  
+    - If you find that the differenced time series is stationary, do the next test with the time series
+    - We assume the series has at most quadratic trend -> we difference not more than 3 times to obtain a stationary process
+      - testing in descending order: d=3 -> d=2 -> d=1 
+        - if we failed to reject the $H_0$ at order $d$ -> correct order of integration = $d+1$
     
   - <u>example: identifying that a time series has order of integration 2 = I(2)</u>
 
@@ -631,6 +636,10 @@
   - optionally: refit again using only the significant parameters with `restrict()`
   - if fitting a differenced time series, rearrange terms of the model equstion
   - optionally: check for unit root by calculating $\sum_i\alpha_i$
+
++ **How to find the model equation given a time series data:**
+  1. Determine the order of integration using Pantula principle to perform Dickey-Fuller test (walking up the model selection tree)
+  2. 
 
 ### Differencing too often (= infinite lag order)
 
@@ -940,7 +949,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - `acf()` plots the autocorrelogram of a time series
 
-  
+  - tell if a series is stationary or not -> if it is, ACF will drop to zero relatively quickly; non-stationary series, ACF will decreases slowly (value of the autocorrelation is large & positive) 
 
 - log-transform a time series:
 
