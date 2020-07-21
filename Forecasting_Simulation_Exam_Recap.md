@@ -441,6 +441,14 @@
 - **How to do bootstrapping with `boot()`**
 - **How to do bootstrapping with `sample()`**
 
+### AR(p) model
+
++ **Key idea: current values of the series, $x_t$ can be explained as a function of $p$ past values**, $x_{t-1}, x_{t-2}, ..., x_{t-p}$ where $p$ determines the number of time step we need to step into the past in order for us to forecast the current value! 
++ Model eqn: $x_t = \alpha_0 + \alpha_{t-1} +...+ \alpha_px_{t-p} + w_t$
+    + with the lag operator, rewrite to: $(1- \alpha_1L - ...-\alpha_pL^p) x_t = \alpha_0 + w_t$ 
+    + $L \cdot x_t = x_{t-1}$
+    + $L^nx_t = x_{t-n}$
+
 ### Stationarity
 
 - formal definitions of the types of stationarity we encounter
@@ -607,8 +615,6 @@
   - optionally: refit again using only the significant parameters with `restrict()`
   - if fitting a differenced time series, rearrange terms of the model equstion
   - optionally: check for unit root by calculating $\sum_i\alpha_i$
-
-### AR(p) model
 
 ### Differencing too often (= infinite lag order)
 
