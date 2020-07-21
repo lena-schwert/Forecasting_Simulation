@@ -765,9 +765,38 @@
 
 ### Determining the lag order p
 
++ 3 ways to determine the lag order p: rule of thumb, partial autocorrelatin and information criteria
+
+#### Using rule of thumb
+
++ $$p-1 = p_{max} = [12 \cdot(\frac{n}{100})^\frac{1}{4}] $$
++ this is a rule of thumb (found by simulation result by MCMC approach)
+    + round off to an integer 
+
 #### Using partial autocorrelation
 
++ Definition: pacf at lag $k$ is the $k$th coefficient of the fitted model AR($k$)
+  + if $k$ is the "right" order, then the pacf of lag $> k$ will be zero 
++ **partial autocorrelation of an AR($p$) process =0 at lag p + 1 and greater**
+      + pacf value lies within the confidence line $(1.96/sqrt(n))$ when at lag $p+1$ and greater 
++ pacf is used to find the correct order of the series; acf is used to check for stationary of the process/check the normality of the residuals 
+
 #### Using information criteria
+
++ when we have $n$ obs. then we have $n-p$ residuals 
+  + the variance: $\hat{\sigma}_{w}^{2}(p):=\frac{1}{n-p} \sum_{i=p+1}^{n} \widehat{w}_{i}^{2}(p)$
++ the no. of coefficients and the "goodness" of the fit are both considered
+  + more parameters in the model -> better fit but can also lead to overfitting (same concept as in ML)
+  + need to find the sweet spot (balance bt. the no. of parameters vs. low value in residuals)
+  + penalize the no. of parameters to find a better fit 
++ Two type of information criterion: 
+  + AIC (Akaike Information Criterion)
+    + $A I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{2}{n-p} \cdot p*$
+  + SIC (Schwarz Information Criterion aka. Bayesian criterion)
+    + $S I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{ln(n-p)}{n-p} \cdot p*$
+  + $p^{*}=\left\{\begin{array}{l}p+1, \text { if } \alpha_{0} \text { is estimated } \\ p, \text { if } \alpha_{0} \text { is not estimated }\end{array}\right.$
++ AIC estimate is usually > SIC estimate
++ when we try to fit multiple model with different $p$, implicitly we assume sample size is constant for all order $p$ -> presample value need to be the same 
 
 ### Checking model residuals for autocorrelation (Ljung-Box tests)
 
