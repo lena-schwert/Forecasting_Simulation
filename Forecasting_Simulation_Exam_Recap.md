@@ -400,14 +400,20 @@
   $$
   \begin{align}
   \frac{\part}{\part\alpha}SSE=0\\
-  \frac{\part}{\part\alpha}\sum_t(x_t-\alpha\cdot x_{t-1})^2 = 0\\
-  -2\sum_t....
+  \frac{\part}{\part\alpha}\sum_{t=1}^{n-1}(x_{t+1}-\alpha x_t)^2 = 0\\
+  -2\sum_t (x_{t+1}-\alpha x_t) x_t=0\\
+  \dots \\
+  \alpha = \frac{\sum_{t=2}^nx_t\cdot x_{t-1}}{\sum_{t=1}^{n-1}x_t^2}\\
+  \text{substitute } x_t = \alpha x_{t-1}+w_t \text{ to get:}\\
+  \hat\alpha = \alpha + \text{bias term}
   \end{align}
   $$
 
   
 
   - **there will be a bias $\neq 0$ in the parameter estimate!** 
+
+    –> $\alpha \neq E[\hat\alpha]$ 
 
 - use maximum likelihood (ML)
 
@@ -797,7 +803,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - **random walk**
 
-  - $x_t = x_0+\sum_{i=1}^tw_i$  
+  - $x_t = x_{t-1}+w_t =  x_0+\sum_{i=1}^tw_i$  
   - $\mu=\mathbb{E}[w_t] = x_0$ 
   - $\gamma_k(t)=Cov(x_t,x_{t+k})= t\sigma^2$ 
   - $\rho_k(t)= \frac{1}{\sqrt{1+\frac{k}{t}}}$ 
