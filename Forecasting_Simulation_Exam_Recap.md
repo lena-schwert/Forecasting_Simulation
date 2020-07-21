@@ -758,6 +758,9 @@
 
 ### Differencing too often (= infinite lag order)
 
++ The effect on a time series that is differenced too often (differeced more times than its actual order of integration) -> result in a model with infinite lag order -> why it's bad? Hard to forecast with it
++ **How to proof**? We state that if $x_t$ is stationary then $\Delta x_t$ will have infinite lag order this implies that if $\Delta x_t$ have finite lag order, that mean we just differenced enough from a unit root process, $x_t$ -> we proof this implication  
+
 ### Determining the lag order p
 
 #### Using partial autocorrelation
