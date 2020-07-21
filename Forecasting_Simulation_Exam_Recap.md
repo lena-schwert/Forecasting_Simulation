@@ -6,6 +6,17 @@
 
 <img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="additive model.png" alt="additive model" style="zoom: 80%;" />
 
+- White Noise, Random Walk and AR(1) process in a nutshell 
+
+  - **WN has no memory** -> no memory of its previous value at all! -> most jagged series 
+  - **AR(1) process has short term memory** -> has moderate memory of its previous values at each next step 
+  - **RW has long term memory** -> highly correlated to its previous value at each next step -> smoothest among the three processes 
+
+- **Why there is a deterministic trend in random walk with drift**? 
+
+  - random walk with drift is basically a random walk on a slope -> corresponds to a deterministic trend, $\vartheta t$ 
+  - "drift"here refers to a constant that each variable drifted away from its previous value at each step-> as this constant get "accumulated" for each step, it becomes a linear trend over time
+
 - **Why does differencing actually work to make a non-stationary time series stationary?**
   
   - insight from Chap 4 HW 3 (week 10): e.g.for a random walk, the absolute values are very different over time, but the **differences between subsequent values are not!**
