@@ -838,6 +838,25 @@
 
 ### Checking model residuals for stability/breakpoints (Chow test)
 
++ General idea: we want to know if the parameters of the fit stable over time? 
+  => check if there exists some breakpoints (e.g. some part of the data = AR(3), other part = AR(4))
+
+  + type of tests: Chow Tests (Chow Breakpoint & Chow Forecast) and Cumsum Test
+
++ **Chow Tests**: 3 variants -> sample split, breakpoint & forecast 
+
+  + General idea: looks at the residuals; split into two parts: 1 set for period before break point, the other contains break point; 
+
+    + if no break point -> residuals of both part should be comparable 
+      + SSR of two periods are similar 
+
+    + $H_0:$ We have stationary AR($p$) process with fixed parameters 
+    + $H_1$: paramters change over time 
+
++ **Chow Breakpoint Test** 
+
++ **Chow Forecast Test**
+
 ### ARIMA
 
 ### Seasonal ARIMA
