@@ -269,7 +269,7 @@
 
   + it is the **accumulation of random deviations from prev steps** until the current time
       + `for (t in 2:1000) x[t] <- x[t-1]+w[t]`
-      + generalized eqn: $x_t = x_0 + \sum_{i=1}^tw_i$
+      + generalized eqn: $x_t = x_0 + \sum_{i=1}^tw_i$ 
 
   = **long-memory process** -> due to high autocorrelation of all past obs. 
 
