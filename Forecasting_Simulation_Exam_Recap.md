@@ -460,18 +460,44 @@
 
   ![image-20200720092417147](image-20200720092417147.png)
 
-### Testing for Stationarity (= unit roots)
+### Testing for Stationarity (= unit roots)/ Augmented Dickey-Fuller test
 
 - **we test for stationarity using an alternative form of the AR(1)/AR(p) model equation**
   - by rearranging we achieve: $\Delta x_t = \alpha_0+ \delta x_{t-1}+w_t$ (AR(1))
-  - or $\Delta x_t = \alpha_0+\delta x_{t-1}+\sum_{i=1}^{p-1}\tilde\alpha_i\Delta x_{t-1} +w_t$ AR(p), respectively 
 
-- **intuition: Do the model coefficients $\alpha_i, \alpha_0, \delta$ take on specific values (= Are their values restricted, e.g. equal to zero)?**
+  - or $\Delta x_t = \alpha_0+\delta x_{t-1}+\sum_{i=1}^{p-1}\tilde\alpha_i\Delta x_{t-1} +w_t$ AR(p), respectively
+
+    where  $\delta = \alpha_1+\dots+\alpha_p-1$ 
+
+- **intuition: Do the model coefficients $\alpha_i, \alpha_0, \delta$ take on specific values (= Are their values restricted, e.g. equal to zero or one)?**
+
 - **the existence of unit roots mean that the process is non-stationary!**
   - unit roots = restriction on the model coefficients $\alpha$
-  - for AR(1) –> $\alpha_1=1$
-  - for AR(p) –> $\sum_i \alpha_i = 1$ 
+  
+  - for AR(1) –> $\alpha_1=1\iff \delta = 0$
 
+    - the process will be stationary, if all roots are $>1$, because
+  
+    $$
+    \begin{align}
+    x_t&= \alpha_0+\alpha_1x_{t-1} + w_t\\
+    x_t-\alpha_1x_{t-1} &= \alpha_0+w_t\\
+    (1-\alpha_1L)x_t&= \alpha_0+w_t\\
+    1-\alpha_1L & \text{ is the characteristic polynomial }\\
+    &\text{set to zero and solve to obtain roots}\\
+    1-\alpha_1L &=0\\
+    L &=\frac{1}{\alpha_1}
+    \end{align}
+    $$
+  
+    **–> if $0<\alpha_1<1$, the root will be $>1$!** 
+  
+  - for AR(p) –> $\sum_i \alpha_i = 1 \iff \delta = 0$ (sum of coefficients is deciding)
+  
+  - in practice, we do not solve the characteristic equation, because the roots may be complex
+  
+    –> do the Dickey-Fuller test instead
+  
 - **null hypothesis:** "The parameter restrictions hold."
 
 - **alternative hypothesis:** "The parameter restrictions do not hold."
@@ -487,7 +513,11 @@
   - where test statistics $\tau= \frac{\hat\delta}{\sqrt{\hat{ Var}[\hat\delta]}}$ 
     
     - $\hat\delta$ is obtained by OLS estimation of the respective model equation
+    
   - where test statistics $\phi = \frac{SSE_R-SSE}{r}/\frac{SSE}{n-k}$
+    
+    (same approach as test statistics of F-tests) 
+    
     - $SSE$: sum of squared residuals of the **unrestricted** model
     
       –> fit obtained with the **model equation from the alternative hypothesis**
@@ -521,12 +551,14 @@
 
   ```R
   # additional options: lags =, selectlags =
-  summary(ur.df(x, type = "none"))
-  summary(ur.df(x, type = "drift"))
+  summary(ur.df(d3x, type = "none"))
+  summary(ur.df(d2x, type = "drift"))
+  summary(ur.df(d1x, type = "trend"))
   summary(ur.df(x, type = "trend"))
   ```
 
-  
+  - general idea: 
+    - If you find that the differenced time series is stationary, do the next test with the time series 
 
 - **How to do model selection like above using `ur.df()`**
 
@@ -536,7 +568,13 @@
   summary(ur.df(x, type = "none"))  # tests tau1
   ```
 
-  - 
+  - model coefficients
+    - `z` corresponds to x (time series) 
+    - `z.diff` correponds to $\Delta x_t$ here
+    - `intercept` corresponds to $\alpha_0$
+    - `t.t` corresponds to $\beta$ (= trend)
+    - `z.lag.one` corresponds to "coefficient of $x_{t-1}$" ($\delta$) 
+    - `z.diff.lag.i` corresponds to $\tilde \alpha_i$
 
 - **How to find the model equation in the shape $x_t=\dots$ after doing model selection** 
 
@@ -551,13 +589,19 @@
   - if fitting a differenced time series, rearrange terms of the model equstion
   - optionally: check for unit root by calculating $\sum_i\alpha_i$
 
+### AR(p) model
+
 ### Differencing too often (= infinite lag order)
 
-### Partial Autocorrelation
+### Determining the lag order p
+
+#### Using partial autocorrelation
+
+#### Using information criteria
 
 ### Checking model residuals for correlation (Ljung-Box tests)
 
-### Checking model residuals for stability (Chow test)
+### Checking model residuals for stability/breakpoints (Chow test)
 
 ### ARIMA
 
@@ -784,6 +828,8 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   - $\mu=E[X_t]=^{t\rightarrow \infty}\frac{\alpha_0}{1-\alpha_1}$
 
 - **AR(p) process** (= autoregressive)
+
+  - $x_t= \alpha_0 +\alpha_1x_{t-1}+\dots+\alpha_px_{t-p}+w_t$ 
 
 - **MA(q) process **(= moving average)
 
