@@ -807,6 +807,35 @@
 
 ### Checking model residuals for autocorrelation (Ljung-Box tests)
 
++ can use `acf` to check model residuals for autocorrelation -> only check for randomness at each lag 
+
++ Ljung-Box test: test the "overall" randomness of the ts instead of the randomness at each lag
+
+  + $H_0$: autocorrelation = zero (up to certain lag of $h$)
+
+  + $H_1$: there are some lag in between $i$ and $h$, there exist some lag which autocorrelation $\neq 0$ 
+
+  + test statistic = $Q_{h}=(n-p)^{2} \sum_{i=1}^{h} \frac{1}{n-p-i} \hat{\rho}_{i}^{2}$
+
+    + $p$ is the lag order; the no. of fixed parameter exclude the deterministic parameter: intercept, deterministirc trend
+
+    + $\hat{\rho}$: estimated autocorrelation
+      
+      + square it to cancel out postive & negative value 
+      
+    + $$
+      \begin{array}{l}
+      \hat{\rho}_{i}=\frac{1}{n-p} \sum_{t=p+i+1}^{n} \hat{w}_{t}^{s} \hat{w}_{t-i}^{s} \\
+      \hat{w}_{t}^{s}=\left(\hat{w}_{t}-\bar{w}_{t}\right) / \hat{\sigma}, \hat{\sigma}^{2}=\frac{1}{n-p} \sum_{t=p+1}^{n}\left(\hat{w}_{t}-\bar{w}_{t}\right)^{2}, \bar{w}_{t}=\frac{1}{n-p} \sum_{t=p+1}^{n} \hat{w}_{t}
+      \end{array}
+      $$
+
+    + the residuals are $\chi^2(h-p)$ distributed 
+
+    + $h$ need to be $> p$ for the distribution to hold
+
+    + if $Q_h$ is large then we can reject $H_0$
+
 ### Checking model residuals for stability/breakpoints (Chow test)
 
 ### ARIMA
@@ -1105,7 +1134,8 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 - `acf()` plots the autocorrelogram of a time series
 
-  - tell if a series is stationary or not -> if it is, ACF will drop to zero relatively quickly; non-stationary series, ACF will decreases slowly (value of the autocorrelation is large & positive) 
+  - input the time series: tells us if a series is stationary or not -> if it is, ACF will drop to zero relatively quickly; non-stationary series, ACF will decreases slowly (value of the autocorrelation is large & positive) 
+  - input the residuals: check the correlation of the residuals -> count the no. which cross the dashed line 
 
 - log-transform a time series:
 
