@@ -642,8 +642,119 @@
   1. Determine the order of integration using Pantula principle to perform Dickey-Fuller test (revise order of model selection tree) => "none" (tau1) -> "drift" (tau2, phi1) -> "trend" (tau3, phi2, phi3)
   2. Do model selection (walk down the model selection tree) => "trend" (tau3, phi2, phi3) -> "drift" (tau2, phi) -> "none" (tau1)
      + to determine which type of process the time series is e.g. random walk with/withou drift, stationary or trend stationary 
-  3. Model estimation -> with the correct order of integration + type of series, perform a fit to get the parameter estimation and then derive the model equantion
-     + we can use either `lm` , `ur.df` or `ar` function to perform the fit  
+  3. Model estimation -> with the correct order of integration + type of series, perform a fit to get the parameter estimation and then derive the model equation
+     + we can use either `lm` , `ur.df` or `ar` function to perform the fit -> **REMEMBER - we need to input data with stationarity when we are doing the fit!** 
+     + omit the coefficients that are not significant! 
+  
+  <u> Example: Chapter4 Ex2.R</u>
+  
+  
+  
+  ```` R
+  # Step1: Determine the order of integration 
+  >d3x<-diff(x,differences=3)
+  >d3x.df<-ur.df(d3x,"none",selectlags="BIC")
+  >summary(d3x.df) #reject H0, d=3
+  Coefficients:
+             Estimate Std. Error t value Pr(>|t|)    
+  z.lag.1    -2.80907    0.04526  -62.06   <2e-16 ***
+  z.diff.lag  0.63760    0.02444   26.09   <2e-16 ***
+  Value of test-statistic is: -62.0599 
+  
+  Critical values for test statistics: 
+        1pct  5pct 10pct
+  tau1 -2.58 -1.95 -1.62
+  
+  >d2x<-diff(x,differences=2)
+  >d2x.df<-ur.df(d2x,"drift",selectlags="BIC")
+  >summary(d2x.df) #reject H0, d=2
+  Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+  (Intercept) -0.00617    0.08284  -0.074    0.941    
+  z.lag.1     -2.50168    0.04837 -51.717   <2e-16 ***
+  z.diff.lag   0.53540    0.02680  19.977   <2e-16 ***
+  Value of test-statistic is: -51.7172 1337.335 
+  
+  Critical values for test statistics: 
+        1pct  5pct 10pct
+  tau2 -3.43 -2.86 -2.57
+  phi1  6.43  4.59  3.78
+  
+  >d1x<-diff(x,differences=1)
+  >d1x.df<-ur.df(d1x,"trend",selectlags="BIC")
+  >summary(d1x.df) #rejct H0, d=1
+  Coefficients:
+                Estimate Std. Error t value Pr(>|t|)    
+  (Intercept)  1.1114057  0.1353956   8.209  6.9e-16 ***
+  z.lag.1     -1.7983297  0.0514448 -34.957  < 2e-16 ***
+  tt          -0.0002102  0.0002282  -0.921    0.357    
+  z.diff.lag   0.2700459  0.0305768   8.832  < 2e-16 ***
+  
+  Value of test-statistic is: -34.9565 407.3201 610.9795 
+  
+  Critical values for test statistics: 
+        1pct  5pct 10pct
+  tau3 -3.96 -3.41 -3.12
+  phi2  6.09  4.68  4.03
+  phi3  8.27  6.25  5.34
+  
+  # Step2: Do model selection 
+  >x.df<-ur.df(x,"trend",selectlags="BIC")
+  >summary(x.df) # failed to reject tau3, phi2 but can reject phi2 -> random walk with drift
+  Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+  (Intercept)  1.417158   0.208811   6.787 1.97e-11 ***
+  z.lag.1     -0.028221   0.008249  -3.421 0.000649 ***
+  tt           0.015077   0.004463   3.378 0.000758 ***
+  z.diff.lag  -0.402818   0.028930 -13.924  < 2e-16 ***
+  
+  Value of test-statistic is: -3.4211 47.2405 6.1167 
+  
+  Critical values for test statistics: 
+        1pct  5pct 10pct
+  tau3 -3.96 -3.41 -3.12
+  phi2  6.09  4.68  4.03
+  phi3  8.27  6.25  5.34
+  
+  ### order of integration = 1; model equation: random walk with drift
+  # Step3: Model Estimation - required to fit a stationary data! 
+  > d1x<-diff(x,differences=1)
+  > d1x.df<-ur.df(d1x,"drift",selectlags="BIC") # fit d1x because I(1) -> stationary
+  > summary(d1x.df)
+  Coefficients:
+              Estimate Std. Error t value Pr(>|t|)    
+  (Intercept)  1.00561    0.07171  14.023   <2e-16 ***
+  z.lag.1     -1.79712    0.05142 -34.947   <2e-16 ***
+  z.diff.lag   0.26945    0.03057   8.815   <2e-16 ***
+  
+  # every coefficients are signficant *** -> include all in the model equation 
+  # CAUTION: ur.df is fitting the model eqn defined: "the rearranged AR(p) model equation for ADF " 
+  # We input a differenced series, d1x -> so increment the order of differencing in the model estimation 
+  # Step4: Derive the model equation 
+  #D^2x[t]=1-1.8Dx[t-1]+0.27D^2x[t-1]
+  #Dx[t]=1-0.53Dx[t-1]-0.27Dx[t-2]
+  #x[t]=1+0.47x[t-1]+0.26x[t-2]+0.27x[t-3]
+  
+  # Model Estimation with lm function -> fit with the first differenced series 
+  # Dx[t] = a0 + a1Dx[t-1] + a2Dx[t-2]
+  # fitting of AR(p) model: LHS -observed data: x[(p+1):length(x)]; RHS - lag p: x[1:(length(x)-p)];
+  # lag p-1: x[2:(length(x)-p-1)]...
+  >z.diff<-diff(x)[3:length(diff(x))]
+  >z.diff.lag.1<-diff(x)[2:(length(diff(x))-1)]
+  >z.diff.lag.2<-diff(x)[1:(length(diff(x))-2)]
+  >lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
+  >summary(lm.d1x)
+  Coefficients:
+               Estimate Std. Error t value Pr(>|t|)    
+  (Intercept)   1.00561    0.07171  14.023   <2e-16 ***
+  z.diff.lag.1 -0.52766    0.03055 -17.272   <2e-16 ***
+  z.diff.lag.2 -0.26945    0.03057  -8.815   <2e-16 ***
+  
+  # Dx[t] = a0 + a1Dx[t-1] + a2Dx[t-2] -> Dx[t] = 1 -0.53Dx[t-1]-0.267Dx[t-2]
+  # We obtain the same model equation as estimated using ur.df() fit
+  ````
+
++ Model equation derivation: $\Delta^2 x_{t}=\alpha_{0}+\delta \Delta x_{t-1}+\tilde{\alpha}_{1} \Delta^2 x_{t-1}+w_{t}$ $\Rightarrow \Delta^2 x_t = 1 -1.8\Delta x_{t-1} + 0.27 \Delta^2 x_{t-1} + w_t$
 
 ### Differencing too often (= infinite lag order)
 
