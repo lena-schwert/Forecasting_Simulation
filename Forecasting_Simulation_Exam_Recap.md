@@ -472,6 +472,7 @@
 - **intuition: Do the model coefficients $\alpha_i, \alpha_0, \delta$ take on specific values (= Are their values restricted, e.g. equal to zero or one)?**
 
 - **the existence of unit roots mean that the process is non-stationary!**
+  
   - unit roots = restriction on the model coefficients $\alpha$
   
   - for AR(1) –> $\alpha_1=1\iff \delta = 0$
@@ -499,8 +500,16 @@
     –> do the Dickey-Fuller test instead
   
 - **null hypothesis:** "The parameter restrictions hold."
+  - for AR(1) –> $\alpha_1=1$
+- for AR(p) –> $\sum_i \alpha_i = 1$ 
+  
+- **null hypothesis:** "The parameter restrictions hold." -> testing for $\delta = (1-\alpha_1) =0$  
 
-- **alternative hypothesis:** "The parameter restrictions do not hold."
+  - if we cannot reject $H_0$ -> we'll get a random walk -> not stationary process 
+
+- **alternative hypothesis:** "The parameter restrictions do not hold." -> testing for $\delta < 0 $ (correspond to $|\alpha| < 1$) 
+
+  - if we can reject $H_0$ -> we'll get an AR process -> stationary process 
 
 - the critical values for significance of the value of the test statistic are obtained **from the student-t or the Dickey Fuller distribution**
 
@@ -533,6 +542,18 @@
     - $n$: number of observations
   
 - **intuition:** we test whether the restrictions on the model coefficients, e.g. for phi1, $\alpha_0=\delta=0$ are likely to be true or not, given our time series
+
+- Dickey-Fuller test only considered the AR(1), an extension of it, augmented Dickey-Fuller test allows higher order of $p$ in the autoregressive process: 
+  $$
+  \Delta y_{t}=\alpha+\beta t+\gamma y_{t-1}+\delta_{1} \Delta y_{t-1}+\cdots+\delta_{p-1} \Delta y_{t-p+1}+\varepsilon_{t}
+  \\
+  \text{Rearranging terms:} \quad
+  \Delta x_{t}=\alpha_{0}+\beta \cdot t+\delta \cdot x_{t-1}+\sum_{i=1}^{p-1} \tilde{\alpha}_{i} \Delta x_{t-i}+w_{t}
+  $$
+  => with augmented Dickey-Fuller test the model with $p$ order, we need to find out the exact lag order, $p$ when applying the test -> use AIC/ BIC
+
+  + do Dickey-Fuller test using `ur.df()` function 
+  + set the lag order using the lags argument; `lags=3` or set AIC/BIC in selectlags argument - `selectlags=BIC` -> check `ur.df` documentation for detailed usage 
 
 ![image-20200720093159237](image-20200720093159237.png)
 
