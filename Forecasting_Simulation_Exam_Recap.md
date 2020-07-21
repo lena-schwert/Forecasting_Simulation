@@ -760,6 +760,8 @@
 
 + The effect on a time series that is differenced too often (differeced more times than its actual order of integration) -> result in a model with infinite lag order -> why it's bad? Hard to forecast with it
 + **How to proof**? We state that if $x_t$ is stationary then $\Delta x_t$ will have infinite lag order this implies that if $\Delta x_t$ have finite lag order, that mean we just differenced enough from a unit root process, $x_t$ -> we proof this implication  
+  + **Start by assuming that $\Delta x_t$ has finite lag order: $\Delta x_t = \beta_0 + \sum_{i=1}^{p-1} \beta_i x_{t-i}$**  expand it -> $x_t = \beta_0 + x_{t-1} + \sum_{i=1}^{p-1} \beta_i x_{t-i} - \sum_{i=2}^p \beta_{i-1} x_{t-i}$ -> rearranging the term with $\alpha$s to show that all coefficients of $x_{t-i}$ sum up to 1, this show that $x_t$ is a unit root process! 
+  + use $\Delta x_t = \beta_0 + \beta_1 \Delta x_{t-1} + \beta_2 \Delta x_{t-2}$ to deduce the expansion from the initial assumption! 
 
 ### Determining the lag order p
 
