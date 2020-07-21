@@ -574,7 +574,7 @@
 
 + **Order of Integration** 
   + tell us how many times we need to difference a time series to get a stationary process 
-  + order of integration = no. of unit roots 
+  + order of integration = no. of unit roots $\neq$ the number of lags, $p$! 
 
 #### Code Snippets
 
@@ -585,11 +585,12 @@
   summary(ur.df(d3x, type = "none"))
   summary(ur.df(d2x, type = "drift"))
   summary(ur.df(d1x, type = "trend"))
+  summary(ur.df(x, type = "trend"))
   ```
 
   - general idea:  
     - If you find that the differenced time series is stationary, do the next test with the time series
-    - We assume the series has at most quadratic trend -> we difference not more than 3 times to obtain a stationary process
+    - We assume the series has at most quadratic trend -> we will not difference more than 3 times to obtain a stationary process
       - testing in descending order: d=3 -> d=2 -> d=1 
         - if we failed to reject the $H_0$ at order $d$ -> correct order of integration = $d+1$
     
