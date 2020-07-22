@@ -913,6 +913,13 @@ for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p
 + General idea: we want to know if the parameters of the fit stable over time? 
   => check if there exists some breakpoints (e.g. some part of the data = AR(3), other part = AR(4))
 
+  + in another word, Chow Test tells us if is there a structural break in the process? 
+    + structural break: sudden change over time in parameters (e.g. company (that sells masks/gloves) stock price change due to coronavirus)
+
+  <img src="f979c3db.png" alt="f979c3db"  />	
+
+  ​			*no structural break on the left; there is a structural break on the right*	
+
   + type of tests: Chow Tests (Chow Breakpoint & Chow Forecast) and Cumsum Test
 
 + **Chow Tests**: 3 variants -> sample split, breakpoint & forecast 
@@ -925,7 +932,44 @@ for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p
     + $H_0:$ We have stationary AR($p$) process with fixed parameters 
     + $H_1$: paramters change over time 
 
+  + Notation: 
+
+    + $n$: no. of all obs.
+    + $n_1$: no. of obs in the first period 
+    + $n_2 = n-n_1$: no. of obs. in the second period 
+    + $k$: the no. of model parameters (i.e. either p or p+1) 
+    + $\hat{w}^i$: residuals of a fit at period $i$
+    + $\hat{w}$: residuals of a fit to the full sample 
+
 + **Chow Breakpoint Test** 
+
+  + General idea: We do in total 3 fits in the test; 1 model fit with all data points; Another 2 model fits with data that splitted into two parts at a certain breakpoint -> compute the test statistic by comparing the SSEs of the respective fit in a ratio 
+
+    + **How it works?** -> define an arbitrary breakpoint where we split the data into two parts (period 1 and period 2), fit the data of period 1 and the data of period 2 to get the respective SSEs ($S_1$ and $S_2$); We also fit another model with all the data, $n$ and get its SSE, $S$ 
+
+      + numerator of test statistic: consider the SSE of the sum of $S_1$ and $S_2$ 
+
+      + denominator of test statistic: consider the difference of SSE of $S$ and the combined SSE of $S_1 + S_2$  
+
+      + The logic of the comparison with a F-ratio:
+
+        + If there is a break points; the fit with data of period 1 and the fit with data of period 2 should be better (small $S_1$ and $S_2$) than the fit of all data, so $S-(S_1 + S_2)$ should be some small positive value -> F = positive value (large test statistic -> reject $H_0$)
+        +  If there is no beak point; the fit of all data is better, $S$ will be smaller than $S_1 + S_2$ so the denominator = some negative value -> F = negative value (we will get small test statistic -> cannot reject $H_0$)
+
+        
+
+    $$F=\frac{S_1+ S_2}{n-2k}/\frac{S-(S_1+S_2)}{k} \Rightarrow \frac{S-\left(S_{1}+S_{2}\right)}{S_{1}+S_{2}} \cdot \frac{n-2 k}{k} \\ \text{where}$$
+
+    $$\begin{aligned} S=& \sum_{t=1}^{n} \widehat{w}_{t}^{2} -> \text{full sample}\\ S_{1} &=\sum_{t=1}^{n_{1}}\left(\widehat{w}_{t}^{(1)}\right)^{2} -> \text{period 1}\\ S_{2} &=\sum_{t=n_{1}+1}^{n}\left(\widehat{w}_{t}^{(2)}\right)^{2}  -> \text{period 2}\end{aligned}$$
+
+    + account for the no. of obs of the fit as well as the parameters used in the fit 
+      + need to subtract the no. of parameter used for the fit because SSE will be smaller if more parameters are used
+      + $n_1 - k + n_2 -k = n-2k$ 
+        + $n_1 -k$ : no. of obs. for period 1 minus the no. of parameter used for the fit; no. 
+        + $n_2-k$ : no. of obs. for period 2 minus the no. of parameter used for the fit; no. 
+      + $n-k-(n-2k) = k$ 
+
+    
 
 + **Chow Forecast Test**
 
