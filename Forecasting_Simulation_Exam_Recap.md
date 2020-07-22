@@ -973,6 +973,39 @@ for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p
 
 + **Chow Forecast Test**
 
+  + no fit for period 2 which contains the break point; only the full sample $S$ and the fit of the first period (no break point)
+
+  + $F=\frac{S-S_{1}}{S_{1}} \cdot \frac{n_{1}-k}{n-n_{1}}$
+    where 
+
+    $S=\sum_{t=1}^{n} \widehat{w}_{t}^{2}$
+    $S_{1}=\sum_{t=1}^{n_{1}}\left(\widehat{w}_{t}^{(1)}\right)^{2}$
+
+  + Rule of thumb, requires 5-10% of obs to be reserved for forecasting -> no hard rule for determining the relative size of $n$ and $n_1$
+
++ **Chow Breakpoint vs. Chow Forecast**
+
+  + Restriction of two chow tests: fit the point in time of the break point in advanced
+    - when perform the breakpoint test repeatedly -> test statistics are non-standard
+  + Chow Breakpoint test needs $n$ of each period $>=$ $n$ of parameters fitted in both period 
+      + the breakpoint test statistic include the fit for period 1 and period 2, so we need to make sure both period has enough of data point (the coefficient to do the AR($p$) fitting.)
+    + the length of the second period can be less than the no. of  in CF, it is still okay!
+      + rule of thumb: reserve 5%, 10%, 15% of obs. for testing! 
+  + in computing the p-value, with Chow Breakpoint test we need to divide by $p$ in order to have the F-statstic; 
+      + Chow Breakpoint: `pval <- 1 - pf(fs$Fstats/p, df1=p, df2=n-2*p)`
+      + Chow Forecast: `pval <- 1 - pf(fs$chowFstats, df1=n-n1, df2=n1-p)`
+
++ Structural Break vs. Break in Variance:
+
+  + Structural break means a break in the coefficient (of the lags), could be invisible (when the coefficients differ just a little)
+  + Break in the variance means the coefficient of the white noise differ -> tested by heteroskedasticity test - procedure "ChowHRGNR"
+  + The two Chow Tests only account for structural break but not series with break in the variance! 
+
++ Definition of Heteroskedasticity
+  + circumstance when the variability of dependent variable is unequal across the range of independent variables (which predict it)
+    + when we plot them -> looks like a cone shape in 2 dimensions! 
+    + in short, variance of the residuals is not constant!
+
 ### ARIMA
 
 ### Seasonal ARIMA
