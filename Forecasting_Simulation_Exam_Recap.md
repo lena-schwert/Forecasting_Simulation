@@ -794,10 +794,22 @@
 #### Using partial autocorrelation
 
 + Definition: pacf at lag $k$ is the $k$th coefficient of the fitted model AR($k$)
+
   + if $k$ is the "right" order, then the pacf of lag $> k$ will be zero 
+
 + **partial autocorrelation of an AR($p$) process =0 at lag p + 1 and greater**
+
       + pacf value lies within the confidence line $(1.96/sqrt(n))$ when at lag $p+1$ and greater 
+
 + pacf is used to find the correct order of the series; acf is used to check for stationary of the process/check the normality of the residuals 
+
+  + `pacf(ts)` does not start from lag = 0! -> find the last significant lag = the right lag order of the series 
+
+  + significant line -> dashed line = $1.96/sqrt(n)$
+
+  + high $n$ guarantee high accuracy; When n is small then significant value could be very close to the coefficient of the lag order 
+
+    => conclude to a smaller lag order, $p-1$ as the correct order mistakenly 
 
 #### Using information criteria
 
@@ -815,6 +827,36 @@
   + $p^{*}=\left\{\begin{array}{l}p+1, \text { if } \alpha_{0} \text { is estimated } \\ p, \text { if } \alpha_{0} \text { is not estimated }\end{array}\right.$
 + AIC estimate is usually > SIC estimate
 + when we try to fit multiple model with different $p$, implicitly we assume sample size is constant for all order $p$ -> presample value need to be the same 
+
+##### Code Snippets
+
+```R
+calc.infocrit <- function(x, maxord=1, mean=FALSE, crit=c("aic","bic"))
+{
+  crit <- match.arg(crit) # pick the arg input by user
+  n <- length(x)
+  values<-NULL 
+  for (p in 0:maxord){
+    fit <- ar(x, order.max = p, method="ols", demean=mean)
+    res<-fit$resid[(maxord+1):n]
+    if (mean) # mean = the intercept: a_0 
+      pstar<-p+1 #do not consider sigma^2; with intercept 
+    else
+      pstar<-p
+    if (crit=="bic")
+      val <- log(var(res))+log(n-p)/(n-p)*pstar 
+    else
+      val <- log(var(res))+2/(n-p)*pstar
+    values<-c(values,val) # Jacobs' way to do append -> replace the initialized NULL value
+  }
+  values
+}
+#order of lag = the lag returned with the min information criteria; minus 1 -> we start from 0 in the loop
+which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="aic")) #4=>p=3; 
+which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="bic")) #4=>p=3 if n= 10000; 3=>p=2 if n = 1000 
+```
+
+
 
 ### Checking model residuals for autocorrelation (Ljung-Box tests)
 
@@ -846,6 +888,25 @@
     + $h$ need to be $> p$ for the distribution to hold
 
     + if $Q_h$ is large then we can reject $H_0$
+
+##### Code Snippets 
+
+```R
+# e.g. here we do Ljung Box test up to lag order = 8 
+# compare the return p-value to the significant level e.g. 0.05, if it's smaller -> reject H0 
+Box.test(resid,1,type="Ljung-Box", lag=8)$p.value
+
+# do the Ljung Box test in a for loop to include multiple lag order
+h.max<-10 # we test lag order up to 10 here 
+x<-1:h.max
+y<-rep(NA,h.max)
+#ensure h>p
+for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p 
+  y[h]<-Box.test(resid,fitdf=p,type="Ljung-Box", lag=h)$p.value # probability to obtain Q_h when H_0 holds 
+}
+```
+
++ **REMEMBER** resid has to be taken from $p+1$ to $n$ to account for the $p$ no. of the presampled value 
 
 ### Checking model residuals for stability/breakpoints (Chow test)
 
