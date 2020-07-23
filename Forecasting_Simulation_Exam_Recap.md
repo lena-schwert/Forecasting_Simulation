@@ -1163,6 +1163,41 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
 
 ### Seasonal ARIMA
 
++ Time series with seasonality (periodic behavior) will have strong autocorrelations at certain lags periodically (e.g. every 4 months; every 12 months) 
+
++ model this type of time series with ARIMA without explicit seasonal term will have more parameters -> use seasonal ARIMA
+
++ $(1-\alpha_{4,1}L^4) \cdot(1- \alpha_1L)x_t =w_t$ -> this is a seasonal model with 2 parameters
+
+  + correspond to $\Rightarrow x_t = \alpha_1 \cdot x_{t-1} + \alpha_{4,1} \cdot x_{t-4} - \alpha_1 \cdot \alpha_{4,1} \cdot x_{t-5} + w_t$
+  + this a AR(5) model with 5 parameters -> more parameters to be fitted than the seasonal ARIMA model 
+
++ $(1-\alpha_{4,1}L^4)$ introduces stochastic seasonality -> there are other approaches as well e.g. seasonal dummies 
+
+    + introduce the effect of seasonal patterns with deterministic term ; include some & different constants for certain quarter 
+
++ It's written as ARIMA$(p,d,q)$ x $(P,D,Q)_s$ ->  $(P,D, Q)_s$ is the seasonal part of the model  
+
+  + Definition: $\alpha_{s}\left(L^{s}\right) \alpha(L) \Delta_{s}^{D} \Delta^{d} x_{t}=\alpha_{0}+\theta_{s}\left(L^{s}\right) \theta(L) w_{t} $  (will be given in the exam)
+
+    + $\Delta^d x_t = (1-L)^d x_t$ - this to stationalize the series 
+
+    + $\Delta ^D_s x_t = (1-L^s)^D x_t$ - this is the differencing operation to the seasonal part 
+
+    + $\alpha(L)=1-\alpha_{1} \cdot L-\cdots-\alpha_{p} \cdot L^{p}$
+
+    + $\alpha_{s}\left(L^{s}\right)=1-\alpha_{s, 1} \cdot L^{s}-\cdots-\alpha_{s, P} \cdot L^{s \cdot P}$ - applies polynomial to the seasonal part; lag is to the power of s 
+
+    + $\theta(L)=1+\theta_{1} \cdot L+\cdots+\theta_{q} \cdot L^{q}$
+
+    + $\theta_{s}\left(L^{s}\right)=1+\theta_{s, 1} \cdot L^{s}+\cdots+\theta_{s, Q} \cdot L^{s \cdot Q}$
+
+    + How many lags LHS introduce? -> $d+ D + p + s \cdot P$
+
+    + How many lags RHS introduce? -> $q + s \cdot Q$
+
+      
+
 ### Cointegration
 
 + If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
