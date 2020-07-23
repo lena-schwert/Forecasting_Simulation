@@ -41,6 +41,9 @@
   ```
 
 + **Why unit root causes problem in AR(p) process?** -> From its asymptotic mean properties, we can see that the mean will be unbounded when there is a unit root ($\sum_{i=1}^p \alpha_i = 1$), hence making the process non stationary -> remove the unit roots by differencing to obtain stationary process 
++ **Integration order and Unit Root vs. lag order** 
+  => no. of unit root = integration order $\neq$ lag order 
+  => Given an AR(p) process, if the $\sum_{i=1}^p \alpha_i = 1$ (NOT including $\alpha_0$!) then we know there is a unit root process but it does not tell us how many unit roots -> solve the polynomial characteristic equation to find out, use `polyroot()`
 + **Covariance of random variables** -> When two random variables,($w_i$ & $w_j$) are independent and identiacally distributed (i.i.d), independent means there is no correlation when $i \neq j$; when $i = j$ -> $cov[w_i, w_i] = cov[w_j,w_j]$ (covariance of the random variable with itself = variance of the random variable), if $w_i, w_j$ ~ $N(0, \sigma^2)$ -> $cov[w_i, w_i] = cov[w_j,w_j] = var[w_i] = var[w_j] = \sigma^2$ (when $i =j$) 
 
 ## Summary
@@ -479,14 +482,15 @@
   - **(weakly) stationary**
     - "… if mean + variance of a time series are constant (can be large, but $<\infty$)." 
     - this is the most often used notion of stationarity
+    - for an AR(p) time series, if all complex roots of the characteristic polynomial $1 - \alpha_1z \dots-\alpha_p \cdot z^p$ are outside the unit circle {$z \in \mathbb{C} | |z| = 1$} 
   - **trend-stationary**
     - "… if the time series is stationaryafter a constant, deterministic trend term $\beta t$ is subtracted."
   - **difference-stationary**
     - "…if the one-times differenced time series $\Delta x_t$ is stationary."
   - **strictly stationary**
     - "…if the distribution of data points across all lagged versions  $x_{t+k}$ are identical to $x_t$." 
-    - we never use this
-
+  - we never use this
+  
 - **differencing a time series means using the difference operator like this: **
 
   ![image-20200720092417147](image-20200720092417147.png)
@@ -594,10 +598,6 @@
   - start at the bottom when following the Pantula principle to determine the order of integration ($\leq 3$)
 
 <img src="image-20200720093337261.png" alt="image-20200720093337261" style="zoom:50%;" />
-
-+ **Order of Integration** 
-  + tell us how many times we need to difference a time series to get a stationary process 
-  + order of integration = no. of unit roots $\neq$ the number of lags, $p$! 
 
 #### Code Snippets
 
@@ -778,6 +778,29 @@
   ````
 
 + Model equation derivation: $\Delta^2 x_{t}=\alpha_{0}+\delta \Delta x_{t-1}+\tilde{\alpha}_{1} \Delta^2 x_{t-1}+w_{t}$ $\Rightarrow \Delta^2 x_t = 1 -1.8\Delta x_{t-1} + 0.27 \Delta^2 x_{t-1} + w_t$
+
+### Order of Integration
+
++ tell us how many times we need to difference a time series to get a stationary process 
+
++ order of integration = no. of unit roots $\neq$ the number of lags, $p$! 
+
+  + <u>Time Series y from Chap4 HW2</u>: $x_t= 1.06 + 1.93x_{t-1} -0.86x_{t-2} -0.07x_{t-3} + w_t$ 
+
+    -> lag order =3 but it's a I(2) process which mean there are two unit roots 
+
+    ```R
+    > polyroot(c(1, -1.93, 0.86, 0.07))
+    1.00000+0i   1.00000-0i -14.28571-0
+    ```
+
+  + <u>Example1 from Chap4 Ex2.R</u>: $x_t = 1 + 0.5x_{t-1} + 0.25x_{t-2} + 0.25x_{t-3}$ 
+    -> lag order = 3 as well but it has integration order of 1, there is only 1 unit root 
+
+    ```R
+    > polyroot(c(1, -0.5, -0.25, -0.25))
+      1-0.000000i -1+1.732051i -1-1.732051i
+    ```
 
 ### Differencing too often (= infinite lag order)
 
