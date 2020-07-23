@@ -45,6 +45,7 @@
   => no. of unit root = integration order $\neq$ lag order 
   => Given an AR(p) process, if the $\sum_{i=1}^p \alpha_i = 1$ (NOT including $\alpha_0$!) then we know there is a unit root process but it does not tell us how many unit roots -> solve the polynomial characteristic equation to find out, use `polyroot()`
 + **Covariance of random variables** -> When two random variables,($w_i$ & $w_j$) are independent and identiacally distributed (i.i.d), independent means there is no correlation when $i \neq j$; when $i = j$ -> $cov[w_i, w_i] = cov[w_j,w_j]$ (covariance of the random variable with itself = variance of the random variable), if $w_i, w_j$ ~ $N(0, \sigma^2)$ -> $cov[w_i, w_i] = cov[w_j,w_j] = var[w_i] = var[w_j] = \sigma^2$ (when $i =j$) 
++ **What are the causes of non-stationary in a process?** -> seasonal effect, trend or serially correlated variance (heteroskedasticity)
 
 ## Summary
 
@@ -1094,11 +1095,54 @@ for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p
     + when we plot them -> looks like a cone shape in 2 dimensions! 
     + in short, variance of the residuals is not constant!
 
-### ARIMA
+### MA(q) Model
+
++ $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q} \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
+
+  + linear combination of the current white noise and the past noise up to $q$ lag + a constant 
+
++ it is a weighted moving average of the $w_t$ term 
+
+     + moving average around $c_0$ which is the mean, with the weighted term of $\theta$s
+
+       -> a past error model (multiplied by some coefficients)
+       -> made up of past white noises so always stationary!
+
+    + but the coefficients of these $\theta$s do not sum up to 1!!!
+
++ short hand: $x_t = c_o + \theta(L) w_t$, where $\theta$ is a polynomial with degree $q$
+
++ **properties**:
+
+  + $\mathbb{E}[x_t] = c_0$ -> expected value of the sum of white noises = 0,
+
+  + $var[x_t] = (1+\theta_1^2+\theta_2^2 +...+\theta_q^2)\sigma_w^2$ -> each white noise has the same variance and each terms are mutually independent (i.i.d)
+
+    => both expectation and variance are independent of time
+
+    => it is second order stationary (weak stationary)
+
+  + $$\rho_k = \begin{cases}
+    1 & \text{for k = 0} \\
+    (\theta_{k}+\sum_{i=1}^{q-k} \theta_{i} \cdot   \theta_{i+k}) /(1+\sum_{i=1}^{q} \theta_{i}^{2}) &   \text{for k=1,...,q} \\ 0 & \text{for k > q}\end{cases}$$
+
++ different from AR($p$) model, which use the partial correlation, here we can use the autocorrelation to determine the order $q$
+
+  => recall, we use `acf()` to study residuals = white noises 
+
+### ARMA(p,q) Model
+
++ $x_{t}=\alpha_{0}+\sum_{i=1}^{p} \alpha_{i} \cdot x_{t-i}+w_{t}+\sum_{j=1}^{q} \theta_{j} \cdot w_{t-j} \Rightarrow \left(1-\alpha_{1} \cdot L-\cdots-\alpha_{p} \cdot L^{p}\right) x_{t}=\alpha_{0}+\left(1+\theta_{1} \cdot L+\cdots+\theta_{q} \cdot L^{q}\right) w_{t}$
+  + hybrid of AR(p) and MA(q) model 
++ shorthand: $\alpha(L)x_t = \alpha_0 + \theta(L)w_t$
++ neither autocorrelation or partial autocorrelation can be used to find the order of the model 
+      + use cross validation to determine the lag oder p and q 
+
+### ARIMA(p,d,q) Model
+
++ 
 
 ### Seasonal ARIMA
-
-### VAR(p)
 
 ### Cointegration
 
@@ -1108,7 +1152,7 @@ for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p
 
 + Rank$(\Pi)$ tell us the no. of cointegrating relations. 
 
-### VAR 
+### VAR(p) 
 
 + a multivariate model with multiple no. of AR($p$): $X_{t} = A_0 +A_1X_{t-1} +...+ A_pX_{t-p} + R_t$ series up to $k$
 $\Rightarrow X_t =A_0 + A_iX_{t-i} + R_t$ where $A_i$ is a $k \times k$ matrix, with coefficients in each row e.g. $\alpha_{11,1}, \alpha_{12,1}, ...,\alpha_{1k,1}$ expresses granger causality of all other series e.g. $x_{2t},...,x_{kt}$ for this corresponding series in the row, e.g. $x_{1t}$ 
