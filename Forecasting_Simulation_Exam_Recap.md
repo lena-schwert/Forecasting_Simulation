@@ -28,8 +28,12 @@
 - see below, left: random walk, right: 1-times differenced, looks way more stationary
   
   ![image-20200620191114648](image-20200620191114648.png)
-
-+ Effect on the variance of random variables when the variables are scaled by a factor, $a$ : since variance is in term of squared factor of the variables, the new variance = $a^2 \times$ old variance
+  
+  => A stock price of a company over a time span of 3000 consecutive days (on the left) generally looks like a random walk but when we difference the series to look at the daily change for 3000 consecutive days (on the right), it should be a stationary process (stock price does not differ much from the one day before in general!)
+  
+  
+  
+- Effect on the variance of random variables when the variables are scaled by a factor, $a$ : since variance is in term of squared factor of the variables, the new variance = $a^2 \times$ old variance
 
   ```R
   w1 <- rnorm(100000, mean = 0, sd = 2)  
@@ -1140,7 +1144,22 @@ for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p
 
 ### ARIMA(p,d,q) Model
 
-+ 
++ a combination of a differenced AR(p) and a MA model 
+  + $x_t$ follows an ARIMA(p,d,q) model if $(1-\alpha_1L)^dx_t = \Delta^dx_t$ is a stationary ARMA(p,q) time series 
+    => this means the AR(p) part of the MA(p,q) should not have coefficients (exclude $\alpha_0$) sum up to 1 (unit root)
+  + e.g. ARIMA(2,1,2) -> $(1-\alpha_1L - \alpha_2L^2)\Delta x_t=(1+\theta_1L+\theta_2L^2)w_t$ -> this MA(2,2) that has to be stationary 
+    => $\alpha_1 + \alpha_2$ should not be equal to 1! 
+    => $\Delta x_t = \alpha_1 \Delta x_{t-1} + \alpha_2 \Delta_{t-2}+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2} \rightarrow x_t=x_{t-1}+\alpha_1(x_{t-1}-x_{t-2})+\alpha_2(x_{t-2}-x_{t-3})+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2}$
++ its stationary can be checked with ADF for an AR(k) if k is high enough -> rule of thumb: $k = \sqrt[4]{n}$ 
+
+##### Code Snippets
+
+```R
+# n = length of the series 
+# arima fit the differenced series AR(p), here we difference once, so input n-1 instead of n! 
+# CAUTION: ar=c(0.7,0.3) for instance will throw error, MA(p,q) need to be stationary! 
+x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.gen=rnorm)
+```
 
 ### Seasonal ARIMA
 
