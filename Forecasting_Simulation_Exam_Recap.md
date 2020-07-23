@@ -17,6 +17,10 @@
   - random walk with drift is basically a random walk on a slope -> corresponds to a deterministic trend, $\vartheta t$ 
   - "drift"here refers to a constant that each variable drifted away from its previous value at each step-> as this constant get "accumulated" for each step, it becomes a linear trend over time
 
+- Random Walk vs. Random Walk with drift 
+  
+  - a constant drift in Random Walk lead to a linear trend over time, since this trend is deterministic -> same covariance, autocorrrelation  as Random Walk without drift but the expected value has an additional linear trend 
+  
 - **Why does differencing actually work to make a non-stationary time series stationary?**
   
   - insight from Chap 4 HW 3 (week 10): e.g.for a random walk, the absolute values are very different over time, but the **differences between subsequent values are not!**
@@ -37,6 +41,7 @@
   ```
 
 + **Why unit root causes problem in AR(p) process?** -> From its asymptotic mean properties, we can see that the mean will be unbounded when there is a unit root ($\sum_{i=1}^p \alpha_i = 1$), hence making the process non stationary -> remove the unit roots by differencing to obtain stationary process 
++ **Covariance of random variables** -> When two random variables,($w_i$ & $w_j$) are independent and identiacally distributed (i.i.d), independent means there is no correlation when $i \neq j$; when $i = j$ -> $cov[w_i, w_i] = cov[w_j,w_j]$ (covariance of the random variable with itself = variance of the random variable), if $w_i, w_j$ ~ $N(0, \sigma^2)$ -> $cov[w_i, w_i] = cov[w_j,w_j] = var[w_i] = var[w_j] = \sigma^2$ (when $i =j$) 
 
 ## Summary
 
@@ -364,7 +369,7 @@
 
   - **mean** $\mu(t)= E[x_t]= \alpha_0\cdot \frac{1-\alpha_1^t}{1-\alpha_1}+\alpha_1^t\cdot x_0 \xrightarrow{t\rightarrow\infty} \frac{\alpha_0}{1-\alpha_1}$  
 
-  - **autocovariance** $\gamma_k(t) \xrightarrow{t\rightarrow\infty} \frac{\alpha^k\cdot \sigma^2}{1-\alpha_1^2}$ 
+  - **autocovariance** $\gamma_k(t) \xrightarrow{t\rightarrow\infty} \frac{\alpha^k\cdot \sigma^2}{1-\alpha_1^2}$ (use geometric series to expand the summation in order to derive this!)
 
   - **autocorrelation** $\rho_k(t)= \frac{\gamma_k(t)}{\gamma_0(t)}= \alpha_1^k$  -> **autocorrelation decays to zero more rapidly for small $\alpha_1$**  
 
@@ -393,13 +398,13 @@
 
 <img src="image-20200720150121227.png" alt="image-20200720150121227" style="zoom:50%;" />
 
-–> **the interval of values is quite large**
+–> **the interval of values is quite large **for random walk with drift -> its variance is unbounded when $t \rightarrow \infty$ 
 
 <img src="image-20200720150205036.png" alt="image-20200720150205036" style="zoom:50%;" />
 
 <img src="image-20200720150225864.png" alt="image-20200720150225864" style="zoom:50%;" />
 
-#### Parameter Estimation (ML, OLS) 
+#### Parameter Estimation of $\alpha$ (ML, OLS) 
 
 - use ordinary least squares (OLS)
 
