@@ -779,6 +779,66 @@
 
 + Model equation derivation: $\Delta^2 x_{t}=\alpha_{0}+\delta \Delta x_{t-1}+\tilde{\alpha}_{1} \Delta^2 x_{t-1}+w_{t}$ $\Rightarrow \Delta^2 x_t = 1 -1.8\Delta x_{t-1} + 0.27 \Delta^2 x_{t-1} + w_t$
 
+### Root of Characteristic Polynomials 
+
++ rearrange the AR(p) model equation with backshift operator to get the characteristic polynomial
+  AR(2): $x_t = \alpha_0 + \alpha_1x_{t-1} + \alpha_2x_{t-2} + w_t \Rightarrow (1-\alpha_1L -\alpha_2L^2)$, equate to zero and find the root of the polynomial function 
+  => $1-\alpha_1z-\alpha_2 z^2=0$, this is a quadratic function -> use $z = \frac{-\alpha_1 \pm \sqrt{\alpha_1^2-4\alpha_2}}{2\alpha_2}$ ; if $\alpha_1^2 -4\alpha_2 <0$ we'll have complex roots where $(i^2 = -1)$  
+
++ if the root lies within the unit circle < 1 -> explosive process 
+
+  ```R
+  > polyroot(c(1,0,-4)) 
+  0.5+0i -0.5+0i
+  ```
+
+  <img src="explosive.png" alt="explosive" style="zoom:50%;" />
+
++ only roots with absolute value > 1 -> exponential damping
+
+  ```R
+  > polyroot(c(1,1,0.25))
+  -2-0i -2+0i
+  ```
+
+  <img src="exponential damping.png" alt="exponential damping" style="zoom:50%;" />
+
++ complex roots with absolute value > 1 -> stochastic cycle with damped oscillations 
+
+  ```R
+  > polyroot(c(1,0,0,0, -0.4096))
+  0.00+1.25i -1.25-0.00i  0.00-1.25i  1.25+0.00i
+  ```
+
+  <img src="cycle with damping.png" alt="cycle with damping" style="zoom:50%;" />
+
++ complex roots -> Stochastic cycle 
+
+  ```R
+  > polyroot(c(1,-0.5,1, -0.5))
+  0+1i 0-1i 2+0i
+  ```
+
+  <img src="cycle only.png" alt="cycle only" style="zoom:50%;" />
+
++ a unit root with all other roots are outside the unit circle -> random walk behavior (if there is $\alpha_0$ -> random walk with drift)
+
+  ```R
+  > polyroot(c(1,-0.5,-0.5)) #1-0i -2+0i -> we have one unit root so it's non-stationary
+  1-0i -2+0i
+  ```
+
+  <img src="non-stationary with a unit root.png" alt="non-stationary with a unit root" style="zoom:50%;" />
+
++ more than one unit root -> does not look like random walk! 
+
+  ```R
+  polyroot(c(1, -1.93, 0.86, 0.07))
+  1.00000+0i   1.00000-0i -14.28571-0i
+  ```
+
+  <img src="AR(3)_2 unit roots.png" alt="AR(3)_2 unit roots" style="zoom:50%;" />
+
 ### Order of Integration
 
 + tell us how many times we need to difference a time series to get a stationary process 
@@ -794,7 +854,7 @@
     1.00000+0i   1.00000-0i -14.28571-0
     ```
 
-  + <u>Example1 from Chap4 Ex2.R</u>: $x_t = 1 + 0.5x_{t-1} + 0.25x_{t-2} + 0.25x_{t-3}$ 
+  + <u>Example1 from Chap4 Ex2.R</u>: $x_t = 1 + 0.5x_{t-1} + 0.25x_{t-2} + 0.25x_{t-3} + w_t$ 
     -> lag order = 3 as well but it has integration order of 1, there is only 1 unit root 
 
     ```R
@@ -1194,15 +1254,12 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
 ## The Formula Vault
 
+- quadractic formula for solving quadratic roots: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$
 - expected value $\mathbb{E}[x]$ 
 - variance of a sample: $var(x)=\sum_{i=1}^n(x-\bar{x})^2/(n-1) = cov(x,x)$
-
 - standard deviation: $\sigma= \sqrt{ \text{variance}}$
-
 - covariance of two variables $cov(x,y)= \sum_{i=1}^n(x-\bar{x})(y-\bar{y})/(n-1)$
-
 - correlation $corr(x,y)= \frac{cov(x,y)}{\sigma_x\sigma_y}$ 
-
 - standard error $\sigma_\mu = \frac{\sigma}{\sqrt{n}}$
 
 
