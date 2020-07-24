@@ -1282,6 +1282,12 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 ### MA(q) Model
 
++ MA(1) = AR($\infty$) if we restrict $\alpha_i = -\beta^i$ for $i>0$, $|\beta| < 1$ 
+
+  + derivation: $x_t = \alpha_0+\beta x_{t-1}+\beta^2 x_{t-2}+ \dots + w_t$ — eqn (1)
+  + $x_{t-1} = \alpha_0+\beta x_{t-2}+\beta^2 x_{t-3}+ \dots + w_{t-1}$ — eqn(2)
+  + eqn(1)$- \beta \times$ eqn(2):  $x_t =\alpha_0 - \beta \cdot\alpha_0 + w_t - \beta \cdot w_{t-1} \iff x_t = c_0 + w_t + \theta_1 w_t$ — (MA(1) process)
+
 + $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q}\\ \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
 
   + linear combination of the current white noise and the past noise up to $q$ lag + a constant 
@@ -1623,6 +1629,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 ## The Formula Vault
 
 - quadractic formula for solving quadratic roots: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$
+- geometric series: $a+a r+a r^{2}+a r^{3}+a r^{4}+\cdots=\sum_{k=0}^{\infty} a r^{k}=\frac{a}{1-r},$ for $|r|<1$
 - expected value $\mathbb{E}[x]$ 
 - variance of a sample: $var(x)=\sum_{i=1}^n(x-\bar{x})^2/(n-1) = cov(x,x)$
 - standard deviation: $\sigma= \sqrt{ \text{variance}}$
