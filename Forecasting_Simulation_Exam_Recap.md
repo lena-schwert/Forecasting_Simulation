@@ -1,3 +1,7 @@
+
+
+
+
 ## Key Insights
 
 - **How to differentiate additive model and multiplicative model with the plot of decompose function?**
@@ -843,18 +847,18 @@
   > polyroot(c(1,0,-4)) 
   0.5+0i -0.5+0i
   ```
-```
 
   <img src="explosive.png" alt="explosive" style="zoom:50%;" />
 
 + only roots with absolute value > 1 -> exponential damping
-
-  ```R
-  > polyroot(c(1,1,0.25))
-  -2-0i -2+0i
+```R
+> polyroot(c(1,1,0.25))
+-2-0i -2+0i
 ```
 
-  <img src="exponential damping.png" alt="exponential damping" style="zoom:50%;" />
+<img src="exponential damping.png" alt="exponential damping" style="zoom:50%;" />
+
+  
 
 + complex roots with absolute value > 1 -> stochastic cycle with damped oscillations 
 
