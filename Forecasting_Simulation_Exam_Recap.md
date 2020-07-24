@@ -828,8 +828,7 @@
   # Dx[t] = a0 + a1Dx[t-1] + a2Dx[t-2] -> Dx[t] = 1 -0.53Dx[t-1]-0.267Dx[t-2]
   # We obtain the same model equation as estimated using ur.df() fit
   ````
-````
-  
+
 + Model equation derivation: $\Delta^2 x_{t}=\alpha_{0}+\delta \Delta x_{t-1}+\tilde{\alpha}_{1} \Delta^2 x_{t-1}+w_{t}$ $\Rightarrow \Delta^2 x_t = 1 -1.8\Delta x_{t-1} + 0.27 \Delta^2 x_{t-1} + w_t$
 
 ### Root of Characteristic Polynomials 
@@ -843,6 +842,7 @@
   ```R
   > polyroot(c(1,0,-4)) 
   0.5+0i -0.5+0i
+  ```
 ```
 
   <img src="explosive.png" alt="explosive" style="zoom:50%;" />
@@ -852,7 +852,7 @@
   ```R
   > polyroot(c(1,1,0.25))
   -2-0i -2+0i
-  ```
+```
 
   <img src="exponential damping.png" alt="exponential damping" style="zoom:50%;" />
 
