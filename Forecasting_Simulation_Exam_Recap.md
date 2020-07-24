@@ -45,11 +45,20 @@
   ```
 
 + **Why unit root causes problem in AR(p) process?** -> From its asymptotic mean properties, we can see that the mean will be unbounded when there is a unit root ($\sum_{i=1}^p \alpha_i = 1$), hence making the process non stationary -> remove the unit roots by differencing to obtain stationary process 
+
 + **Integration order and Unit Root vs. lag order** 
   => no. of unit root = integration order $\neq$ lag order 
   => Given an AR(p) process, if the $\sum_{i=1}^p \alpha_i = 1$ (NOT including $\alpha_0$!) then we know there is a unit root process but it does not tell us how many unit roots -> solve the polynomial characteristic equation to find out, use `polyroot()`
+
 + **Covariance of random variables** -> When two random variables,($w_i$ & $w_j$) are independent and identiacally distributed (i.i.d), independent means there is no correlation when $i \neq j$; when $i = j$ -> $cov[w_i, w_i] = cov[w_j,w_j]$ (covariance of the random variable with itself = variance of the random variable), if $w_i, w_j$ ~ $N(0, \sigma^2)$ -> $cov[w_i, w_i] = cov[w_j,w_j] = var[w_i] = var[w_j] = \sigma^2$ (when $i =j$) 
+
 + **What are the causes of non-stationary in a process?** -> seasonal effect, trend or serially correlated variance (heteroskedasticity)
+
++ **Why we use the formula of AR(p) model in integrated of order for prediction?** What this $x_{t}=x_{0}+\sum_{i=1}^{t} \Delta x_{i}$ tells us? 
+
+  => in an imaginary mask shortage outbreak, let says $x_t$ is the mask price of point in time $t=4$, we can estimate the price if we know the past consecutive daily price increment and the starting price -> starting price = 1, so $x_4 = 1+2+3+1 =7$ (CAUTION: assuming the price increase linearly so we do first differencing to get daily difference (a stationary process) in order to do the prediction)
+
+  <img src="insight for I(d).png" alt="insight for I(d)" style="zoom: 67%;" />
 
 ## Summary
 
@@ -675,8 +684,6 @@
      + omit the coefficients that are not significant! 
   
   <u> Example: Chapter4 Ex2.R</u>
-  
-  
   
   ```` R
   # Step1: Determine the order of integration 
