@@ -4,7 +4,13 @@
   - the seasonal and random component should be oscillating around zero for an additive model
   - the seasonal and random component should be oscillating around one for a multiplicative model 
 
-<img src="additive model.png" alt="additive model" style="zoom: 80%;" /><img src="additive model.png" alt="additive model" style="zoom: 80%;" />
+
+
+<img src="additive model.png" alt="additive model" style="zoom: 80%;" />
+
+<img src="additive model.png" alt="additive model" style="zoom: 80%;" />
+
+*Chapter 3*
 
 - White Noise, Random Walk and AR(1) process in a nutshell 
 
@@ -42,7 +48,9 @@
   var(0.5*w1+2*w2) # 0.5^2*4 + 2^2+1 = 5
   ```
 
-+ **Why unit root causes problem in AR(p) process?** -> From its asymptotic mean properties, we can see that the mean will be unbounded when there is a unit root ($\sum_{i=1}^p \alpha_i = 1$), hence making the process non stationary -> remove the unit roots by differencing to obtain stationary process 
+*Chapter 4*
+
++ **Why does a unit root cause problems in AR(p) processes?** -> From its asymptotic mean properties, we can see that the mean will be unbounded when there is a unit root ($\sum_{i=1}^p \alpha_i = 1$), hence making the process non stationary -> remove the unit roots by differencing to obtain stationary process 
 
 + **Integration order and Unit Root vs. lag order** 
   => no. of unit root = integration order $\neq$ lag order 
@@ -57,6 +65,10 @@
   => in an imaginary mask shortage outbreak, let says $x_t$ is the mask price of point in time $t=4$, we can estimate the price if we know the past consecutive daily price increment and the starting price -> starting price = 1, so $x_4 = 1+2+3+1 =7$ (CAUTION: assuming the price increase linearly so we do first differencing to get daily difference (a stationary process) in order to do the prediction)
 
   <img src="insight for I(d).png" alt="insight for I(d)" style="zoom: 67%;" />
+
+*Chapter 5*
+
+*Chapter 7*
 
 ## Summary
 
@@ -803,6 +815,7 @@
   
   # Dx[t] = a0 + a1Dx[t-1] + a2Dx[t-2] -> Dx[t] = 1 -0.53Dx[t-1]-0.267Dx[t-2]
   # We obtain the same model equation as estimated using ur.df() fit
+  ````
 ````
   
 + Model equation derivation: $\Delta^2 x_{t}=\alpha_{0}+\delta \Delta x_{t-1}+\tilde{\alpha}_{1} \Delta^2 x_{t-1}+w_{t}$ $\Rightarrow \Delta^2 x_t = 1 -1.8\Delta x_{t-1} + 0.27 \Delta^2 x_{t-1} + w_t$
@@ -818,7 +831,7 @@
   ```R
   > polyroot(c(1,0,-4)) 
   0.5+0i -0.5+0i
-  ```
+```
 
   <img src="explosive.png" alt="explosive" style="zoom:50%;" />
 
@@ -900,7 +913,7 @@
 
 ### Determining the lag order p
 
-- **intuition:** Why do we
+- **intuition:** Why do we need this? - This is necessary for the fit procedures 
 
 + 3 ways to determine the lag order p: rule of thumb, partial autocorrelatin and information criteria
 
@@ -912,42 +925,111 @@
 
 #### Using partial autocorrelation
 
++ **intuition:** lag terms higher than p do not contribute significantly to a good fit so they are $\approx 0$ 
+
 + Definition: pacf at lag $k$ is the $k$th coefficient of the fitted model AR($k$)
 
   + if $k$ is the "right" order, then the pacf of lag $> k$ will be zero 
 
-+ **partial autocorrelation of an AR($p$) process =0 at lag p + 1 and greater**
++ **partial autocorrelation of an AR($p$) process = 0 at lag p + 1 and greater**
 
       + pacf value lies within the confidence line $(1.96/sqrt(n))$ when at lag $p+1$ and greater 
 
-+ pacf is used to find the correct order of the series; acf is used to check for stationary of the process/check the normality of the residuals 
++ **How to calculate partial autocorrelation:**
 
-  + `pacf(ts)` does not start from lag = 0! -> find the last significant lag = the right lag order of the series 
+  + for each lag, one OLS estimation is done
++ pacf value = the vlaue of the last $\alpha$ coefficient = highest lag term
+    + e.g. for lag = 3, an AR(3) model is fitted to the data and $pacf = \alpha_3$ 
 
-  + significant line -> dashed line = $1.96/sqrt(n)$
++ pacf is used to find the correct order of the series; acf is used to check for stationary of the process/check the normality (= "uncorrelatedness") of the residuals 
 
+  + **The correct lag order is the last pacf value that is significantly different from zero!**
+
+  + `pacf(ts)` does not sta
+
+  + rt from lag = 0! -> find the last significant lag = the right lag order of the series 
+
+  + significant line -> dashed line = $1.96/\sqrt{n}$
+  
   + high $n$ guarantee high accuracy; When n is small then significant value could be very close to the coefficient of the lag order 
-
+  
     => conclude to a smaller lag order, $p-1$ as the correct order mistakenly 
 
 #### Using information criteria
 
+- **intuition:** information criteria are generally used to compare models by jointly evaluating the goodness of fit + the number of parameters in a model
+
+  –> **here, we want to identify a lag order $p$ that will give us a good fit to the data using as few parameters as possible**
+
+  ​	–> Occam's razor, preference for simple models, etc.
+
 + when we have $n$ obs. then we have $n-p$ residuals 
+  
   + the variance: $\hat{\sigma}_{w}^{2}(p):=\frac{1}{n-p} \sum_{i=p+1}^{n} \widehat{w}_{i}^{2}(p)$
+  
 + the no. of coefficients and the "goodness" of the fit are both considered
   + more parameters in the model -> better fit but can also lead to overfitting (same concept as in ML)
   + need to find the sweet spot (balance bt. the no. of parameters vs. low value in residuals)
   + penalize the no. of parameters to find a better fit 
-+ Two type of information criterion: 
+  
++ **Two types of information criterion:** 
+  
   + AIC (Akaike Information Criterion)
+    
     + $A I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{2}{n-p} \cdot p*$
+    
   + SIC (Schwarz Information Criterion aka. Bayesian criterion)
+    
     + $S I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{ln(n-p)}{n-p} \cdot p*$
+    
   + $p^{*}=\left\{\begin{array}{l}p+1, \text { if } \alpha_{0} \text { is estimated } \\ p, \text { if } \alpha_{0} \text { is not estimated }\end{array}\right.$
-+ AIC estimate is usually > SIC estimate
+  
+    + AIC estimate is usually > SIC/BIC estimate
+  
+      –> **Jacobs often prefers BIC to achieve simpler models with less lag terms**
+  
+    - both are used in practice, but AIC may be better for forecasts
+  
 + when we try to fit multiple model with different $p$, implicitly we assume sample size is constant for all order $p$ -> presample value need to be the same 
 
-##### Code Snippets
+#### Code Snippets
+
+- **How to identify the lag order p using `pacf()`**
+
+  ```R
+  # generate the time series
+  set.seed(1)
+  n<-1000
+  ar3<-ar1<-rw<-w<- rnorm(n)
+  for (t in 2:3) {
+    rw[t]<-rw[t-1]+w[t]
+    ar1[t] <- 0.7*ar1[t-1]+w[t] #  has p = 1
+  } 
+  for (t in 4:n) {
+    ar3[t] <- ar3[t-1]-0.11*ar3[t-2]-0.23*ar3[t-3]+w[t] # needs 3 presample values
+    rw[t]<-rw[t-1]+w[t]
+    ar1[t] <- 0.7*ar1[t-1]+w[t]
+  }
+  # look at the pacf plots
+  pacf(w) # shows that the order p = 0
+  # --> there are 3 crossings, but this is not significant
+  pacf(rw) # shows that the order p = 1
+  pacf(ar1) # shows that the order p = 1
+  pacf(ar3) # shows that the order p = 3
+  ```
+
+  - **How to interpret the plots:** The height of the lines (= partial autocorrelation for that lag) needs to significant and you choose **the lag of the last significant crossing as your lag order p** (see ar3 example)
+    - white noise violates the threshold here, but that's still within the 5% level (5% times number of)
+
+  <img src="image-20200724120537403.png" alt="image-20200724120537403" style="zoom:50%;" />
+
+  <img src="image-20200724120551582.png" alt="image-20200724120551582" style="zoom:50%;" />![image-20200724120949747](image-20200724120949747.png)
+
+  <img src="image-20200724121027335.png" alt="image-20200724121027335" style="zoom:50%;" />
+
+  <img src="image-20200724121109715.png" alt="image-20200724121109715" style="zoom:50%;" />
+
+- Jacobs' function that calculates the lag order p for a process based on the information criteria AIC or BIC
 
 ```R
 calc.infocrit <- function(x, maxord=1, mean=FALSE, crit=c("aic","bic"))
@@ -975,40 +1057,64 @@ which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="aic")) #4=>p=3;
 which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="bic")) #4=>p=3 if n= 10000; 3=>p=2 if n = 1000 
 ```
 
+### Asymptotic mean in autoregressive models
 
+- **Why this matters:** it is an important property of forecasts made based on autoregressive models
+
+  –> forecasts generally converge quickly to a mean value (can be calculated using the model coefficients $\alpha$)
+
+- **The mean reversion property for stationary time series means, that the mean converges to $\mu=E[x_t]=\frac{\alpha_0}{1-\alpha_1-\dots-\alpha_p}$ for $t\rightarrow \infty.$** 
+
+  - this means that a time series converges to the mean despite structural breaks/shocks.
+
+  –> **asymptotic mean**
+
+  -  this implies that $\hat x_{t+k|t}\xrightarrow{k\rightarrow\infty}\frac{\alpha_0}{1-\alpha_1-\dots-\alpha_p}$
+
+    –> for forecasts long into the future, the model will simply predict this mean value
 
 ### Checking model residuals for autocorrelation (Ljung-Box tests)
+
++ **intuition:** we need to check the residuals for autocorrelation to know whether our model suits the data well (if it is good, we have truly random residuals)
 
 + can use `acf` to check model residuals for autocorrelation -> only check for randomness at each lag 
 
 + Ljung-Box test: test the "overall" randomness of the ts instead of the randomness at each lag
 
-  + $H_0$: autocorrelation = zero (up to certain lag of $h$)
+  –> **Ljung-Box test is a more solid approach than using `acf()`** 
 
-  + $H_1$: there are some lag in between $i$ and $h$, there exist some lag which autocorrelation $\neq 0$ 
+  + $H_0$: autocorrelation = zero (up to a certain lag $h$)
 
-  + test statistic = $Q_{h}=(n-p)^{2} \sum_{i=1}^{h} \frac{1}{n-p-i} \hat{\rho}_{i}^{2}$
+  + $H_1$: for some lag in between $i$ and $h$, there exists a lag where autocorrelation $\neq 0$ 
 
-    + $p$ is the lag order; the no. of fixed parameter exclude the deterministic parameter: intercept, deterministirc trend
+  + test statistic $Q_{h}=(n-p)^{2} \sum_{i=1}^{h} \frac{1}{n-p-i} \hat{\rho}_{i}^{2}$
 
+    + $p$ is the lag order; the no. of fixed parameter exclude the deterministic parameter: intercept, deterministic trend
+  
     + $\hat{\rho}$: estimated autocorrelation
       
-      + square it to cancel out postive & negative value 
+      + square it to cancel out positive & negative value 
       
     + $$
       \begin{array}{l}
       \hat{\rho}_{i}=\frac{1}{n-p} \sum_{t=p+i+1}^{n} \hat{w}_{t}^{s} \hat{w}_{t-i}^{s} \\
       \hat{w}_{t}^{s}=\left(\hat{w}_{t}-\bar{w}_{t}\right) / \hat{\sigma}, \hat{\sigma}^{2}=\frac{1}{n-p} \sum_{t=p+1}^{n}\left(\hat{w}_{t}-\bar{w}_{t}\right)^{2}, \bar{w}_{t}=\frac{1}{n-p} \sum_{t=p+1}^{n} \hat{w}_{t}
-      \end{array}
+    \end{array}
       $$
 
+      + $\hat w_t^s$ = **standardized residuals**
+  
+        –> residual $\hat w_t$ minus mean of all residual $\hat{\bar{w}}_t$, divided by the standard deviation
+    
     + the residuals are $\chi^2(h-p)$ distributed 
-
+    
     + $h$ need to be $> p$ for the distribution to hold
+    
+  + **if $Q_h$ is large then we can reject $H_0$!**
+  
+    –> because if it is large, the squared autocorrelations $\hat \rho_i$ are not close enough to zero
 
-    + if $Q_h$ is large then we can reject $H_0$
-
-##### Code Snippets 
+#### Code Snippets 
 
 ```R
 # e.g. here we do Ljung Box test up to lag order = 8 
@@ -1023,13 +1129,20 @@ y<-rep(NA,h.max)
 for (h in (p+1):h.max) { # so y < p is NA; we are testing on h > p 
   y[h]<-Box.test(resid,fitdf=p,type="Ljung-Box", lag=h)$p.value # probability to obtain Q_h when H_0 holds 
 }
+
+# plot the results of the tests + the significance level
+plot(x,y,ylim=c(0,1), xaxs = "r", yaxs = "r")
+lines(rep(0.05,h),lty=2,col='blue')
+# if all points are above the lines, we are good!
 ```
 
 + **REMEMBER** resid has to be taken from $p+1$ to $n$ to account for the $p$ no. of the presampled value 
 
+  <img src="image-20200724125318368.png" alt="image-20200724125318368" style="zoom:67%;" />
+
 ### Checking model residuals for stability/breakpoints (Chow test)
 
-+ General idea: we want to know if the parameters of the fit stable over time? 
++ **General idea:** we want to know if the parameters of the fit stable over time? 
   => check if there exists some breakpoints (e.g. some part of the data = AR(3), other part = AR(4))
 
   + in another word, Chow Test tells us if is there a structural break in the process? 
@@ -1389,11 +1502,13 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   - drift = intercept = $\alpha_0$ 
   - (deterministic) trend, indicated by $\beta t$ in the AR(p) model equations
   
-- **lag operator** $L = x_{t-1}$
+- **lag operator** $Lx_t = x_{t-1}$
 
   - returns the value of one/$k$ time step(s) before t
   - equivalent to backshift operator $\mathbf{B}$ 
   - can be used an arbitrary, k times –> $L^kx_t = x_{t-k}$
+  - also: $L\Delta x_t= \Delta x_{t-1}$ and $L^k\Delta x_t = \Delta x_{t-k}$ 
+
   - is most importantly used to **calculate autocorrelation of a time series**
   - **lagging a time series reduces n (= number of observations)** 
   - another application: create the lagged time series for model fit using `lm()`
