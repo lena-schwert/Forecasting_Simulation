@@ -12,7 +12,7 @@
   - **AR(1) process has short term memory** -> has moderate memory of its previous values at each next step 
   - **RW has long term memory** -> highly correlated to its previous value at each next step -> smoothest among the three processes 
 
-- **Why there is a deterministic trend in random walk with drift**? 
+- **Why is there a deterministic trend in a random walk with drift**? 
 
   - random walk with drift is basically a random walk on a slope -> corresponds to a deterministic trend, $\vartheta t$ 
   - "drift"here refers to a constant that each variable drifted away from its previous value at each step-> as this constant get "accumulated" for each step, it becomes a linear trend over time
@@ -25,13 +25,11 @@
   
   - insight from Chap 4 HW 3 (week 10): e.g.for a random walk, the absolute values are very different over time, but the **differences between subsequent values are not!**
   
-- see below, left: random walk, right: 1-times differenced, looks way more stationary
-  
-  ![image-20200620191114648](image-20200620191114648.png)
-  
-  => A stock price of a company over a time span of 3000 consecutive days (on the left) generally looks like a random walk but when we difference the series to look at the daily change for 3000 consecutive days (on the right), it should be a stationary process (stock price does not differ much from the one day before in general!)
-  
-  
+  - see below, left: random walk, right: 1-times differenced, looks way more stationary
+    
+    ![image-20200620191114648](image-20200620191114648.png)
+    
+    => A stock price of a company over a time span of 3000 consecutive days (on the left) generally looks like a random walk but when we difference the series to look at the daily change for 3000 consecutive days (on the right), it should be a stationary process (stock price does not differ much from the one day before in general!)
   
 - Effect on the variance of random variables when the variables are scaled by a factor, $a$ : since variance is in term of squared factor of the variables, the new variance = $a^2 \times$ old variance
 
@@ -659,6 +657,8 @@
 
        –> conclude that the order of integration = 2, do model selection from here on
 
+       ans **use the stationary d2x as input to obtain the model coefficients!**
+
 - **How to do model selection like above using `ur.df()`**
 
   ```R
@@ -690,7 +690,8 @@
   - if fitting a differenced time series, rearrange terms of the model equstion
   - optionally: check for unit root by calculating $\sum_i\alpha_i$
 
-+ **How to find the model equation given a time series data:**
++ **How to find the model equation given a time series data:** (all 3 steps from above in one place)
+  
   1. Determine the order of integration using Pantula principle to perform Dickey-Fuller test (revise order of model selection tree) => "none" (tau1) -> "drift" (tau2, phi1) -> "trend" (tau3, phi2, phi3)
   2. Do model selection (walk down the model selection tree) => "trend" (tau3, phi2, phi3) -> "drift" (tau2, phi) -> "none" (tau1)
      + to determine which type of process the time series is e.g. random walk with/withou drift, stationary or trend stationary 
@@ -802,8 +803,8 @@
   
   # Dx[t] = a0 + a1Dx[t-1] + a2Dx[t-2] -> Dx[t] = 1 -0.53Dx[t-1]-0.267Dx[t-2]
   # We obtain the same model equation as estimated using ur.df() fit
-  ````
-
+````
+  
 + Model equation derivation: $\Delta^2 x_{t}=\alpha_{0}+\delta \Delta x_{t-1}+\tilde{\alpha}_{1} \Delta^2 x_{t-1}+w_{t}$ $\Rightarrow \Delta^2 x_t = 1 -1.8\Delta x_{t-1} + 0.27 \Delta^2 x_{t-1} + w_t$
 
 ### Root of Characteristic Polynomials 
@@ -892,7 +893,6 @@
 ### Differencing too often (= infinite lag order)
 
 + The effect on a time series that is differenced too often (differenced more times than its actual order of integration) -> result in a model with infinite lag order -> too many model coefficients –> bad model fit (too complex, we prefer simple models)
-+ 
 + **How to proof**? We state that if $x_t$ is stationary then $\Delta x_t$ will have infinite lag order this implies that if $\Delta x_t$ have finite lag order, that mean we just differenced enough from a unit root process, $x_t$ -> we proof this implication  
   + we proof that, if $\Delta x_t$ has finite lag order, the coefficients of $x_t$ sum up to one –> the process has a unit root = is a non-stationary random walk
   + **Start by assuming that $\Delta x_t$ has finite lag order: $\Delta x_t = \beta_0 + \sum_{i=1}^{p-1} \beta_i x_{t-i}$**  expand it -> $x_t = \beta_0 + x_{t-1} + \sum_{i=1}^{p-1} \beta_i x_{t-i} - \sum_{i=2}^p \beta_{i-1} x_{t-i}$ -> rearranging the term with $\alpha$s to show that all coefficients of $x_{t-i}$ sum up to 1, this show that $x_t$ is a unit root process! 
