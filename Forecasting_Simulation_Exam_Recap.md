@@ -1218,11 +1218,51 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
 
     + $\theta_{s}\left(L^{s}\right)=1+\theta_{s, 1} \cdot L^{s}+\cdots+\theta_{s, Q} \cdot L^{s \cdot Q}$
 
-    + How many lags LHS introduce? -> $d+ D + p + s \cdot P$
+    + **How many lags the LHS introduce?** -> $d+ s \cdot D + p + s \cdot P$ 
 
-    + How many lags RHS introduce? -> $q + s \cdot Q$
+      + the differecing operation introduce lag term(s) without the coefficients 
 
-      
+      + **differencing operaton in seasonal part introduce same no of lag (just different lag term)** as in non-seasonal part: 
+        => $s=4, D=2, d=2 \rightarrow (1-L^4-L^8)$ for seasonal part; $(1-L-L^2)$ for non-seasonal part 
+
+      + same logic applies to the lags introduce by the autoregressive part 
+
+        => $p = 2, P=2, s=12 \rightarrow (1-\alpha_{12,1}L^{12}-\alpha_{12,2}L^{24})$ for seasonal part; $(1-\alpha_1L-\alpha_2L^2)$ for non-seasonal part   
+
+    + **How many lags the RHS introduce?** -> $q + s \cdot Q$
+      => $q=2, Q=2, s=4 \rightarrow (1+\theta_{4,1}L^4+\theta_{4,2}L^2)$ for seaonal part; $(1+\theta_1L +\theta_2 L^2)$ for non-seaonal part
+
+    + same as ARIMA, the series is assumed to be stationary with intergation order, $d$ there are restrictions on the $\alpha_s$ and $\alpha$ -> the summation of these $\alpha$s (exclude $\alpha_0$) should not be equal to 1 (=unit root process)!  
+
+      + not solving by unit-root through polynomial -> use statistical test like augmented dickey-fuller test instead!
+      + need to calculate the mean of the seasonal part first then substract this mean from the series -> use the same value for the characteristic & criteria value of the distribution -> do not explore it in this class 
+      + Other approaches: 
+        + just use a function which calculate the BIC -> order of differencing - $d \& D$ -(not a test but just a HINT)
+        + HEGY - seasonal unit root test -> $H_0$: We have any root in the unit circle not just the value 1 
+        + ANOVA -Hansen, $H_0$: we have a stationary proces
+
+  + **How many coefficients we have to fit in the classical ARIMA model?** -> the differencing operation only introduce lag terms without coefficients! -> $1(\alpha_0) + p + sP + q + sQ$ (this is an unrestricted model -> more parameters!)
+
+  + **How many coefficients we have to fit in a seasonal ARIMA model? **-> $1+p+P+q+Q$ (this is a restricted model, REMEMBER the seasonal part of the model introduce the restrictions on the modelling which in turn reduces the no. of parameters!)
+
+    
+
+  <u> Example3 from lecture slide:</u>
+
+  + ARIMA$(0,1,0)$ x $(2,0,0)_{12}$ model: 
+  + Calculate the highest lag order: $p + sP + d+ sD = 12(2) + 1 = 25$
+    + normal ARIMA without the seasonality ARIMA -> we will have to fit up to 26 (include intercept)
+    + seasonal ARIMA -> we only need to estimate $p+P+q+Q = 3$ coefficients  
+  + $q + sQ = 0$ for the moving average part 
+    + $\alpha_{12}(L^{12}) = 1 - \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24} \quad (P=2)$
+    + $\alpha(L) = 1 \quad \quad (p =0)$
+    + $\Delta^0_{12} = 1 \quad \quad (D=0)$
+    + $\Delta^1 = 1- L \quad \quad (d=1)$
+    + $\theta(L) = 1 \quad \quad (q=0)$
+    + $\theta_{12}(L^{12}) = 1 \quad \quad (Q=0)$
+      + $(1- \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24})(1-L) x_t = \alpha_0 + w_t$
+      + $\Rightarrow (1- \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24} - L + \alpha_{12,1} L^{13} + \alpha_{12,2} L^{25}) x_t = \alpha_0 + w_t$
+      + $\Rightarrow x_t = \alpha_0 + x_{t-1} + \alpha_{12,1}x_{t-12} -\alpha_{12,1} x_{t-13} + \alpha_{12,2}x_{t-24}- \alpha_{12,2} x_{t-25}+w_t$
 
 ### Cointegration
 
