@@ -1073,6 +1073,31 @@ which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="bic")) #4=>p=3 if n= 10000; 
 
     –> for forecasts long into the future, the model will simply predict this mean value
 
+#### Code Snippets
+
+- **How to show exemplarily that for an AR(p) process the mean will be predicted**
+
+  ```R
+  # from Chap 4 Ex 3.R
+  # generate an AR(3) process
+  n<-10000
+  ar3c<-w<- rnorm(n) 
+  for (t in 4:n) {
+    ar3c[t] <- 2+ar3c[t-1]-0.11*ar3c[t-2]-0.07*ar3c[t-3]+w[t]
+  }
+  # calculate mean with the theoretical formula
+  mean<-alpha0/((1-ar3c.ar$ar[1]-ar3c.ar$ar[2]-ar3c.ar$ar[3]))
+  # mean = 11.07
+  
+  # make a prediction 1000 steps ahead
+  ar3c.predict<-predict(ar3c.ar, n.ahead=n/10)
+  
+  # plot time series with predictions
+  ts.plot(ts(ar3c), ar3c.predict$pred, lty = 1:2)
+  ```
+
+  <img src="image-20200724130325781.png" alt="image-20200724130325781" style="zoom:67%;" />
+
 ### Checking model residuals for autocorrelation (Ljung-Box tests)
 
 + **intuition:** we need to check the residuals for autocorrelation to know whether our model suits the data well (if it is good, we have truly random residuals)
