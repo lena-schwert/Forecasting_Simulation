@@ -1230,7 +1230,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
     $$F=\frac{S_1+ S_2}{n-2k}/\frac{S-(S_1+S_2)}{k} \Rightarrow \frac{S-\left(S_{1}+S_{2}\right)}{S_{1}+S_{2}} \cdot \frac{n-2 k}{k} \\ \text{where}$$
 
-    $$\begin{aligned} S=& \sum_{t=1}^{n} \widehat{w}_{t}^{2} -> \text{full sample}\\ S_{1} &=\sum_{t=1}^{n_{1}}\left(\widehat{w}_{t}^{(1)}\right)^{2} -> \text{period 1}\\ S_{2} &=\sum_{t=n_{1}+1}^{n}\left(\widehat{w}_{t}^{(2)}\right)^{2}  -> \text{period 2}\end{aligned}$$
+    $$\begin{aligned} S=& \sum_{t=1}^{n} \widehat{w}_{t}^{2} -> \text{full sample}\\ S_{1} &=\sum_{t=1}^{n_{1}}\left(\widehat{w}_{t}^{(1)}\right)^{2} -> \text{period 1}\\ S_{2} &=\sum_{t=n_{1}+1}^{n}\left(\widehat{w}_{t}^{(2)}\right)^{2}  -> \text{sum of squares of residuals of period 2}\end{aligned}$$
 
     + account for the no. of obs of the fit as well as the parameters used in the fit 
       + need to subtract the no. of parameter used for the fit because SSE will be smaller if more parameters are used
@@ -1278,7 +1278,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 ### MA(q) Model
 
-+ $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q} \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
++ $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q}\\ \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
 
   + linear combination of the current white noise and the past noise up to $q$ lag + a constant 
 
@@ -1303,7 +1303,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
     => it is second order stationary (weak stationary)
 
-  + $$\rho_k = \begin{cases}
+    $$\rho_k = \begin{cases}
     1 & \text{for k = 0} \\
     (\theta_{k}+\sum_{i=1}^{q-k} \theta_{i} \cdot   \theta_{i+k}) /(1+\sum_{i=1}^{q} \theta_{i}^{2}) &   \text{for k=1,...,q} \\ 0 & \text{for k > q}\end{cases}$$
 
@@ -1313,9 +1313,16 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 ### ARMA(p,q) Model
 
-+ $x_{t}=\alpha_{0}+\sum_{i=1}^{p} \alpha_{i} \cdot x_{t-i}+w_{t}+\sum_{j=1}^{q} \theta_{j} \cdot w_{t-j} \Rightarrow \left(1-\alpha_{1} \cdot L-\cdots-\alpha_{p} \cdot L^{p}\right) x_{t}=\alpha_{0}+\left(1+\theta_{1} \cdot L+\cdots+\theta_{q} \cdot L^{q}\right) w_{t}$
++ $$
+  x_{t}=\alpha_{0}+\sum_{i=1}^{p} \alpha_{i} \cdot x_{t-i}+w_{t}+\sum_{j=1}^{q} \theta_{j} \cdot w_{t-j}\\ \Rightarrow \left(1-\alpha_{1} \cdot L-\cdots-\alpha_{p} \cdot L^{p}\right) x_{t}=\alpha_{0}+\left(1+\theta_{1} \cdot L+\cdots+\theta_{q} \cdot L^{q}\right) w_{t}​
+  $$
+  
+  
+  
   + hybrid of AR(p) and MA(q) model 
+  
 + shorthand: $\alpha(L)x_t = \alpha_0 + \theta(L)w_t$
+
 + neither autocorrelation or partial autocorrelation can be used to find the order of the model 
       + use cross validation to determine the lag oder p and q 
 
@@ -1674,6 +1681,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 - **AR(p) process** (= autoregressive)
 
   - $x_t= \alpha_0 +\alpha_1x_{t-1}+\dots+\alpha_px_{t-p}+w_t$ 
+  - rephrased to: $\Delta x_t = \alpha_0+\delta x_{t-1}+\sum_{i=1}^{p-1}\tilde\alpha_i\Delta x_{t-1} +w_t$ 
 
 - **MA(q) process **(= moving average)
 
