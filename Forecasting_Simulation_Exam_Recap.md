@@ -497,7 +497,19 @@
 #### Code Snippets
 
 - **How to do bootstrapping with `boot()`**
+
 - **How to do bootstrapping with `sample()`**
+
+- **How to do bias-corrected bootstrapping**
+
+  - bias correction is important for **small samples, because the bias term will be $\neq 0$** (refer to Chapter *Parameter Estimation of $\alpha$ (ML, OLS)* ) 
+  - implements approach from a paper: Kim et al. (2010): Bias-Corrected Bootstrap Prediction Intervals for Autoregressive Model: New Alternatives with Applications to Tourism Forecasting, Journal of Forecasting 29(7):655 - 672
+
+  ```R
+  # from Chap 4 Bootstrap.R
+  ```
+
+  
 
 ### Stationarity
 
