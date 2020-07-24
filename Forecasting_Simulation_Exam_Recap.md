@@ -570,6 +570,10 @@
     
     - $\hat\delta$ is obtained by OLS estimation of the respective model equation
     
+      ![image-20200722174208791](image-20200722174208791.png)
+    
+      –> derived in *Dickey Fuller 1.pdf*
+    
   - where test statistics $\phi = \frac{SSE_R-SSE}{r}/\frac{SSE}{n-k}$
     
     (same approach as test statistics of F-tests) 
@@ -612,6 +616,15 @@
   - start at the bottom when following the Pantula principle to determine the order of integration ($\leq 3$)
 
 <img src="image-20200720093337261.png" alt="image-20200720093337261" style="zoom:50%;" />
+
++ **Order of Integration** 
+  + tell us how many times we need to difference a time series to get a stationary process 
+  
+  + order of integration = no. of unit roots $\neq$ the number of lags, $p$! 
+  
+  + reason for why a model is called "integrated": $x_t = x_0+\sum_{i =1}^t\Delta x_i$ 
+  
+    –> **What is the implication of this?**
 
 #### Code Snippets
 
@@ -659,7 +672,7 @@
     - `z.diff` correponds to $\Delta x_t$ here
     - `intercept` corresponds to $\alpha_0$
     - `t.t` corresponds to $\beta$ (= trend)
-    - `z.lag.one` corresponds to "coefficient of $x_{t-1}$" ($\delta$) 
+    - `z.lag.1` corresponds to "coefficient of $x_{t-1}$" ($\delta$) 
     - `z.diff.lag.i` corresponds to $\tilde \alpha_i$
 
 - **How to find the model equation in the shape $x_t=\dots$ after doing model selection** 
@@ -668,8 +681,10 @@
 
     - **CAUTION:** use the function call where the input is a stationary time series!
 
+      - this is required, because `ur.df()` uses a linear process, so the process actually needs to be linear (= stationary)
+    
       –> for a non-stationary process (= model selection identified a random walk) you have to fit d1x or d1x instead of x directly!
-
+  
   - identify which model parameters are significant using `summary(ur.df(...))`
   - optionally: refit again using only the significant parameters with `restrict()`
   - if fitting a differenced time series, rearrange terms of the model equstion
@@ -876,12 +891,16 @@
 
 ### Differencing too often (= infinite lag order)
 
-+ The effect on a time series that is differenced too often (differeced more times than its actual order of integration) -> result in a model with infinite lag order -> why it's bad? Hard to forecast with it
++ The effect on a time series that is differenced too often (differenced more times than its actual order of integration) -> result in a model with infinite lag order -> too many model coefficients –> bad model fit (too complex, we prefer simple models)
++ 
 + **How to proof**? We state that if $x_t$ is stationary then $\Delta x_t$ will have infinite lag order this implies that if $\Delta x_t$ have finite lag order, that mean we just differenced enough from a unit root process, $x_t$ -> we proof this implication  
+  + we proof that, if $\Delta x_t$ has finite lag order, the coefficients of $x_t$ sum up to one –> the process has a unit root = is a non-stationary random walk
   + **Start by assuming that $\Delta x_t$ has finite lag order: $\Delta x_t = \beta_0 + \sum_{i=1}^{p-1} \beta_i x_{t-i}$**  expand it -> $x_t = \beta_0 + x_{t-1} + \sum_{i=1}^{p-1} \beta_i x_{t-i} - \sum_{i=2}^p \beta_{i-1} x_{t-i}$ -> rearranging the term with $\alpha$s to show that all coefficients of $x_{t-i}$ sum up to 1, this show that $x_t$ is a unit root process! 
   + use $\Delta x_t = \beta_0 + \beta_1 \Delta x_{t-1} + \beta_2 \Delta x_{t-2}$ to deduce the expansion from the initial assumption! 
 
 ### Determining the lag order p
+
+- **intuition:** Why do we
 
 + 3 ways to determine the lag order p: rule of thumb, partial autocorrelatin and information criteria
 
