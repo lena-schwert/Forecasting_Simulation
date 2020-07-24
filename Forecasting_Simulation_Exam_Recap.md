@@ -1287,6 +1287,9 @@ lines(rep(0.05,h),lty=2,col='blue')
   + derivation: $x_t = \alpha_0+\beta x_{t-1}+\beta^2 x_{t-2}+ \dots + w_t$ — eqn (1)
   + $x_{t-1} = \alpha_0+\beta x_{t-2}+\beta^2 x_{t-3}+ \dots + w_{t-1}$ — eqn(2)
   + eqn(1)$- \beta \times$ eqn(2):  $x_t =\alpha_0 - \beta \cdot\alpha_0 + w_t - \beta \cdot w_{t-1} \iff x_t = c_0 + w_t + \theta_1 w_t$ — (MA(1) process)
+  + Alternative derivation: using geometric series equation, without constant term
+    + with backshift operator, eqn(1) without constant term becomes: $(1+\beta L+\beta^2L^2+\dots)x_t = w_t$
+    + use geometric series formula: $\frac{x_t}{1-\beta L} = w_t \iff x_t = w_t -\beta w_{t-1} = w_t+\theta_1w_1$
 
 + $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q}\\ \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
 
