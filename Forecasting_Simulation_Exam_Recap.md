@@ -939,8 +939,9 @@
 
   + for each lag, one OLS estimation is done
 + pacf value = the vlaue of the last $\alpha$ coefficient = highest lag term
-    + e.g. for lag = 3, an AR(3) model is fitted to the data and $pacf = \alpha_3$ 
-
+  
++ e.g. for lag = 3, an AR(3) model is fitted to the data and $pacf = \alpha_3$ 
+  
 + pacf is used to find the correct order of the series; acf is used to check for stationary of the process/check the normality (= "uncorrelatedness") of the residuals 
 
   + **The correct lag order is the last pacf value that is significantly different from zero!**
@@ -1456,6 +1457,46 @@ $i = p =$ no. of lags; $k =$ no. of series in the system; first index of $\alpha
 **To check the stability in a VAR model**: 
 
 + $\text{det}\left(I_{k}-A_{1} z-\cdots-A_{p} z^{p}\right)=0$ lie outside of the unit circle (> 1 in absolute value)
+
+**To check the lag order p**: Generalized Information Criteria 
+
++  use the information criteria that generalize from the univariate process 
+
++ $$
+  \begin{array}{l}
+  \hat{\Sigma}:=\frac{1}{n-p} \sum_{i=p+1}^{n} \hat{R}_{i} \hat{R}_{i}^{\prime} \\
+  \operatorname{AIC}(p)=\ln (\operatorname{det} \hat{\Sigma})+\frac{2}{n-p} \cdot p^{*} \\
+  \operatorname{SIC}(p):=\ln (\operatorname{det} \hat{\Sigma})+\frac{\ln (n-p)}{n-p} \cdot p^{*} \\
+  p^{*}=\left\{\begin{array}{l}
+  p \cdot k^{2}+k, \text { if } A_{0} \text { is estimated } \\
+  p \cdot k^{2}, \text { if } A_{0} \text { is not estimated }
+  \end{array}\right.
+  \end{array}
+  $$
+
++ How it is different from the IC of univariate process? 
+  => variance-covariance matrix show the variances ($\sigma^2$ in the univariate), summation of white noises in multiplication of vector, $R_i$ 
+  => instead of taking the natural log of the variance -> take the natural log of the determinant of variance-covariance matrix  $ln(\text{det} \hat{\Sigma})$
+
+**To check the residuals autocorrelation**: Generalized Ljung-Box Test 
+
++ $$
+  \begin{array}{l}
+  \Sigma_{l}=E\left[R_{t} R_{t-l}^{\prime}\right] \\
+  \hat{\Sigma}_{l}=\frac{1}{n-p} \sum_{t=p+l+1}^{n} \hat{R}_{t} \hat{R}_{t-l}^{\prime} \\
+  H_{0}: \Sigma_{1}=\cdots=\Sigma_{h}=0 \\
+  H_{1}: \exists i \operatorname{with} \Sigma_{i} \neq 0
+  \end{array}
+  $$
+
++ **Test statistic**: 
+  $$
+  Q_{h}=(n-p)^{2} \sum_{i=1}^{h} \frac{1}{n-p-i} \operatorname{tr}\left(\hat{\Sigma}_{i}^{\prime} \hat{\Sigma}_{0}^{-1} \hat{\Sigma}_{i} \hat{\Sigma}_{0}^{-1}\right)
+  $$
+
+  + the trace of these matrix products reduced to $\hat{\rho_i}^2$ -> equivalent to the test statistic in univariate process 
+
++ approximately Chi-squared distribution $\chi^2(k^2(h-p))$
 
 ### VECM
 
