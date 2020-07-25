@@ -1771,6 +1771,49 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
   + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
 
+### How to generate correlated residuals
+
+1. **Cholesky decomposition**
++ Cholesky decomposition is a decomposition of a symmetric positive definite matrix A into a product of a **lower triangular matrix** and **its conjugate transpose**, $A=LL'$
++ our covariance matrix is **positive definite** -> can be decomposed into $LL'$ and generate a correlated residuals, $w$ from uncorrelated residuals, $u$: $w=Lu$
+  1. definite the covariance matrix, $\Sigma$ we want to simulate 
+  2. decompose $\Sigma$ into $LL'$
+  3. generate uncorrelated residuals, $u$ -> each with variance = 1
+      + expectation of $uu'$ is the variance of $u$ because the mean = 0; $\mathbb{E(uu')}=\text{identity matrix}$
+  4. generate the correlated residuals $w=Lu$
+      + $w\cdot w'=(Lu)(Lu)^{'}=Luu'L'$
+      + $\mathbb{E}[ww'] =cov(w,w) = \mathbb{E}(Luu'L)=L\mathbb{E}[uu']L'=LL'=\Sigma$
+
+```R
+#Chap7 Ex1
+covR<-matrix(c(1, -0.5, 0.6,
+               -0.5, 1, 0,
+               0.6, 0, 1), ncol=3
+)
+
+L <- t(chol(covR))
+w1 <- rnorm(n, mean=0, sd=1)
+w2 <- rnorm(n, mean=0, sd=1)
+w3 <- rnorm(n, mean=0, sd=1)
+
+w <- L%*%t(cbind(w1,w2,w3))
+cov(t(w)) # approximately equal to covR, LL'
+```
+2. By adding uncorrelated residuals
+```R
+#Chap7 Ex2
+> w1 <- rnorm(n, mean=0, sd=1)
+> w2 <- rnorm(n, mean=0, sd=1)
+> R <- cbind(w1, 0.5*w1+2*w2)
+> cov(R)
+          w1          
+w1 1.0710508 0.5493046
+   0.5493046 4.6077879
+# sum((w1-mean(w1))^2)/(n-1) -> var(w1) = 1.071051 
+# sum((w1-mean(w1))*((0.5*w1+2*w2)-mean(0.5*w1+2*w2)))/(n-1) =  0.5493046
+# sum(((0.5*w1+2*w2)-mean((0.5*w1+2*w2)))^2)/(n-1) = 4.607788
+```
+
 ## Definitions (A-Z)
 
 - **Cholesky decomposition**
