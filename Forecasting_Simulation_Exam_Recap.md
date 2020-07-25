@@ -1785,6 +1785,8 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
   + where $T$ = number of fitted observations ($n-p$) and $r$ = true rank 
   + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
 
+##### Code Snippets
+
 ```R
 # Chap7 Ex3
 # z = VAR(p) with 3 series of lag order = 2
@@ -1837,7 +1839,7 @@ r = 0  | 487.74 39.06 42.44 48.45
 > evs1<-z.vecm.h1@lambda
 > evsstar<-z.vecm.h.asterik@lambda
 
-> teststat=(n-2)*sum(log((1-evs1)[1:2]/(1-evsstar)[1:2])) # T = n-2 no. of fitted observations 
+> teststat=(n-2)*sum(log((1-evs1)[1:2]/(1-evsstar)[1:2])) # T = n-2 no. of fitted observations, incl 2 lambda 
 > 1-pchisq(teststat,df=2) # reject H0 if this is less than p-value=0.05; in this case =0 so reject H0
 # conclusion, r=2 and there is trend in the cointegrating relations & linear trend in the levels -> fit H*
 
@@ -1853,6 +1855,7 @@ trend.l1  2.092249e-02 -0.02266474 # vecm.r2$beta[4,] = beta1 = trend
 ```
 
 + cointegrating relations: $y_{1t-1} = 0.021t+ x_{1t-1}-x_{3t-1}$ and $y_{2t-1} = - 0.023t+x_{2t-1} + x_{3t-1}$ 
++ side note: Eigenvalues(lambda) estimated here $\neq$ to the eigenvalue of $\Pi =\alpha\beta'$ 
 
 ### How to generate correlated residuals
 
