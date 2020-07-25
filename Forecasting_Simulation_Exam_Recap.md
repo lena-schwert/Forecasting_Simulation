@@ -1658,6 +1658,21 @@ fitRestrict<-restrict(fit, method = "ser", thresh = 2.0)
 + idea: to study the effect observed in multivariate time-series -> is there a correlation of one series to another series? Can the lags of a series be used to forecast the other series? 
   + If there are significant lags of $x_{it}$ appear in the regression equation of $x_{jt}$, then we can say $x_{it}$ Granger-causes $x_{jt}$ or $x_{it}$ is Granger-causal for $x_{jt}$
 + $x_{it}$ is instantaneously causal for $x_{jt}$ if knowing $x_{it}$ **in the forecasting period** is useful in forecasting $x_{jt}$ s
++ Bi-variate process (without intercept):
+  + $\left(\begin{array}{c}x_{1t} \\ x_{2t}\end{array}\right)=\sum_{i=1}^{p}\left(\begin{array}{cc}\alpha_{11,i} & \alpha_{12,i} \\ \alpha_{21,i} & \alpha_{22,i}\end{array}\right)\left(\begin{array}{c}x_{1t-i} \\ x_{2t-i}\end{array}\right)+\left(\begin{array}{c}r_{1t} \\ r_{2t}\end{array}\right)$
+  + $x_{2t}$ is non-causal for $x_{1t} \iff \alpha_{12,i} =0 \forall i$
+  + $x_{1t}$ is non-causal for $x_{2t} \iff \alpha_{21,i} =0 \forall i$ 
+  + in short, if the other series is non-causal for this series (refer each row), the corresponding $\alpha$(s) of the other series (in this row) should be = 0 
++ Tri-variate process: 
+  + $\left(\begin{array}{l}x_{1t} \\ x_{2t} \\ x_{3t}\end{array}\right)=\sum_{i=1}^{p}\left(\begin{array}{ccc}\alpha_{11, i} & \alpha_{12,i} & \alpha_{13,t} \\ \alpha_{21,i} & \alpha_{22, i} & \alpha_{23, i} \\ \alpha_{31,i} & \alpha_{32, i} & \alpha_{33,i} \end{array}\right)\left(\begin{array}{c}x_{1 t-1} \\ x_{2 t-1} \\ x_{3 t-1}\end{array}\right)+\left(\begin{array}{c}r_{1 t} \\ r_{21} \\ r_{3 t}\end{array}\right)$
+  + $x_{2t}$ is non-causal for $x_{1t}$ and $x_{3t} \iff \alpha_{12,i}=\alpha_{32,i}=0 \forall i$
+  + $x_{1t}$ and ${x_{3t}}$ are non-causal for $x_{2t} \iff \alpha_{21,i}=\alpha_{23,i}=0 \forall i$ 
++ $k$ series: 
+  + find $C$ with $C\alpha=0$ where $\alpha$ is a vector column constructed from $A_{ij,l}$ where the parameters in this matrix is cascaded column after column to form a column vector, $\alpha$ (dim=no.of parameters x1)
+  + $C$ is a $m \times n$ matrix where $m$= no. of constraint and $n$ = no. of parameters ; $C_{ij} =1$ if constraint is true = 0 otherwise  
+  + m is the no. of paramters have to be zero if $H_0$ is true  e.g. $k=3, p=2$ $x_2$ is non-causal for $x_1, x_3$ 
+    => constraints: $\alpha_{12,1}, \alpha_{12,2}, \alpha_{31,1}, \alpha_{31,2}=0$ 
+  + $H_0$ can be checked with F-test: F(df1, df2) where df1 = m and df2 = n
 
 ##### Code Snippets 
 
@@ -1666,8 +1681,7 @@ fitRestrict<-restrict(fit, method = "ser", thresh = 2.0)
 #Test for Granger causality
 ###########################
 #H0: restrictions due to Granger causality hold
-#H0: (y1, y2) do not Granger cause y3 -> y3 does not influeced by y1 and y2: check A1, A2 
-# p-value = 0.3902 > 0.05 -> cannot reject H0: y1, y2 do not Granger-cause y3  
+#H0: (y1, y2) do not Granger cause y3 -> y3 does not influeced by y1 and y2: check A1, A2   
 > causality(fit, cause=c("y1", "y2"))
 $Granger
 
@@ -1675,16 +1689,9 @@ $Granger
 
 data:  VAR object fit
 F-Test = 1.0297, df1 = 4, df2 = 29973, p-value = 0.3902
+# p-value = 0.3902 > 0.05 -> cannot reject H0: y1, y2 do not Granger-cause y3
 
-
-$Instant
-
-	H0: No instantaneous causality between: y1 y2 and y3
-
-data:  VAR object fit
-Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
-
-> #H0: y3 does not Granger cause (y1, y2)
+#H0: y3 does not Granger cause (y1, y2)
 > causality(fit, cause=c("y3")) #F-Test = 1372.8, df1 = 4, df2 = 29973, p-value < 2.2e-16 => reject H0
 $Granger
 
@@ -1692,14 +1699,17 @@ $Granger
 
 data:  VAR object fit
 F-Test = 1372.8, df1 = 4, df2 = 29973, p-value < 2.2e-16
+# conclusion: p-value < 0.05 reject H0, y3 Granger-cause y1 & y2 
 
+> causality(fit, cause=c("y2"))
+$Granger
 
-$Instant
-
-	H0: No instantaneous causality between: y3 and y1 y2
+	Granger causality H0: y2 do not Granger-cause y1 y3
 
 data:  VAR object fit
-Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
+F-Test = 1.4789, df1 = 4, df2 = 29973, p-value = 0.2056
+# conclusion: p-value < 0.2056 do not reject H0, y2 Granger-cause y1 & y3
+
 
 # Retrieve the coefficients of estimate and translate them into A_i
 > coef(fitRestrict)$y1[,1]
@@ -1718,6 +1728,8 @@ Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
 + $A_0=\left[\begin{array}{c}0.586 \\ 0.615 \\ 0 \end{array}\right]$ -> from const 
 + $A_1=\left[\begin{array}{ccc}0.605 & 0 & 0.412\\-0.307 & 0.701 & -0.605 \\ 0&0 &0.998\end{array}\right]$ -> y1.l1, y2.l1, y3.l1 from each series (y1[,1], y2[,1], y3[,1]): coefficients of lag 1
 + $A_2=\left[\begin{array}{ccc}-0.197 & 0 & 0.281\\0.200 & -0.312 & 0.302 \\ 0&0 &-0.311\end{array}\right]$ -> y1.l2, y2.l2, y3.l2 from each series (y1[,1], y2[,1], y3[,1]): coefficients of lag 2
+  + y1 & y2 are non Granger-causal for y3 ($\alpha_{31,1}=\alpha_{31,2}=\alpha_{32,1}=\alpha_{32,2}=0$); 
+  + y2 is non Granger-causal for y1 & y3 ($\alpha_{12,1}=\alpha_{12,2}=\alpha_{32,1}=\alpha_{32,2}=0$)
 
 ### Cointegration
 
