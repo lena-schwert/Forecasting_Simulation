@@ -1475,8 +1475,8 @@ $$
 \mathbf{r}_{kt} \\
 \end{array}\right]
 $$
-$i = p =$ no. of lags; $k =$ no. of series in the system; first index of $\alpha$ = $k^{th}$ series, second index of $\alpha$ 
-+ from this eqn, we can see that no. of parameters of the model: $k+k^2 \times p$
+$i = p =$ no. of lags;  $k =$ no. of series in the system; first index of $\alpha$ = $k^{th}$ series = $k^{th}$ row, second index of $\alpha$: corresponding to all $k^{th}$ series -> $\alpha_{kk,i}$ = express some kind of relationship of the series (in each row) to the other series in the system.  
++ from this eqn, we can see that no. of parameters of the model: $k+k^2 \times p $ -> ($k$ variable in column vector of $\alpha_k$) + $k \times k$ variables in each $A_i$ which defined by no. of lag $p$ 
 + no. of lag define the how many $A_i$ matrices we'll have 
 + no. of series define the size of $A_i$ matrices -> always a $k\times k$ matrix 
 + $R_t$ is a zero mean white noise process with a positive definite covariance matrix: $R_t$~ $(0,\Sigma_R)$ where $\Sigma_R = \mathbb{E}[R_t R_t']$
@@ -1489,6 +1489,7 @@ $i = p =$ no. of lags; $k =$ no. of series in the system; first index of $\alpha
 **To check the stability in a VAR model**: 
 
 + $\text{det}\left(I_{k}-A_{1} z-\cdots-A_{p} z^{p}\right)=0$ lie outside of the unit circle (> 1 in absolute value)
+  + its first and second moments: $\mathbb{E[X_t]}$ & $cov[X_t, X_{t-1}]$ are time-invariant -> it’s weakly stationary 
 
 **To check the lag order p**: Generalized Information Criteria 
 
