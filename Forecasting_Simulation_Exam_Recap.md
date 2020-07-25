@@ -1798,6 +1798,10 @@ w3 <- rnorm(n, mean=0, sd=1)
 
 w <- L%*%t(cbind(w1,w2,w3))
 cov(t(w)) # approximately equal to covR, LL'
+           [,1]         [,2]        [,3]
+[1,]  1.0710508 -0.529558846 0.683009140
+[2,] -0.5295588  1.072967271 0.001625916
+[3,]  0.6830091  0.001625916 1.128740165
 ```
 2. By adding uncorrelated residuals
 ```R
