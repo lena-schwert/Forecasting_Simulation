@@ -1190,7 +1190,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 ### Checking model residuals for stability/breakpoints (Chow test)
 
-+ **General idea:** we want to know if the parameters of the fit stable over time? 
++ **General idea:** we want to know if the parameters of the fit are stable over time
   => check if there exists some breakpoints (e.g. some part of the data = AR(3), other part = AR(4))
 
   + in another word, Chow Test tells us if is there a structural break in the process? 
