@@ -1040,7 +1040,7 @@
 
   <img src="image-20200724120537403.png" alt="image-20200724120537403" style="zoom:50%;" />
 
-  <img src="image-20200724120551582.png" alt="image-20200724120551582" style="zoom:50%;" />![image-20200724120949747](image-20200724120949747.png)
+  <img src="image-20200724120551582.png" alt="image-20200724120551582" style="zoom:50%;" />
 
   <img src="image-20200724121027335.png" alt="image-20200724121027335" style="zoom:50%;" />
 
