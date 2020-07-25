@@ -537,7 +537,7 @@
 
   ![image-20200720092417147](image-20200720092417147.png)
 
-### Testing for Stationarity (= unit roots)/ Augmented Dickey-Fuller test
+### Augmented Dickey-Fuller test/ Unit roots Test (= testing for Stationarity)
 
 - **we test for stationarity using an alternative form of the AR(1)/AR(p) model equation**
   - by rearranging we achieve: $\Delta x_t = \alpha_0+ \delta x_{t-1}+w_t$ (AR(1))
@@ -921,7 +921,7 @@
       1-0.000000i -1+1.732051i -1-1.732051i
     ```
 
-### Differencing too often (= infinite lag order)
+### Differencing a stationary process, $x_t$ ($\Delta x_t$= infinite lag order)
 
 + The effect on a time series that is differenced too often (differenced more times than its actual order of integration) -> result in a model with infinite lag order -> too many model coefficients –> bad model fit (too complex, we prefer simple models)
 + **How to proof**? We state that if $x_t$ is stationary then $\Delta x_t$ will have infinite lag order this implies that if $\Delta x_t$ have finite lag order, that mean we just differenced enough from a unit root process, $x_t$ -> we proof this implication  
@@ -1856,6 +1856,13 @@ trend.l1  2.092249e-02 -0.02266474 # vecm.r2$beta[4,] = beta1 = trend
 
 + cointegrating relations: $y_{1t-1} = 0.021t+ x_{1t-1}-x_{3t-1}$ and $y_{2t-1} = - 0.023t+x_{2t-1} + x_{3t-1}$ 
 + side note: Eigenvalues(lambda) estimated here $\neq$ to the eigenvalue of $\Pi =\alpha\beta'$ 
+
+### Differencing a stationary VAR model 
+
++ Consequences: if $X_t$ is stationary then $\Delta X_t$ has infinite lag order (same as univariate process)
+  + if rank$(\Pi)=k$, then $X_t$ is staionary -> $\Delta X_t$ has infinite lag order 
+  + if $0< \text{rank}(\Pi) \leq k$, $X_t$ is at most I(1) so $\Delta X_t = I(0)$ then $\Delta X_{t}=A_{0}+\Pi X_{t-1}+\sum_{i=0}^{p-1} \Gamma_{i} \Delta X_{t-i}+R_{t}$ is I(0) this means $\Pi X_{t-1}$ is also I(0) which implies $\Delta \Pi X_{t}$ does not have finite lag order so that means $\Delta X_{t}$ aslo does not have finite lag order since $\Delta \Pi X_{t} = \Pi\Delta X_{t}$ 
+  + if rank($\Pi$)=0 -> similar proof as the univariate process (*13_04_Differencing_a_stationary_VAR_model.pdf*)
 
 ### How to generate correlated residuals
 
