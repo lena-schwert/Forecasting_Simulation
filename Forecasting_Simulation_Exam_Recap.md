@@ -1531,6 +1531,200 @@ $i = p =$ no. of lags;  $k =$ no. of series in the system; first index of $\alph
 
 + approximately Chi-squared distribution $\chi^2(k^2(h-p))$
 
+##### Code Snippets
+
+1. fit VAR model with general setting (`type=both`) to estimate the lag order 
+2. fit VAR model with the correct lag order and correct type of the simulated series (here multiple time series with a constant)
+3. retrieve the residuals of the fit -> residuals checking with `acf()` and `Ljung-Box` test; calculate the variance-covariance matrix 
+4. fit with restriction (to remove non-signficant estimates) -> to obtain more precise estimate
+
+```R
+#Chap7 Ex1.R 
+> ord<-VAR(zt,type="both",ic="SC", lag.max=8) # use "both" type to be general (include constant + trend)
+> ord$p #2 -> find the lag order of the VAR model 
+> fit<-VAR(zt, type="const", p=2)
+> resid<-residuals(fit) # dim = 9998 x 3 -> n=10000, lag order=2, 3 series (no. of endogenous variables)
+> summary(fit)
+
+VAR Estimation Results:
+========================= 
+Endogenous variables: y1, y2, y3 
+Deterministic variables: const 
+Sample size: 9998 
+Log Likelihood: -37949.718 
+Roots of the characteristic polynomial:
+0.5992 0.5992 0.5732 0.5732 0.4127 0.4127
+Call:
+VAR(y = zt, p = 2, type = "const")
+
+Estimation results for equation y1: 
+=================================== 
+y1 = y1.l1 + y2.l1 + y3.l1 + y1.l2 + y2.l2 + y3.l2 + const 
+
+       Estimate Std. Error t value Pr(>|t|)    
+y1.l1  0.607271   0.012918  47.011   <2e-16 ***
+y2.l1  0.001783   0.009511   0.187    0.851    
+y3.l1  0.409968   0.011664  35.148   <2e-16 ***
+y1.l2 -0.192067   0.011596 -16.563   <2e-16 ***
+y2.l2  0.007884   0.009093   0.867    0.386    
+y3.l2  0.282170   0.013538  20.842   <2e-16 ***
+const  0.570401   0.019553  29.172   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.013 on 9991 degrees of freedom
+Multiple R-Squared: 0.7921,	Adjusted R-squared: 0.792 
+F-statistic:  6346 on 6 and 9991 DF,  p-value: < 2.2e-16 
+
+Estimation results for equation y2: 
+=================================== 
+y2 = y1.l1 + y2.l1 + y3.l1 + y1.l2 + y2.l2 + y3.l2 + const 
+
+       Estimate Std. Error t value Pr(>|t|)    
+y1.l1 -0.307257   0.012684  -24.22   <2e-16 ***
+y2.l1  0.700546   0.009339   75.01   <2e-16 ***
+y3.l1 -0.605393   0.011453  -52.86   <2e-16 ***
+y1.l2  0.200356   0.011386   17.60   <2e-16 ***
+y2.l2 -0.312073   0.008928  -34.95   <2e-16 ***
+y3.l2  0.301577   0.013293   22.69   <2e-16 ***
+const  0.616230   0.019199   32.10   <2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 0.9942 on 9991 degrees of freedom
+Multiple R-Squared: 0.764,	Adjusted R-squared: 0.7639 
+F-statistic:  5392 on 6 and 9991 DF,  p-value: < 2.2e-16 
+
+Estimation results for equation y3: 
+=================================== 
+y3 = y1.l1 + y2.l1 + y3.l1 + y1.l2 + y2.l2 + y3.l2 + const 
+
+       Estimate Std. Error t value Pr(>|t|)    
+y1.l1  0.009219   0.012863   0.717    0.474    
+y2.l1  0.003456   0.009471   0.365    0.715    
+y3.l1  0.996742   0.011615  85.817   <2e-16 ***
+y1.l2 -0.001545   0.011547  -0.134    0.894    
+y2.l2 -0.009960   0.009054  -1.100    0.271    
+y3.l2 -0.322398   0.013481 -23.915   <2e-16 ***
+const -0.002026   0.019470  -0.104    0.917    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+Residual standard error: 1.008 on 9991 degrees of freedom
+Multiple R-Squared: 0.6203,	Adjusted R-squared:  0.62 
+F-statistic:  2720 on 6 and 9991 DF,  p-value: < 2.2e-16 
+
+Covariance matrix of residuals:
+        y1       y2       y3
+y1  1.0252 -0.50835  0.61646
+y2 -0.5084  0.98844 -0.01083
+y3  0.6165 -0.01083  1.01656
+
+Correlation matrix of residuals:
+        y1      y2      y3
+y1  1.0000 -0.5050  0.6039
+y2 -0.5050  1.0000 -0.0108
+y3  0.6039 -0.0108  1.0000
+
+#Check for autocorrelations of individual series
+> acf(resid[,1])
+> acf(resid[,2])
+> acf(resid[,3])
+
+#multivariate Ljung-Box test - check for residuals autocorrelation of VAR model 
+h.min<-7 #Tsay
+h.max=25 #Box
+x<-h.min:h.max
+y<-rep(NA,(h.max-h.min)+1)
+for (h in h.min:h.max) { #ensure h>order
+  y[h-h.min]<-Box.testVAR(resid,order=2, lag=h)$p.value
+}
+#xaxs = "r", yaxs = "r" expands the axis ranges by 4% in both directions
+plot(x,y,ylim=c(0,1), xaxs = "r", yaxs = "r") 
+lines(rep(0.05,h.max),lty=2,col='blue') # all points lie above the significant line -> all p-value > alpha
+
+# Calculate the variance-covariance matrix: \Sigma_R: 
+> t(resid) %*% resid/n # resid = (n-2)*3 -> 3*9998 x 9998*3 = 3x3 matrix  
+           y1          y2          y3
+y1  1.0243100 -0.50789639  0.61590779
+y2 -0.5078964  0.98755176 -0.01081661
+y3  0.6159078 -0.01081661  1.01564411
+
+# Remove non-significant estimate with restrict function 
+fitRestrict<-restrict(fit, method = "ser", thresh = 2.0)
+
+# To retreive the coefficients of each series of the restricted fit (estimate is the first column)
+> coef(fitRestrict)$y1[,1]
+> coef(fitRestrict)$y2[,1]
+> coef(fitRestrict)$y3[,1]
+```
+
+### Granger Causality 
+
++ idea: to study the effect observed in multivariate time-series -> is there a correlation of one series to another series? Can the lags of a series be used to forecast the other series? 
+  + If there are significant lags of $x_{it}$ appear in the regression equation of $x_{jt}$, then we can say $x_{it}$ Granger-causes $x_{jt}$ or $x_{it}$ is Granger-causal for $x_{jt}$
++ $x_{it}$ is instantaneously causal for $x_{jt}$ if knowing $x_{it}$ **in the forecasting period** is useful in forecasting $x_{jt}$ s
+
+##### Code Snippets 
+
+```R
+# Chap7 Ex1
+#Test for Granger causality
+###########################
+#H0: restrictions due to Granger causality hold
+#H0: (y1, y2) do not Granger cause y3 -> y3 does not influeced by y1 and y2: check A1, A2 
+# p-value = 0.3902 > 0.05 -> cannot reject H0: y1, y2 do not Granger-cause y3  
+> causality(fit, cause=c("y1", "y2"))
+$Granger
+
+	Granger causality H0: y1 y2 do not Granger-cause y3
+
+data:  VAR object fit
+F-Test = 1.0297, df1 = 4, df2 = 29973, p-value = 0.3902
+
+
+$Instant
+
+	H0: No instantaneous causality between: y1 y2 and y3
+
+data:  VAR object fit
+Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
+
+> #H0: y3 does not Granger cause (y1, y2)
+> causality(fit, cause=c("y3")) #F-Test = 1372.8, df1 = 4, df2 = 29973, p-value < 2.2e-16 => reject H0
+$Granger
+
+	Granger causality H0: y3 do not Granger-cause y1 y2
+
+data:  VAR object fit
+F-Test = 1372.8, df1 = 4, df2 = 29973, p-value < 2.2e-16
+
+
+$Instant
+
+	H0: No instantaneous causality between: y3 and y1 y2
+
+data:  VAR object fit
+Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
+
+# Retrieve the coefficients of estimate and translate them into A_i
+> coef(fitRestrict)$y1[,1]
+     y1.l1      y3.l1      y1.l2      y3.l2      const 
+ 0.6045938  0.4120426 -0.1968997  0.2813956  0.5858969 
+
+> coef(fitRestrict)$y2[,1]
+     y1.l1      y2.l1      y3.l1      y1.l2      y2.l2      y3.l2      const 
+-0.3072573  0.7005461 -0.6053926  0.2003557 -0.3120729  0.3015775  0.6162297
+
+> coef(fitRestrict)$y3[,1]
+    y3.l1     y3.l2 
+ 0.998005 -0.311093
+```
+
++ $A_0=\left[\begin{array}{c}0.586 \\ 0.615 \\ 0 \end{array}\right]$ -> from const 
++ $A_1=\left[\begin{array}{ccc}0.605 & 0 & 0.412\\-0.307 & 0.701 & -0.605 \\ 0&0 &0.998\end{array}\right]$ -> y1.l1, y2.l1, y3.l1 from each series (y1[,1], y2[,1], y3[,1]): coefficients of lag 1
++ $A_2=\left[\begin{array}{ccc}-0.197 & 0 & 0.281\\0.200 & -0.312 & 0.302 \\ 0&0 &-0.311\end{array}\right]$ -> y1.l2, y2.l2, y3.l2 from each series (y1[,1], y2[,1], y3[,1]): coefficients of lag 2
+
 ### VECM
 
 Given a VAR($p$) of I(1): 
