@@ -1729,7 +1729,7 @@ Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
 
 ### VECM
 
-+ **Motivation**: Each component of a VAR(p) is I(d), differencing each component individually may distort the relationship between the orginal variables -> fitting a VAR model with cointegrated variables may be inadequdate -> check the rank of $\Pi$ (ref: *Lütkepohl*)
++ **Motivation**: Each component of a VAR(p) is I(d), differencing each component individually may distort the relationship between the orginal variables -> fitting a VAR model with cointegrated variables may be inadequdate -> check the rank of $\Pi$ of VECM model 
 
 Given a VAR($p$) of I(1): 
 $X_t = A_0 + A_1 X_{t-1} + ... + A_p X_{t-p} + R$
@@ -1741,6 +1741,10 @@ where
 $\Pi=-\left(I_{k}-A_{1}-\cdots-A_{p}\right), \Gamma_{i}=-\left(A_{i+1}+\cdots+A_{p}\right)$
 e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 
++ under the assumption of the component series in VAR(p) is at most I(1) -> $\Pi X_{t-1} =\alpha \beta’X_{t-1}$ contains the cointegrating relations (if any) and they all are assumed to be I(0) 
+  + if any component series in VAR is I(1) then the VAR(p) model is considered I(1)
++ factorization of $\Pi$ is not unique 
+
 **Interpretation of VECM:**
 
 + if $\Pi=0$, all $\lambda(\Pi)=0$, rank=0 -> **no cointegration**; Non-stationary of I(1) vanishes by taking the differences -> we **fit $\Delta X_t$**
@@ -1751,7 +1755,11 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 ### Johansen Test 
 
 + A procedure to determine the rank of $\Pi$ and whether there is a trend in the cointegrating relations  
-  + First, 
+  1. check the value of test statistic of $H^*_1$ and $H_1$ in an alternating order starting from rank = 0; $H_0$; rank tested is the true rank -> continue until we cannot reject the null hypothesis -> get the true rank 
+  2. check the cointegrating relations by testing $H_1$ against $H^*$ (use the true rank from step1 for the likelihood ratio test statistic)
+  3. use the correct VECM/ VAR model according to the conclusion of the Johansen Test
+     -> fit VECM model with `cajorls(z.vecm, r = 2)` function   
+  4. get the beta estimate and find the cointegrating relations (if any)  
 + $H_1^*$ -> $A_0 = \alpha \cdot\beta_0, B=0$: no trend in levels, no trend in cointegrating relations -> **(ecdet="constant")**
 `z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="const",K=2)`
 + $H_1$ -> $A_0 \neq 0 , B=0$: linear trend in levels, no trend in cointegrating relations, drift in differences -> **(ecdet="none")**
@@ -1774,7 +1782,77 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 + teststat is chi-square distributed 
 + The likelihood ratio test statistic:
   $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
+  + where $T$ = number of fitted observations ($n-p$) and $r$ = true rank 
   + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
+
+```R
+# Chap7 Ex3
+# z = VAR(p) with 3 series of lag order = 2
+> z.vecm.h1.asterik<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="const",K=2)
+> summary(z.vecm.h1.asterik) 
+
+Test type: trace statistic , H1*: no trend in levels, no trend in cointegrating relations, no drift in differences (Johansen: Table 15.2, Osterwald-Lenum: TABLE 1*) 
+
+Eigenvalues (lambda):
+[1]  1.661816e-01  9.226390e-02  1.200872e-02 -3.642919e-17
+
+Values of teststatistic and critical values of test:
+
+           test 10pct  5pct  1pct
+r <= 2 |  12.06  7.52  9.24 12.97 #5. reject H0, continue
+r <= 1 | 108.67 17.85 19.96 24.60 #3. reject H0, continue
+r = 0  | 290.04 32.00 34.91 41.07 #1. reject H0, continue
+
+> z.vecm.h1<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="none",K=2)
+> summary(z.vecm.h1) 
+
+Test type: trace statistic , H1: trend in levels, no trend in cointegrating relations, drift in differences (Johansen: Table 15.3, Osterwald-Lenum: TABLE 1) 
+
+Eigenvalues (lambda):
+[1] 0.1661467874 0.0918689568 0.0001856323
+
+Values of teststatistic and critical values of test:
+
+           test 10pct  5pct  1pct
+r <= 2 |   0.19  2.69  3.76  6.65 #6. cannot reject H0, r = 2 is the true rank, there is trend in levels
+r <= 1 |  96.36 13.33 15.41 20.04 #4. reject H0, continue
+r = 0  | 277.69 26.79 29.68 35.65 #2. reject H0, continue
+
+> z.vecm.h.asterik<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="trend",K=2)
+> summary(z.vecm.h.asterik) 
+
+Test type: trace statistic , H*: trend in levels, trend in cointegrating relations, drift in differences (Johansen: Table 15.4, Osterwald-Lenum: TABLE 2*) 
+
+Eigenvalues (lambda):
+[1] 3.011819e-01 1.145788e-01 8.623160e-03 6.560202e-19
+
+Values of teststatistic and critical values of test:
+
+           test 10pct  5pct  1pct
+r <= 2 |   8.64 10.49 12.25 16.26
+r <= 1 | 130.09 22.76 25.32 30.45
+r = 0  | 487.74 39.06 42.44 48.45
+
+# Testing H1 against H*
+> evs1<-z.vecm.h1@lambda
+> evsstar<-z.vecm.h.asterik@lambda
+
+> teststat=(n-2)*sum(log((1-evs1)[1:2]/(1-evsstar)[1:2])) # T = n-2 no. of fitted observations 
+> 1-pchisq(teststat,df=2) # reject H0 if this is less than p-value=0.05; in this case =0 so reject H0
+# conclusion, r=2 and there is trend in the cointegrating relations & linear trend in the levels -> fit H*
+
+# Fitting VECM model and get the estimated cointegrating factor, beta 
+> z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="trend",K=2)
+> vecm.r2<-cajorls(z.vecm, r = 2)
+> vecm.r2$beta
+                  ect1        ect2
+y1.l1     1.000000e+00  0.00000000
+y2.l1    -1.734723e-18  1.00000000
+y3.l1    -1.002092e+00  2.00677684
+trend.l1  2.092249e-02 -0.02266474 # vecm.r2$beta[4,] = beta1 = trend
+```
+
++ cointegrating relations: $y_{1t-1} = 0.021t+ x_{1t-1}-x_{3t-1}$ and $y_{2t-1} = - 0.023t+x_{2t-1} + x_{3t-1}$ 
 
 ### How to generate correlated residuals
 
