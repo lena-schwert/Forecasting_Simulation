@@ -1435,15 +1435,7 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
     + $\theta_{12}(L^{12}) = 1 \quad \quad (Q=0)$
       + $(1- \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24})(1-L) x_t = \alpha_0 + w_t$
       + $\Rightarrow (1- \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24} - L + \alpha_{12,1} L^{13} + \alpha_{12,2} L^{25}) x_t = \alpha_0 + w_t$
-      + $\Rightarrow x_t = \alpha_0 + x_{t-1} + \alpha_{12,1}x_{t-12} -\alpha_{12,1} x_{t-13} + \alpha_{12,2}x_{t-24}- \alpha_{12,2} x_{t-25}+w_t$
-
-### Cointegration
-
-+ If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
-
-+ Cointegrating relation is a **mean reverting process**. (converges to a mean value) The long term forecast of the cointegrated series are linearly related. 
-
-+ Rank$(\Pi)$ tell us the no. of cointegrating relations. 
+      + $\Rightarrow x_t = \alpha_0 + x_{t-1} + \alpha_{12,1}x_{t-12} -\alpha_{12,1} x_{t-13} + \alpha_{12,2}x_{t-24}- \alpha_{12,2} x_{t-25}+w_t
 
 ### VAR(p) 
 
@@ -1727,9 +1719,17 @@ Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
 + $A_1=\left[\begin{array}{ccc}0.605 & 0 & 0.412\\-0.307 & 0.701 & -0.605 \\ 0&0 &0.998\end{array}\right]$ -> y1.l1, y2.l1, y3.l1 from each series (y1[,1], y2[,1], y3[,1]): coefficients of lag 1
 + $A_2=\left[\begin{array}{ccc}-0.197 & 0 & 0.281\\0.200 & -0.312 & 0.302 \\ 0&0 &-0.311\end{array}\right]$ -> y1.l2, y2.l2, y3.l2 from each series (y1[,1], y2[,1], y3[,1]): coefficients of lag 2
 
+### Cointegration
+
+<img src="bivariate_cointegrated series.png" alt="bivariate_cointegrated series" style="zoom:50%;" />
+
++ if the determinantal polynomial of a VAR process has a unit root (the determinant = 0 for z=1) -> some/all of the variables in the system are integrated 
+  + If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
++ Cointegrating relation is a **mean reverting process**. (converges to a mean value) The long term forecast of the cointegrated series are linearly related. 
+
 ### VECM
 
-+ Motivation: VAR(p) is stationary when if the determinantal polynomial of its VAR operator has all its roots outside the complex unit circle, what happen if the roots on the unit circle? -> a VAR process can generate stochastic and deterministic trends 
++ **Motivation**: Each component of a VAR(p) is I(d), differencing each component individually may distort the relationship between the orginal variables -> fitting a VAR model with cointegrated variables may be inadequdate -> check the rank of $\Pi$ (ref: *Lütkepohl*)
 
 Given a VAR($p$) of I(1): 
 $X_t = A_0 + A_1 X_{t-1} + ... + A_p X_{t-p} + R$
@@ -1880,6 +1880,7 @@ w1 1.0710508 0.5493046
 
 - quadractic formula for solving quadratic roots: $x = \frac{-b \pm \sqrt{b^2-4ac}}{2a}$
 - geometric series: $a+a r+a r^{2}+a r^{3}+a r^{4}+\cdots=\sum_{k=0}^{\infty} a r^{k}=\frac{a}{1-r},$ for $|r|<1$
+- geometric series: $1+\alpha+\alpha^2_…+\alpha^{t-1}=\sum_{i=0}^{t-1}\alpha^i=\frac{1-\alpha^t}{1-\alpha}$ 
 - expected value $\mathbb{E}[x]$ 
 - variance of a sample: $var(x)=\sum_{i=1}^n(x-\bar{x})^2/(n-1) = cov(x,x)$
 - standard deviation: $\sigma= \sqrt{ \text{variance}}$
