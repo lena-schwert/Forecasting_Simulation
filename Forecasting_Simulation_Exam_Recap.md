@@ -318,7 +318,7 @@
       + `for (t in 2:1000) x[t] <- x[t-1]+w[t]`
       + generalized eqn: $x_t = x_0 + \sum_{i=1}^tw_i$ 
 
-  = **long-memory process** -> due to high autocorrelation of all past obs. 
+  = **long-memory process** -> $x_t$ consists of sum of all noises of the prev periods so each noise has a lasting impact on the process  
 
 - **properties**
 
@@ -334,7 +334,9 @@
 
   - **autocorrelation** $\gamma_k = Cor[x_t,x_{t+k}] = \frac{1}{\sqrt{1+k/t}}$ 
 
-    –> for large t, the denominator is $\approx 0$ and autocorrelation approaches 1, **so values of a time series heavily depend on previous ones!** 
+    –> for large t ($t \rightarrow \infty$ ), the denominator is $\approx 0$ and autocorrelation approaches 1, **so values of a time series heavily depend on previous ones!** 
+    
+    => in another word, $x_t$ and $x_{t+l}$ are strongly correlated even if they are far apart in time -> result in a lasting trend which is stochastic! Why stochastic? (from the sum of all past noises!)
 
 - **random walk with drift:** $x_t = \vartheta+x_{t-1}+w_t$
 
@@ -1727,6 +1729,8 @@ Chi-squared = 3246.1, df = 2, p-value < 2.2e-16
 
 ### VECM
 
++ Motivation: VAR(p) is stationary when if the determinantal polynomial of its VAR operator has all its roots outside the complex unit circle, what happen if the roots on the unit circle? -> a VAR process can generate stochastic and deterministic trends 
+
 Given a VAR($p$) of I(1): 
 $X_t = A_0 + A_1 X_{t-1} + ... + A_p X_{t-p} + R$
 
@@ -1742,6 +1746,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 + if $\Pi=0$, all $\lambda(\Pi)=0$, rank=0 -> **no cointegration**; Non-stationary of I(1) vanishes by taking the differences -> we **fit $\Delta X_t$**
 + if $\Pi$ has full rank, $k$, then VAR($p$) is stationary, cannot be I(1) -> **fit VAR model directly**
 + if rank$(\Pi) =m$, $0<m<k$ -> the case of cointegration, we write $\Pi=\alpha\beta'; (k \times k) =(k \times m)[(k \times m)']$ -> **fit VECM($p-1$) model**
+  + in this case, rank of $\Pi$ represents the no. of cointegrating equation(s)
 
 ### Johansen Test 
 
