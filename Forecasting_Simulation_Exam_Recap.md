@@ -1190,34 +1190,38 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 ### Checking model residuals for stability/breakpoints (Chow test)
 
-+ **General idea:** we want to know if the parameters of the fit are stable over time
-  => check if there exists some breakpoints (e.g. some part of the data = AR(3), other part = AR(4))
++ **General idea:** we want to know if the parameters of the fit are stable over the entire time period of the time series
+  
+  –> check if there exists any breakpoint (e.g. some part of the data = AR(3), other part = AR(4))
+  
+    –> **if we know that a breakpoint exists, we know that it's better to use different model equations for before/after the breakpoint, respectively!**
+  
+  + in another word,the Chow Test tells us if is there a **structural break** in the process!
+      + structural break: sudden change over time in parameters (e.g. company (that sells masks/gloves) stock price change due to coronavirus)
 
-  + in another word, Chow Test tells us if is there a structural break in the process? 
-    + structural break: sudden change over time in parameters (e.g. company (that sells masks/gloves) stock price change due to coronavirus)
+    <img src="f979c3db.png" alt="f979c3db"  />	
 
-  <img src="f979c3db.png" alt="f979c3db"  />	
-
-  ​			*no structural break on the left; there is a structural break on the right*	
+​			*no structural break on the left; there is a structural break on the right*	
 
   + type of tests: Chow Tests (Chow Breakpoint & Chow Forecast) and Cumsum Test
-
+  
 + **Chow Tests**: 3 variants -> sample split, breakpoint & forecast 
 
-  + General idea: looks at the residuals; split into two parts: 1 set for period before break point, the other contains break point; 
+  + **How it works**: looks at the residuals; splits data into two parts: 1 set for period before break point, the other contains break point; 
 
-    + if no break point -> residuals of both part should be comparable 
-      + SSR of two periods are similar 
+    –> **if no break point exists, the residuals of both parts should be comparable!** 
 
-    + $H_0:$ We have stationary AR($p$) process with fixed parameters 
-    + $H_1$: paramters change over time 
+    = SSE of the two periods are similar 
+
+    + $H_0:$ We have stationarya  AR($p$) process with fixed parameters 
+    + $H_1$: parameters change over time 
 
   + Notation: 
 
     + $n$: no. of all obs.
     + $n_1$: no. of obs in the first period 
     + $n_2 = n-n_1$: no. of obs. in the second period 
-    + $k$: the no. of model parameters (i.e. either p or p+1) 
+    + $k$: the no. of model parameters (i.e. either p or p+1, with intercept) 
     + $\hat{w}^i$: residuals of a fit at period $i$
     + $\hat{w}$: residuals of a fit to the full sample 
 
@@ -1249,8 +1253,6 @@ lines(rep(0.05,h),lty=2,col='blue')
         + $n_2-k$ : no. of obs. for period 2 minus the no. of parameter used for the fit; no. 
       + $n-k-(n-2k) = k$ 
 
-    
-
 + **Chow Forecast Test**
 
   + no fit for period 2 which contains the break point; only the full sample $S$ and the fit of the first period (no break point)
@@ -1263,28 +1265,52 @@ lines(rep(0.05,h),lty=2,col='blue')
 
   + Rule of thumb, requires 5-10% of obs to be reserved for forecasting -> no hard rule for determining the relative size of $n$ and $n_1$
 
-+ **Chow Breakpoint vs. Chow Forecast**
++ **When to use which variant? -  Chow Breakpoint vs. Chow Forecast**
 
-  + Restriction of two chow tests: fit the point in time of the break point in advanced
-    - when perform the breakpoint test repeatedly -> test statistics are non-standard
-  + Chow Breakpoint test needs $n$ of each period $>=$ $n$ of parameters fitted in both period 
+  + Restriction of two chow tests: you have to fix the point in time of the break point in advance
+    
+    - when performing the breakpoint test repeatedly, the test statistics are **non-standard**
+    
+      –> **you can not use the normal F-distribution to calculate the critical values! Instead take tabulated values from literature!**
+    
+  + Chow Breakpoint test needs at least $n$ of each period $>=$ $n$ of parameters fitted in both period 
       + the breakpoint test statistic include the fit for period 1 and period 2, so we need to make sure both period has enough of data point (the coefficient to do the AR($p$) fitting.)
     + the length of the second period can be less than the no. of  in CF, it is still okay!
       + rule of thumb: reserve 5%, 10%, 15% of obs. for testing! 
+    
+    –> **Breakpoint and Forecast test have different use cases**
+    
+    + it depends on where the breakpoint lies in the time series and how many model coefficients (= lag terms = lag order p) the model has
+    
+    + **Forecast test is best used** when you want to test for **breakpoints really close to the end of the time series!**
+    
+        –> its test statistic does not use the fit of the second period!
+    
   + in computing the p-value, with Chow Breakpoint test we need to divide by $p$ in order to have the F-statstic; 
       + Chow Breakpoint: `pval <- 1 - pf(fs$Fstats/p, df1=p, df2=n-2*p)`
       + Chow Forecast: `pval <- 1 - pf(fs$chowFstats, df1=n-n1, df2=n1-p)`
 
-+ Structural Break vs. Break in Variance:
++ **Structural Break vs. Break in Variance:**
 
-  + Structural break means a break in the coefficient (of the lags), could be invisible (when the coefficients differ just a little)
+  + Structural break means a break in the coefficient (of the lags), that could be invisible to the eye (when the coefficients differ just a little)
   + Break in the variance means the coefficient of the white noise differ -> tested by heteroskedasticity test - procedure "ChowHRGNR"
   + The two Chow Tests only account for structural break but not series with break in the variance! 
 
-+ Definition of Heteroskedasticity
++ **Definition of Heteroskedasticity**
+  
+  + **Chow tests assume constant variance (= homoskedasticity), so heteroskedasticity is a problem**
+    
   + circumstance when the variability of dependent variable is unequal across the range of independent variables (which predict it)
     + when we plot them -> looks like a cone shape in 2 dimensions! 
-    + in short, variance of the residuals is not constant!
+    + in short, variance of the residuals is not constant over time!
+  
+    –> **ideally, test for heteroskedasticity before using the Chow test!**
+
+#### Code Snippets
+
+- **How to perform the Chow test repeatedly to test an interval for a breakpoint**
+
+  
 
 ### MA(q) Model
 
