@@ -2042,7 +2042,7 @@ w1 1.0710508 0.5493046
   - method to decompose a positive-definite matrix into a lower triangular matrix (and its transpose)
 - speeds up solving linear equation systems
   
-- $A = LL^T$, e.g. ![image-20200714210943614](../../../Nextcloud/Documents/Master_Data_Science/Lecture notes and Mindmaps/Notes Semester 4/Forecasting_Simulation/image-20200714210943614.png) 
+- $A = LL^T$, e.g. ![image-20200714210943614](image-20200714210943614.png) 
   
 - **deterministic trend**
 

@@ -144,14 +144,58 @@
 
 - *first exam 2018* : Vector time series with xt1 and xt2
   + what does gamma in matrix of sum of residuals mean?
+  
   + Write down formula 
+  
+  + probably refers to the covariance matrix
+    + then the solution would be:  ![image-20200726141746296](image-20200726141746296.png)
+  
   + Is xt1 and/or xt2 stationary?
+  
+    + check whether the determinant of the reverse characteristic polynomial is equal to zero or not
+    + if it is zero, the series are stationary
+    + check: $\text{det}\left(I_{k}-A_{1} z-\cdots-A_{p} z^{p}\right)=0$ 
+  
   + What is lag order of (p) for Integration Order 1?
-
-- *first exam 2019:* Johannsen-test: R command [ca.jo](http://ca.jo) and output test values and critical values r <= 2, r <= 1, r = 0… -> How many time series in z? Build VECM, what does rank tell about  cointegrating relations
-
+  
+    + unclear what is meant
+  
+    + we assume that $x_t$ is given with the information that it is an I(1) process
+  
+    + if the model equations are given, the lag order of $x_t$ would be 1 + the maximal lag order
+  
+    + e.g.
+      $$
+      \Delta(x_t = \alpha_0+\alpha_1x_{t-1})\\
+      \Delta x_t = \alpha_0+\alpha_1\Delta x_{t-1})\\
+      x_t-x_{t-1} = \alpha_0 + \alpha_1 (x_{t-1}-x_{t-2})\\
+      $$
+  
 - *second exam 2019:* Given an R output for a VAR of 3x2 time series
+  
+  –> we have 3 VAR(2) time series
+  
   1. find the amount of parameters (𝑘+𝑝∙𝑘^2 =𝑘 (1+𝑘𝑝))
-  2. there was an output and of var and you should have come up with the Var equation (there were some insignifikant)
+  
+     - $A_0+A_1 x_{t-1}+A_2 x_{t-2}+ R_t$
+  
+       - $A_0$ has dimension 3 x 1
+       - $A_1,A_2$ have dimensions 3x3
+  
+       –> 3 +  3 *3 + 3 *3 = 21 coefficients
+  
+  2. there was an output and of var and you should have come up with the Var equation (there were some insignificant)
+  
   3. code in R the expected value [R,R´] given residuals as resid
+  
+     ```R
+     (t(resid)%*%resid)/(n-1)
+     ```
+  
   4. does x2t granger cause x1t and x3t? x2t had only insignificant model parameters, x2t and x3t had significant ones
+  
+     - check the coefficients of the matrix –> the parameters outside of the diagonal matrix are relevant for Granger causality!
+
+- *first exam 2019:* Johansen-test: R command [ca.jo](http://ca.jo) and output test values and critical values r <= 2, r <= 1, r = 0… -> How many time series in z? Build VECM, what does rank tell about  cointegrating relations
+  - 
+
