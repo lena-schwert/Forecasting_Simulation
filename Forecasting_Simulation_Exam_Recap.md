@@ -441,7 +441,19 @@
 
 <img src="image-20200720150225864.png" alt="image-20200720150225864" style="zoom:50%;" />
 
-#### Parameter Estimation of $\alpha$ (ML, OLS) 
+#### Code snippets
+
+- **How to generate an AR(1) process without intercept**
+
+  ```R
+  for (t in 2:1000) x[t] <- 0.7*x[t-1]+w[t]
+  ```
+
+  - it is an AR(1) process and no random walk because $\alpha = 0.7\neq1$ 
+
+
+
+### Parameter Estimation of $\alpha$ (ML, OLS) 
 
 - use ordinary least squares (OLS)
 
@@ -470,17 +482,22 @@
 
 - use maximum likelihood (ML)
 
-  - "Maximize the log-densitiy of the joint Gaussian density "
+  - "Maximize the log-densitiy of the joint Gaussian density ”
 
-#### Code snippets
+##### Code Snippets 
 
-- **How to generate an AR(1) process without intercept**
++ **How to estimate alpha with OLS?** 
 
   ```R
-  for (t in 2:1000) x[t] <- 0.7*x[t-1]+w[t]
+  # using the formula derived
+  > alpha<-t(x[2:1000])%*%x[1:999]/t(x[1:999])%*%x[1:999]
+  
+  # using ar function of method = "ols"
+  > fit<-ar(x,order.max=1,demean=F,method = "ols")
+  > fit$ar
   ```
 
-  - it is an AR(1) process and no random walk because $\alpha = 0.7\neq1$ 
+
 
 ### AR(p) model
 
