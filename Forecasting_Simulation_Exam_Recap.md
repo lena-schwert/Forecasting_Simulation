@@ -483,6 +483,7 @@
 - **Why parameter estimates are biased?** -> due to serial correlation 
   => serial correlation in time series occured when errors associated to a given period carry over into future period 
   => when predicting the dividends of a stock, an overestimation of one year will lead to an overestimation in the succeeding year
+  
 - **Why is the bias term unequal to zero for small samples?**
 
   - a hint from Wikipedia (article about OLS)
@@ -750,13 +751,16 @@
   summary(ur.df(x, type = "none"))  # tests tau1
   ```
 
-  - model coefficients
-    - `z` corresponds to x (time series) 
-    - `z.diff` correponds to $\Delta x_t$ here
-    - `intercept` corresponds to $\alpha_0$
-    - `t.t` corresponds to $\beta$ (= trend)
-    - `z.lag.1` corresponds to "coefficient of $x_{t-1}$" ($\delta$) 
+  - model coefficients in `ur.df()`
+
+    ![image-20200726111948571](image-20200726111948571.png)
+
+    - `z.diff` correponds to $\Delta x_t$ here –> LHS
+    - `intercept` or `1` corresponds to $\alpha_0$
+    - `tt` corresponds to the deterministic trend $\beta$ 
+    - `z.lag.1` corresponds to the coefficient of $x_{t-1}$ ($\delta$) 
     - `z.diff.lag.i` corresponds to $\tilde \alpha_i$
+      - occurs multiple times if there are more lag terms
 
 - **How to find the model equation in the shape $x_t=\dots$ after doing model selection** 
 
@@ -1371,12 +1375,14 @@ lines(rep(0.05,h),lty=2,col='blue')
   + Alternative derivation: using geometric series equation, without constant term
     + with backshift operator, eqn(1) without constant term becomes: $(1+\beta L+\beta^2L^2+\dots)x_t = w_t$
     + use geometric series formula: $\frac{x_t}{1-\beta L} = w_t \iff x_t = w_t -\beta w_{t-1} = w_t+\theta_1w_1$
+  + this also implies that **MA(1) = AR model of infinite order with restrictions**
 
 + $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q}\\ \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
 
   + linear combination of the current white noise and the past noise up to $q$ lag + a constant 
+  + $q$ is analogous to $p$ in an AR model, it determines the lag order!
 
-+ it is a weighted moving average of the $w_t$ term 
++ **it is a weighted moving average of the $w_t$ term** 
 
      + moving average around $c_0$ which is the mean, with the weighted term of $\theta$s
 
@@ -1395,13 +1401,13 @@ lines(rep(0.05,h),lty=2,col='blue')
 
     => both expectation and variance are independent of time
 
-    => it is second order stationary (weak stationary)
+    => it is second-order stationary (weakly stationary)
 
     $$\rho_k = \begin{cases}
     1 & \text{for k = 0} \\
     (\theta_{k}+\sum_{i=1}^{q-k} \theta_{i} \cdot   \theta_{i+k}) /(1+\sum_{i=1}^{q} \theta_{i}^{2}) &   \text{for k=1,...,q} \\ 0 & \text{for k > q}\end{cases}$$
 
-+ different from AR($p$) model, which use the partial correlation, here we can use the autocorrelation to determine the order $q$
++ different from AR($p$) model, which use the partial correlation, here **we can use the autocorrelation to determine the order $q$**
 
   => recall, we use `acf()` to study residuals = white noises 
 
@@ -1424,11 +1430,26 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 + a combination of a differenced AR(p) and a MA model 
   + $x_t$ follows an ARIMA(p,d,q) model if $(1-\alpha_1L)^dx_t = \Delta^dx_t$ is a stationary ARMA(p,q) time series 
-    => this means the AR(p) part of the MA(p,q) should not have coefficients (exclude $\alpha_0$) sum up to 1 (unit root)
+    => this means the AR(p) part of the MA(p,q) should not have coefficients (exclude $\alpha_0$) sum up to 1 (–> unit root, time series is not stationary!)
   + e.g. ARIMA(2,1,2) -> $(1-\alpha_1L - \alpha_2L^2)\Delta x_t=(1+\theta_1L+\theta_2L^2)w_t$ -> this MA(2,2) that has to be stationary 
     => $\alpha_1 + \alpha_2$ should not be equal to 1! 
-    => $\Delta x_t = \alpha_1 \Delta x_{t-1} + \alpha_2 \Delta_{t-2}+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2} \rightarrow x_t=x_{t-1}+\alpha_1(x_{t-1}-x_{t-2})+\alpha_2(x_{t-2}-x_{t-3})+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2}$
-+ its stationary can be checked with ADF for an AR(k) if k is high enough -> rule of thumb: $k = \sqrt[4]{n}$ 
+    => $\Delta x_t = \alpha_1 \Delta x_{t-1} + \alpha_2 \Delta_{t-2}+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2} \\\rightarrow x_t=x_{t-1}+\alpha_1(x_{t-1}-x_{t-2})+\alpha_2(x_{t-2}-x_{t-3})+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2}$
+  
++ its **stationary can be checked with ADF** for an AR(k) if k is high enough -> rule of thumb: $k = \sqrt[4]{n}$ (valid for the finance domain)
+
+  + k here is the lag order that is given to `ur.df(lags = k)` in order to calculate the test statistics for the unit root test
+
++ **prediction: k-step ahead forecast**
+
+  ![image-20200726120517731](image-20200726120517731.png)
+
+  **–> MA part does not contribute to the forecast if k > q!**
+
+  - i = iterates through the lag order p from the AR(p)
+  - j = iterates through the lag order q from the MA(q) 
+  - k = how many steps ahead the calculated value should be
+  - for $k-j>0$ or also $k > q$, the w is equal to zero, so therefore the MA(q) part does not contribute to the value of the forecast
+    - this is reasonable, because we expect that the mean of $w_t =0$
 
 ##### Code Snippets
 
@@ -1458,49 +1479,61 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
 
   + Definition: $\alpha_{s}\left(L^{s}\right) \alpha(L) \Delta_{s}^{D} \Delta^{d} x_{t}=\alpha_{0}+\theta_{s}\left(L^{s}\right) \theta(L) w_{t} $  (will be given in the exam)
 
-    + $\Delta^d x_t = (1-L)^d x_t$ - this to stationalize the series 
+    + $\Delta^d x_t = (1-L)^d x_t$ - this to stationalize the series , How often does it need to be differenced?
 
-    + $\Delta ^D_s x_t = (1-L^s)^D x_t$ - this is the differencing operation to the seasonal part 
+      –> **d**
 
-    + $\alpha(L)=1-\alpha_{1} \cdot L-\cdots-\alpha_{p} \cdot L^{p}$
+    + $\Delta ^D_s x_t = (1-L^s)^D x_t$ - this is the differencing operation to the seasonal part on $x_t$ 
+
+      –> D
+
+    + $\alpha(L)=1-\alpha_{1} \cdot L-\cdots-\alpha_{p} \cdot L^{p}$ - creates AR(p) coefficients $(\alpha)$ like in the normal model (**use $-$!**)
+
+      –> p
 
     + $\alpha_{s}\left(L^{s}\right)=1-\alpha_{s, 1} \cdot L^{s}-\cdots-\alpha_{s, P} \cdot L^{s \cdot P}$ - applies polynomial to the seasonal part; lag is to the power of s 
 
-    + $\theta(L)=1+\theta_{1} \cdot L+\cdots+\theta_{q} \cdot L^{q}$
+      –> P
 
-    + $\theta_{s}\left(L^{s}\right)=1+\theta_{s, 1} \cdot L^{s}+\cdots+\theta_{s, Q} \cdot L^{s \cdot Q}$
+    + $\theta(L)=1+\theta_{1} \cdot L+\cdots+\theta_{q} \cdot L^{q}$ - creates MA(q) coefficients ($\theta$) like in the normal model-   **similar to $\alpha(L)$, but with $+$**
+  
+    –> q
+  
+  + $\theta_{s}\left(L^{s}\right)=1+\theta_{s, 1} \cdot L^{s}+\cdots+\theta_{s, Q} \cdot L^{s \cdot Q}$
+  
+    –> Q
+  
+    + **How many lags does the LHS introduce?** -> $d+ s \cdot D + p + s \cdot P$ 
 
-    + **How many lags the LHS introduce?** -> $d+ s \cdot D + p + s \cdot P$ 
+      + the differencing operation introduce lag term(s) without the coefficients 
 
-      + the differecing operation introduce lag term(s) without the coefficients 
-
-      + **differencing operaton in seasonal part introduce same no of lag (just different lag term)** as in non-seasonal part: 
+      + **differencing operation in seasonal part introduces the same number of lags (just different lag term)** as in non-seasonal part: 
         => $s=4, D=2, d=2 \rightarrow (1-L^4-L^8)$ for seasonal part; $(1-L-L^2)$ for non-seasonal part 
-
+  
       + same logic applies to the lags introduce by the autoregressive part 
-
+  
         => $p = 2, P=2, s=12 \rightarrow (1-\alpha_{12,1}L^{12}-\alpha_{12,2}L^{24})$ for seasonal part; $(1-\alpha_1L-\alpha_2L^2)$ for non-seasonal part   
 
     + **How many lags the RHS introduce?** -> $q + s \cdot Q$
-      => $q=2, Q=2, s=4 \rightarrow (1+\theta_{4,1}L^4+\theta_{4,2}L^2)$ for seaonal part; $(1+\theta_1L +\theta_2 L^2)$ for non-seaonal part
-
-    + same as ARIMA, the series is assumed to be stationary with intergation order, $d$ there are restrictions on the $\alpha_s$ and $\alpha$ -> the summation of these $\alpha$s (exclude $\alpha_0$) should not be equal to 1 (=unit root process)!  
-
-      + not solving by unit-root through polynomial -> use statistical test like augmented dickey-fuller test instead!
+    => $q=2, Q=2, s=4 \rightarrow (1+\theta_{4,1}L^4+\theta_{4,2}L^2)$ for seaonal part; $(1+\theta_1L +\theta_2 L^2)$ for non-seaonal part
+  
+  + same as ARIMA, the series is assumed to be stationary with intergation order, $d$ there are restrictions on the $\alpha_s$ and $\alpha$ -> the summation of these $\alpha$s (exclude $\alpha_0$) should not be equal to 1 (=unit root process)!  
+  
+    + not solving by unit-root through polynomial -> use statistical test like augmented dickey-fuller test instead!
       + need to calculate the mean of the seasonal part first then substract this mean from the series -> use the same value for the characteristic & criteria value of the distribution -> do not explore it in this class 
-      + Other approaches: 
+    + Other approaches: 
         + just use a function which calculate the BIC -> order of differencing - $d \& D$ -(not a test but just a HINT)
         + HEGY - seasonal unit root test -> $H_0$: We have any root in the unit circle not just the value 1 
         + ANOVA -Hansen, $H_0$: we have a stationary proces
-
-  + **How many coefficients we have to fit in the classical ARIMA model?** -> the differencing operation only introduce lag terms without coefficients! -> $1(\alpha_0) + p + sP + q + sQ$ (this is an unrestricted model -> more parameters!)
-
+  
+  + **How many coefficients we have to fit in the classical ARIMA model?** -> the differencing operation only introduces lag terms without coefficients! -> $1(\alpha_0) + p + sP + q + sQ$ (this is an unrestricted model -> more parameters!)
+  
   + **How many coefficients we have to fit in a seasonal ARIMA model? **-> $1+p+P+q+Q$ (this is a restricted model, REMEMBER the seasonal part of the model introduce the restrictions on the modelling which in turn reduces the no. of parameters!)
-
+  
     
-
+  
   <u> Example3 from lecture slide:</u>
-
+  
   + ARIMA$(0,1,0)$ x $(2,0,0)_{12}$ model: 
   + Calculate the highest lag order: $p + sP + d+ sD = 12(2) + 1 = 25$
     + normal ARIMA without the seasonality ARIMA -> we will have to fit up to 26 (include intercept)
@@ -1514,7 +1547,7 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
     + $\theta_{12}(L^{12}) = 1 \quad \quad (Q=0)$
       + $(1- \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24})(1-L) x_t = \alpha_0 + w_t$
       + $\Rightarrow (1- \alpha_{12,1} L^{12} - \alpha_{12,2} L^{24} - L + \alpha_{12,1} L^{13} + \alpha_{12,2} L^{25}) x_t = \alpha_0 + w_t$
-      + $\Rightarrow x_t = \alpha_0 + x_{t-1} + \alpha_{12,1}x_{t-12} -\alpha_{12,1} x_{t-13} + \alpha_{12,2}x_{t-24}- \alpha_{12,2} x_{t-25}+w_t
+      + $\Rightarrow x_t = \alpha_0 + x_{t-1} + \alpha_{12,1}x_{t-12} -\alpha_{12,1} x_{t-13} + \alpha_{12,2}x_{t-24}- \alpha_{12,2} x_{t-25}+w_t$
 
 ### VAR(p) 
 
@@ -2078,11 +2111,13 @@ w1 1.0710508 0.5493046
 - **Holt-Winters model**
 
 - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
+
 - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
     $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
     $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
   
   - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
+  
 - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
 
     - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
@@ -2139,6 +2174,10 @@ w1 1.0710508 0.5493046
 - ARIMA
 
 - **Seasonal $ARIMA(p,d,q)(P,D,Q)_s$**
+
+- **How many coefficients we have to fit in the classical ARIMA model?** - $1 (=\alpha_0) + p + sP + q + sQ$ 
+
+- **How many coefficients we have to fit in a seasonal ARIMA model? **- $1(=\alpha_0)+p+P+q+Q$ 
 
 - **VAR(p)**: $X_t =A_0 + A_iX_{t-i} + R_t$
 

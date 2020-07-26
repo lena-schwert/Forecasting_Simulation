@@ -128,7 +128,7 @@
 
   - probably: "How many parameters do you restrict to be = 0, because you use Seasonal ARIMA instead of "normal" ARIMA?"
 
-    - e.g. for thirs example of the lecture:
+    - e.g. for third example of the lecture (week 12):
 
     - highest lag = 25 + intercept
 
