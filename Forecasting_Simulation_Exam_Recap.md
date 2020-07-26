@@ -525,7 +525,12 @@
 ### Bootstrapping
 
 - bootstrapping is **useful when you don't know the distribution of the residuals** 
-- you do sampling with replacement
+  - conventionally we need to performing complex mathematric (estimating with algebra!) to understandsome distributional properties of statistics 
+    => “Why don’t we sample from our empirical distribution repeatedly instead?” -> that’s what we do with bootstrapping 
+  -   you do sampling with replacement!
+    => We simulate a "complete new dataset" by drawing from a given the dataset with replacement -> we get the approximate sampling distribution!
+    -> essentially, bootstrapping uses the **distribution defined by the data** to approximate the unknown sampling distribution 
+    - then use the simulated statistic to define the standard deviation to calculate the standard error 
 - **intuition:** you approximate the unknown distribution you sample from by taking many samples from which you can **calculate mean + standard deviation**
 - in our case, we apply bootstrapping to sample from residuals in order to calculate k-step ahead forecasts
 
