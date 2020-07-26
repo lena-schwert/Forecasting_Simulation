@@ -480,6 +480,10 @@
 
     –> $\alpha \neq E[\hat\alpha]$ 
 
+- **Why parameter estimates are biased?** -> due to serial correlation 
+  => serial correlation in time series occured when errors associated to a given period carry over into future period 
+  => when predicting the dividends of a stock, an overestimation of one year will lead to an overestimation in the succeeding year
+
 - use maximum likelihood (ML)
 
   - "Maximize the log-densitiy of the joint Gaussian density ”
@@ -495,6 +499,10 @@
   # using ar function of method = "ols"
   > fit<-ar(x,order.max=1,demean=F,method = "ols")
   > fit$ar
+  
+  # using ar function of method = "ml"
+  > fit3<-ar(x,order.max=1,demean=F,method = "mle")
+  > fit3$ar
   ```
 
 
