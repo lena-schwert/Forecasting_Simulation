@@ -483,6 +483,25 @@
 - **Why parameter estimates are biased?** -> due to serial correlation 
   => serial correlation in time series occured when errors associated to a given period carry over into future period 
   => when predicting the dividends of a stock, an overestimation of one year will lead to an overestimation in the succeeding year
+- **Why is the bias term unequal to zero for small samples?**
+
+  - a hint from Wikipedia (article about OLS)
+
+    ![image-20200726102100554](image-20200726102100554.png)
+
+    –> OLS is only unbiased (= bias is zero), if the assumption of struct exogeneity holds!
+
+  - **What is exogeneity about?**
+
+    - comes from the i.i.d. assumption
+
+      - all points are drawn at random in the same way!
+
+        –> independent, identically distributed
+
+    - generally $E[something]=0$, only if something is i.i.d!
+
+    - exogeneity $E[w_t\mid x_t] = 0$ 
 
 - use maximum likelihood (ML)
 
