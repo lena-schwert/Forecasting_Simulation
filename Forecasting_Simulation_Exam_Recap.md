@@ -453,7 +453,7 @@
 
 
 
-### Parameter Estimation of $\alpha$ (ML, OLS) 
+### Parameter Estimation of $\alpha$ (using OLS, ML) 
 
 - use ordinary least squares (OLS)
 
@@ -1138,7 +1138,7 @@ which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="bic")) #4=>p=3 if n= 10000; 
 
   <img src="image-20200724130325781.png" alt="image-20200724130325781" style="zoom:67%;" />
 
-### Checking model residuals for autocorrelation (Ljung-Box tests)
+### Ljung-Box Test (=Checking model residuals for autocorrelation)
 
 + **intuition:** we need to check the residuals for autocorrelation to know whether our model suits the data well (if it is good, we have truly random residuals)
 
@@ -1205,7 +1205,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
   <img src="image-20200724125318368.png" alt="image-20200724125318368" style="zoom:67%;" />
 
-### Checking model residuals for stability/breakpoints (Chow test)
+### Chow Tests (=Checking model residuals for stability/breakpoints)
 
 + **General idea:** we want to know if the parameters of the fit are stable over the entire time period of the time series
   
