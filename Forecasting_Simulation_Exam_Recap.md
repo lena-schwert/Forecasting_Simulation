@@ -1532,7 +1532,7 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
   
     
   
-  <u> Example3 from lecture slide:</u>
+  <u> Example 3 from lecture slide:</u>
   
   + ARIMA$(0,1,0)$ x $(2,0,0)_{12}$ model: 
   + Calculate the highest lag order: $p + sP + d+ sD = 12(2) + 1 = 25$
