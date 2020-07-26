@@ -286,7 +286,7 @@
     
     + use the autocorrelation plot obtained with `acf()`
 
-- in practice, the mean is usually never == 0, so you **test whether the mean is significantly different from zero using the covariance!** (???)
+- in practice, the mean is usually never == 0, so you **test whether the mean is significantly different from zero using the covariance!** 
 
 
 #### Code Snippets
@@ -305,6 +305,10 @@
 - **How to check whether the mean is significantly different from zero:**
   - if $1.96 \times \sigma/\sqrt{n}$ is larger than the mean of the series 
   - `1.96*sd(w)/n^0.5 > mean(w)`
+- **How to calculate the variance of the white noise series?**
+  - `cov(w,w)`
+  - `1/(n-1)*t(w-mean(w))%*%(w-mean(w))`
+  - `n/(n-1)*acf(w, type="covariance", plot=FALSE)$acf[1]`
 
 ### Random Walk
 
@@ -2116,6 +2120,7 @@ w1 1.0710508 0.5493046
 
   - input the time series: tells us if a series is stationary or not -> if it is, ACF will drop to zero relatively quickly; non-stationary series, ACF will decreases slowly (value of the autocorrelation is large & positive) 
   - input the residuals: check the correlation of the residuals -> count the no. which cross the dashed line 
+  - can input argument: `type=“covariance”` to be used as `cov` function to calculate the variance of the input series (*refer white noise section for details*)
 
 - log-transform a time series:
 
