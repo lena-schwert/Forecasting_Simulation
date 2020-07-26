@@ -563,8 +563,11 @@
 - **How to do bias-corrected bootstrapping**
 
   - bias correction is important for **small samples, because the bias term will be $\neq 0$** (refer to Chapter *Parameter Estimation of $\alpha$ (ML, OLS)* ) 
+
   - implements approach from a paper: Kim et al. (2010): Bias-Corrected Bootstrap Prediction Intervals for Autoregressive Model: New Alternatives with Applications to Tourism Forecasting, Journal of Forecasting 29(7):655 - 672
+
   - Two main parts: 1. Use bootstrapping to estimate the bias 2. Use bootstrapping to do k-step ahead forecast 
+
     - To estimate the bias: 
       1. First fit the “orginal” observed series to obtain the coefficient(s) -> this is considered as the “estimated coefficient(s)”
       2. centralize the residuals: subtract the residuals of the fit from the mean of the residuals of the fit 
@@ -573,53 +576,83 @@
          => we take the mean of this distribution as the “”true” coefficient(s)
       4. using this distribution of “true” coefficients we estimate the bias: mean of this distribution - “estimated coefficient(s)”   
       5. correct the estimated coefficient(s) (obtained from step1) with the estimated bias (obtained in step 4)
+
+    ```R
+    # from Chap 4 Bootstrap.R
+    # ar3c = ar(3) process 
+    coef_boot <- matrix(1:(4*R),ncol=4) # each col stores the distribution of each coefficients 
+    # Step 1: fit the "orginal" observed time series, ar3c to get the "estimated coefficients"
+    fit<-BootPR:::LSM(ar3c,3)
+    a0_hat<-fit$coef[4]
+    a1_hat<-fit$coef[1]
+    a2_hat<-fit$coef[2]
+    a3_hat<-fit$coef[3]
+    
+    # Step2: centralize the residuals 
+    resid_b<-fit$resid-mean(fit$resid) 
+    set.seed(1)
+    x_b<-rep(0,n)
+    # Step3: bootstrapping with a for loop 
+    for (i in 1:R){
+      w_p<- sample(resid_b, n-3, replace=T)
+      #choose an index randomly to pick a value randomly but include the next consecutive 2 values 
+      # in order to obtain 3 presampled value -> we have a AR(3) process, we need 3 presampled values 
+      i1<-sample.int(n-2,size=1) # sample a random index  
+      x_b[1:3]<-ar3c[i1:(i1+2)] 
+      # generate "new" series which has different random noise 
+      for (t in 4:n) x_b[t] <- a0_hat+a1_hat*x_b[t-1]+a2_hat*x_b[t-2]+a3_hat*x_b[t-3]+w_p[t-3]
+      # fit the "new" series and get "new" coefficient(s) -> repeat these steps R times to get a distribution of coefficient(s)
+      coef_boot[i,1:4]<-t(BootPR:::LSM(x_b,3)$coef) 
+    }
+    
+    # Step4: The formula from parameter estimation using OLS is not needed to estimate the bias with bootstrapping 
+    # The logic: bootstrapping gives us a sampling distribution of coefficient(s) which is considered as the "true" distribution of coefficients if R=large so the mean of this distribution represents the true coefficient(s), the coefficient(s) we obtained from the one-time fit is considered the estimated one, so bias = true coeff (mean of the coeff distribution) - estimated coeff 
+    bias_boot<-c(mean(coef_boot[,1])-a1_hat,
+      mean(coef_boot[,2])-a2_hat, 
+      mean(coef_boot[,3])-a3_hat, 
+      mean(coef_boot[,4])-a0_hat) #-0.0151274471  0.0008821954  0.0003106396  0.0470021339
+    
+    #Step5: calculate the bias corrected parameter estimates
+    a1_hat_c <- a1_hat - bias_boot[1] 
+    a2_hat_c <- a2_hat - bias_boot[2] 
+    a3_hat_c <- a3_hat - bias_boot[3] 
+    a0_hat_c <- a0_hat - bias_boot[4] 
+    ```
+
     - To do k-step ahead forecast:  
 
-  ```R
-  # from Chap 4 Bootstrap.R
-  # ar3c = ar(3) process 
-  coef_boot <- matrix(1:(4*R),ncol=4) # each col stores the distribution of each coefficients 
-  # Step 1: fit the "orginal" observed time series, ar3c to get the "estimated coefficients"
-  fit<-BootPR:::LSM(ar3c,3)
-  a0_hat<-fit$coef[4]
-  a1_hat<-fit$coef[1]
-  a2_hat<-fit$coef[2]
-  a3_hat<-fit$coef[3]
-  
-  # Step2: centralize the residuals 
-  resid_b<-fit$resid-mean(fit$resid) 
-  set.seed(1)
-  x_b<-rep(0,n)
-  for (i in 1:R){
-    w_p<- sample(resid_b, n-3, replace=T)
-    #choose an index randomly to pick a value randomly but include the next consecutive 2 values 
-    # in order to obtain 3 presampled value -> we have a AR(3) process, we need 3 presampled values 
-    i1<-sample.int(n-2,size=1) # sample a random index  
-    x_b[1:3]<-ar3c[i1:(i1+2)] 
-    # generate "new" series which has different random noise 
-    for (t in 4:n) x_b[t] <- a0_hat+a1_hat*x_b[t-1]+a2_hat*x_b[t-2]+a3_hat*x_b[t-3]+w_p[t-3]
-    # fit the "new" series and get "new" coefficient(s) -> repeat these steps R times to get a distribution of coefficient(s)
-    coef_boot[i,1:4]<-t(BootPR:::LSM(x_b,3)$coef) 
-  }
-  
-  # The formula from parameter estimation using OLS is not needed to estimate the bias with bootstrapping 
-  # The logic: bootstrapping gives us a sampling distribution of coefficient(s) which is considered as the
-  # "true" distribution of coefficients if R=large so the mean of this distribution represents the true
-  # coefficient(s), the coefficient(s) we obtained from the one-time fit is considered the estimated one
-  # so, bias = true coeff (mean of the coeff distribution) - estimated coeff 
-  bias_boot<-c(mean(coef_boot[,1])-a1_hat,
-    mean(coef_boot[,2])-a2_hat, 
-    mean(coef_boot[,3])-a3_hat, 
-    mean(coef_boot[,4])-a0_hat) #-0.0151274471  0.0008821954  0.0003106396  0.0470021339
-  
-  #Step5: calculate the bias corrected parameter estimates
-  a1_hat_c <- a1_hat - bias_boot[1] 
-  a2_hat_c <- a2_hat - bias_boot[2] 
-  a3_hat_c <- a3_hat - bias_boot[3] 
-  a0_hat_c <- a0_hat - bias_boot[4] 
-  ```
+    ```R
+    k<-5 # 5-step ahead forecast 
+    R<-10^4
+    #residuals for bias corrected coefficients
+    res_c <- rep(0,n-3)
+    for (t in (1:(n-3))) res_c[t] = ar3c[t+3]-(a0_hat_c+a1_hat_c*ar3c[t+2]+a2_hat_c*ar3c[t+1]+a3_hat_c*ar3c[t])
+    
+    predictions_boot <- 1:R
+    # centralize the residuals 
+    resid_b<-res_c-mean(res_c)
+    pred<-rep(0,h+3)
+    x_b<-rep(0,n)
+    for (i in 1:R){
+      w_p<- sample(resid_b, n-3, replace=T)
+    	#choose an index randomly to pick a value randomly but include the next consecutive 2 values 
+      i1<-sample.int(n-2,size=1) #randomly pick the first index
+      x_b[1:3]<-ar3c[i1:(i1+2)]  #get 3 pre-sample values
+      # generate a "new" AR(3) process with the bias corrected coefficients estimates
+      for (t in 4:n) x_b[t] <- a0_hat_c+a1_hat_c*x_b[t-1]+a2_hat_c*x_b[t-2]+a3_hat_c*x_b[t-3]+w_p[t-3]  
+      fit_b<-BootPR:::LSM(x_b,3) # fit and get the coefficients(~)
+      # correct the coefficients with the bias estimated (obtain in first bootstrapping procedure)
+      fit_b$coef<-fit_b$coef-bias_boot 
+      # take the last 3 obs. from the "original" series as presampled value 
+      pred[1:3]<-ar3c[(length(ar3c)-2):length(ar3c)]
+      # make the prediction using the bootstrapped fitted coefficient(s)
+      for(j in 4:(k+3)){ 
+        pred[j]<-fit_b$coef[4]+fit_b$coef[1]*pred[j-1]+fit_b$coef[2]*pred[j-2]+fit_b$coef[3]*pred[j-3]+w_p[j]
+      }
+      predictions_boot[i]<-pred[k+3] # here only save the last point 
+    }
+    ```
 
-  
 
 ### Stationarity
 
