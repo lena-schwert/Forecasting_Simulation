@@ -247,7 +247,7 @@
 + use additive method when -> seasonal variations are constant through the series 
   + seasonally adjust the level by subtracting the seasonal component (of last period) 
   + forecast formula: adding the seasonal part 
-+ use multiplicative method when -> seasonal variations are changing **in propotion to the level of the series**
++ use multiplicative method when -> seasonal variations are changing **in proportion to the level of the series**
   + seasonally adjust the level by dividing the seasonal component (of last period) 
   + forecast formula: multiplying the seasonal part  
   –> one smoothing parameter for each of the components, $\alpha, \beta, \gamma \in [0,1]$  
@@ -2242,6 +2242,11 @@ w1 1.0710508 0.5493046
   - $x_t= \alpha_0 +\alpha_1x_{t-1}+\dots+\alpha_px_{t-p}+w_t$ 
   - rephrased to: $\Delta x_t = \alpha_0+\delta x_{t-1}+\sum_{i=1}^{p-1}\tilde\alpha_i\Delta x_{t-1} +w_t$ 
 
+- **test statistics for the Chow tests**
+
+    - **breakpoint variant:** $F = \frac{S-(S_1+S_2)}{S_1+S_2}\cdot \frac{n-2k}{k}$
+    - **forecast variant**: $F = \frac{S-S_1}{S_1}\cdot \frac{n_1-k}{n-n_1}$ 
+
 - **MA(q) process **(= moving average)
 
   - $x_t = c_0+w_t+\theta_1w_{t-1}+\dots+\theta_qw_{t-q}$ 
@@ -2254,7 +2259,7 @@ w1 1.0710508 0.5493046
 
     rewritten as $\alpha(L)x_t= \alpha_o+\theta(L)w_t$ 
 
-- ARIMA
+- **ARIMA**
 
 - **Seasonal $ARIMA(p,d,q)(P,D,Q)_s$**
 
