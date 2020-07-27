@@ -435,7 +435,7 @@
 + As compared to random walk with drift, we have a $\alpha$ coefficient for the past value, $x_{t-1}$; we don't have a long memory process, so there is no smooth upward & down trend now 
 + Random walk is smoother than AR(1), which is smoother than white noise model; Autocorrelation of AR(1) decays quicker than the random walk -> AR(1) process has a closer resemblence to the white noise model than the random walk process 
 
-<img src="7c26b157.png" alt="7c26b157" style="zoom:75%;" />
+![visualization of WN, RW, AR(1)](visualization of WN, RW, AR(1).png)
 
 - **compare white noise, random walk (with drift) and AR(1) by eyeballing**
 
