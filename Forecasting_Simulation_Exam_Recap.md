@@ -483,7 +483,7 @@
 - use ordinary least squares (OLS)
 
   - minimize the sum of squared errors
-  - $SSE = \sum_t(x_t-(\alpha_0+\alpha_1\cdot x_{t-1}))^2$
+  - $SSE = \sum_t(x_t-\alpha\cdot x_{t-1})^2$
   - find parameters such that $\frac{\part}{\part\alpha_1}SSE=0$
   - **translates to:** "minimize the squared sum of the difference between the data points and an AR(1) model"
 
@@ -560,8 +560,7 @@
   z.diff.lag.6 <- Apple.d1[1:(length(Apple.d1)-6)] # length 3016
   
   # put the model formula in lm()
-  model_lm <- lm(z.diff ~ 1 + z.diff.lag.1+ z.diff.lag.2 + z.diff.lag.3
-                 + z.diff.lag.4 + z.diff.lag.5 + z.diff.lag.6)
+  model_lm <- lm(z.diff ~ 1 + z.diff.lag.1+ z.diff.lag.2 + z.diff.lag.3 + z.diff.lag.4 + z.diff.lag.5 + z.diff.lag.6)
   summary(model_lm)
   ```
 

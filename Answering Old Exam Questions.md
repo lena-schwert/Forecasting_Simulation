@@ -55,7 +55,20 @@
 
 - ==*second exam 2018*:== differenced Series dx of x is an AR(1) process, Write r Code with lm to  fit dx. Values of x unknown. ; write R code to obtain x ; use lm to fit x
 
+  ```R
+  # create the time series
+  dx <- diff(x)[2:length(x)]
+  dx.lag.1 <- diff(x)[1:(length(x)-1)]
+  
+  # I assume that an intercept exists
+  lm(dx ~ 1 + dx.lag.1)
+  ```
+
 - ==*first exam 2019*:== Fill gaps in lm and bootstrapping code, derive mean and variance of  one-step-ahead forecast of an AR(1) model and write R code to calculate  it with series x and its fit
+
+  ```R
+  
+  ```
 
 ## Recapping chapter 4
 
