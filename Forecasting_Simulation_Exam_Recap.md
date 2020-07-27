@@ -538,19 +538,32 @@
 + **How to estimate alpha with OLS?** 
 
   ```R
-  # using the formula derived
+  ### using the formula derived
   > alpha<-t(x[2:1000])%*%x[1:999]/t(x[1:999])%*%x[1:999]
   
-  # using ar function of method = "ols"
+  ### using ar function of method = "ols"
   > fit<-ar(x,order.max=1,demean=F,method = "ols")
   > fit$ar
   
-  # using ar function of method = "ml"
+  ### using ar function of method = "ml"
   > fit3<-ar(x,order.max=1,demean=F,method = "mle")
   > fit3$ar
+  
+  ### using lm(), e.g. for an AR(6) model, from Chap 4 HW3
+  # CAUTION: Indices must be this way, so that all parts of the model have the same length!
+  z.diff <- Apple.d1[7:length(Apple.d1)] # length 3016
+  z.diff.lag.1 <- Apple.d1[6:(length(Apple.d1)-1)] # length 3016
+  z.diff.lag.2 <- Apple.d1[5:(length(Apple.d1)-2)] # length 3016
+  z.diff.lag.3 <- Apple.d1[4:(length(Apple.d1)-3)] # length 3016
+  z.diff.lag.4 <- Apple.d1[3:(length(Apple.d1)-4)] # length 3016
+  z.diff.lag.5 <- Apple.d1[2:(length(Apple.d1)-5)] # length 3016
+  z.diff.lag.6 <- Apple.d1[1:(length(Apple.d1)-6)] # length 3016
+  
+  # put the model formula in lm()
+  model_lm <- lm(z.diff ~ 1 + z.diff.lag.1+ z.diff.lag.2 + z.diff.lag.3
+                 + z.diff.lag.4 + z.diff.lag.5 + z.diff.lag.6)
+  summary(model_lm)
   ```
-
-
 
 ### AR(p) model
 
@@ -618,13 +631,90 @@ for (t in 2:n) {
     -> essentially, bootstrapping uses the **distribution defined by the data** to approximate the unknown sampling distribution 
     - then use the simulated statistic to define the standard deviation to calculate the standard error 
 - **intuition:** you approximate the unknown distribution you sample from by taking many samples from which you can **calculate mean + standard deviation**
-- in our case, we use bootstrapping to estimate the bias and apply bootstrapping to sample from residuals in order to calculate k-step ahead forecasts
+- in our case, we use bootstrapping to estimate the bias and/or apply bootstrapping to sample from residuals in order to calculate k-step ahead forecasts
 
 #### Code Snippets
 
 - **How to do bootstrapping with `boot()`**
 
+  –> with this approach you do not use a for-loop! 
+
+  ```R
+  # from Chap 3 Bootstrap.R
+  # initialization
+  library(boot)
+  
+  # create the time series
+  n<-500
+  a <- 0.2
+  x<-w<-runif(n,min = -2, max = 2) # uniformly distributed residuals
+  for (t in 2:n) x[t] <- a*x[t-1]+w[t]
+  
+  # fit the series to obtain the residuals
+  fit<-ar(x, method = "ols", order.max = 1, demean = F) # alpha is estimated
+  
+  R<-10^4 # set number of repetitions
+  predictions_boot <- 1:R # create object to store results
+  
+  # write a function as an input for boot()
+  boot_predict <- function(x,i){
+    # w is the white noise vector: 
+    # w = white noise, x_t = a * x_{t-1} + w
+    w <- x[-1]-as.vector(fit$ar)*x[1:(length(x)-1)]
+    # creates an index that will always be < 500 --> 499
+    i <- i[which(i<length(x))]
+    w_p<-w[i]
+    # then we calculate pred just like above
+    pred <- x[length(x)]
+    pred<-fit$ar*pred+w_p[1]
+    pred
+  }
+  
+  # use the function
+  set.seed(1)
+  predictions_b<-boot(x,boot_predict,R=R)
+  
+  # calculate the mean + standard deviation of the bootstrapped results
+  mean(predictions_b$t) # -0.3237718
+  sd(predictions_b$t) # 1.131744
+  ```
+
+  - `boot()`
+    - `data`: the data used for resampling, usually residuals of a model fit, here: mod1$resid[-1]
+    - `statistic`: how to do the bootstrapping = a function that returns a vector, here: boot_k.ahead
+    - `R`: number of repetitions, here: R
+
 - **How to do bootstrapping with `sample()`**
+
+  ```R
+  # from Chap 3 Bootstrap.R
+  
+  # create the time series
+  n<-500
+  a <- 0.2
+  x<-w<-runif(n,min = -2, max = 2) # uniformly distributed residuals
+  for (t in 2:n) x[t] <- a*x[t-1]+w[t]
+  
+  # fit the series to obtain the residuals
+  fit<-ar(x, method = "ols", order.max = 1, demean = F) # alpha is estimated
+  
+  # initialization
+  predictions_boot <- 1:R # create object to store resul
+  
+  for (i in 1:R){
+    pred<-x[length(x)]
+    # draw a random sample (with replacement) from the residuals
+    w_p<- sample(fit$resid[-1], 1, replace=T) 
+    pred<-fit$ar*pred+w_p
+    predictions_boot[i]<-pred
+  }
+  
+  # calculate the mean + standard deviation of the bootstrapped results
+  mean(predictions_boot) # -0.3238181
+  sd(predictions_boot) # 1.131557
+  ```
+
+  - results in mean + sd are very similar to the approach above using `boot()` 
 
 - **How to do bias-corrected bootstrapping**
 
@@ -636,13 +726,19 @@ for (t in 2:n) {
 
     - To estimate the bias: 
       1. First fit the “orginal” observed series to obtain the coefficient(s) -> this is considered as the “estimated coefficient(s)”
+      
       2. centralize the residuals: subtract the residuals of the fit from the mean of the residuals of the fit 
+      
       3. Do the bootstrapping procedure in a for loop to generate the distribution of the coefficient(s): by resampling the residuals (obtained from the fit in step1) then use the resampled residuals and the estimated coefficient(s) from the fit in step 1 (“true value”) to generate “new” series which is then fitted either using `lm()` or `BootPR::LSM()` to get a “new” coefficient -> do this repeated for $R$ times to gerate a distribution of “new” coefficients
          => this distribution of “new” coefficient(s) resemble the “true distributon" of the coefficient(s) 
          => we take the mean of this distribution as the “”true” coefficient(s)
+    
       4. using this distribution of “true” coefficients we estimate the bias: mean of this distribution - “estimated coefficient(s)”   
+      
       5. correct the estimated coefficient(s) (obtained from step1) with the estimated bias (obtained in step 4)
-
+      
+         –> on average, the coefficient will now be closer to the true value!
+    
     ```R
     # from Chap 4 Bootstrap.R
     # ar3c = ar(3) process 
@@ -677,17 +773,16 @@ for (t in 2:n) {
       mean(coef_boot[,2])-a2_hat, 
       mean(coef_boot[,3])-a3_hat, 
       mean(coef_boot[,4])-a0_hat) #-0.0151274471  0.0008821954  0.0003106396  0.0470021339
-    
+  
     #Step5: calculate the bias corrected parameter estimates
-    a1_hat_c <- a1_hat - bias_boot[1] 
-    a2_hat_c <- a2_hat - bias_boot[2] 
-    a3_hat_c <- a3_hat - bias_boot[3] 
+      a1_hat_c <- a1_hat - bias_boot[1] 
+      a2_hat_c <- a2_hat - bias_boot[2] 
+      a3_hat_c <- a3_hat - bias_boot[3] 
     a0_hat_c <- a0_hat - bias_boot[4] 
     ```
-```
   
-    - To do k-step ahead forecast:  
-    
+- **To do k-step ahead forecast:** 
+  
     ```R
     k<-5 # 5-step ahead forecast 
     R<-10^4
