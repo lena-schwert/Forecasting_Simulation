@@ -813,9 +813,6 @@ for (t in 2:n) {
       predictions_boot[i]<-pred[k+3] # here only save the last point 
     }
     ```
-```
-
-
 ### Stationarity
 
 - formal definitions of the types of stationarity we encounter
@@ -963,9 +960,10 @@ for (t in 2:n) {
   summary(ur.df(d2x, type = "drift"))
   summary(ur.df(d1x, type = "trend"))
   summary(ur.df(x, type = "trend"))
-```
+  ```
 
   - general idea:  
+    
     - If you find that the differenced time series is stationary, do the next test with the time series
     - We assume the series has at most quadratic trend -> we will not difference more than 3 times to obtain a stationary process
       - testing in descending order: d=3 -> d=2 -> d=1 
