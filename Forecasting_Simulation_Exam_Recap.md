@@ -1083,7 +1083,7 @@
 + **How to proof**? We state that if $x_t$ is stationary then $\Delta x_t$ will have infinite lag order this implies that if $\Delta x_t$ have finite lag order, that mean we just differenced enough from a unit root process, $x_t$ -> we proof this implication  
   + we proof that, if $\Delta x_t$ has finite lag order, the coefficients of $x_t$ sum up to one –> the process has a unit root = is a non-stationary random walk
   + **Start by assuming that $\Delta x_t$ has finite lag order: $\Delta x_t = \beta_0 + \sum_{i=1}^{p-1} \beta_i x_{t-i}$**  expand it -> $x_t = \beta_0 + x_{t-1} + \sum_{i=1}^{p-1} \beta_i x_{t-i} - \sum_{i=2}^p \beta_{i-1} x_{t-i}$ -> rearranging the term with $\alpha$s to show that all coefficients of $x_{t-i}$ sum up to 1, this show that $x_t$ is a unit root process! 
-  + use $\Delta x_t = \beta_0 + \beta_1 \Delta x_{t-1} + \beta_2 \Delta x_{t-2}$ to deduce the expansion from the initial assumption! 
+  + use $\Delta x_t = \beta_0 + \beta_1 \Delta x_{t-1} + \beta_2 \Delta x_{t-2}$ to deduce the expansion from the initial assumption! ()
 
 ### Determining the lag order p
 
@@ -1166,6 +1166,12 @@
     - both are used in practice, but AIC may be better for forecasts
   
 + when we try to fit multiple model with different $p$, implicitly we assume sample size is constant for all order $p$ -> presample value need to be the same 
+
+##### AIC VS. BIC 
+
+<img src="Screen Shot 2020-07-27 at 12.11.12 PM.png" alt="Screen Shot 2020-07-27 at 12.11.12 PM" style="zoom:50%;" />
+
++ $ln(7)$ =1.95~ 2, so when $n-p > 7$, the penalty term of BIC > AIC -> $p$ converges to true value if large obs. are used (BIC penalize for adding more parameters in the model to avoid the overfitting more when more obs. available)  
 
 #### Code Snippets
 
@@ -1359,13 +1365,13 @@ lines(rep(0.05,h),lty=2,col='blue')
   
 + **Chow Tests**: 3 variants -> sample split, breakpoint & forecast 
 
-  + **How it works**: looks at the residuals; splits data into two parts: 1 set for period before break point, the other contains break point; 
+  + **How it works**: looks at the residuals; splits data into two parts: 1 set for period contains the breakpoint, the other period is after the breakpoint; 
 
     –> **if no break point exists, the residuals of both parts should be comparable!** 
 
     = SSE of the two periods are similar 
 
-    + $H_0:$ We have stationarya  AR($p$) process with fixed parameters 
+    + $H_0:$ We have stationary AR($p$) process with fixed parameters 
     + $H_1$: parameters change over time 
 
   + Notation: 
@@ -1381,7 +1387,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
   + General idea: We do in total 3 fits in the test; 1 model fit with all data points; Another 2 model fits with data that splitted into two parts at a certain breakpoint -> compute the test statistic by comparing the SSEs of the respective fit in a ratio 
 
-    + **How it works?** -> define an arbitrary breakpoint where we split the data into two parts (period 1 and period 2), fit the data of period 1 and the data of period 2 to get the respective SSEs ($S_1$ and $S_2$); We also fit another model with all the data, $n$ and get its SSE, $S$ 
+    + **How it works?** -> define an arbitrary breakpoint where we split the data into two parts (period 1 and period 2), fit the data of period 1(contain the breakpoint(s)) and the data of period 2 to get the respective SSEs ($S_1$ and $S_2$); We also fit another model with all the data, $n$ and get its SSE, $S$ 
 
       + numerator of test statistic: consider the SSE of the sum of $S_1$ and $S_2$ 
 
@@ -1407,7 +1413,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 + **Chow Forecast Test**
 
-  + no fit for period 2 which contains the break point; only the full sample $S$ and the fit of the first period (no break point)
+  + test statistic only include the fit of first period (contains the breakpoint) and the fit of full sample
 
   + $F=\frac{S-S_{1}}{S_{1}} \cdot \frac{n_{1}-k}{n-n_{1}}$
     where 
