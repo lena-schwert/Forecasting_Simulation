@@ -548,7 +548,15 @@
 
     $\Rightarrow \mu = \frac{\alpha_0}{1-\alpha_1 - \dots - \alpha_p}$
 
-    => if we have a unit root, where sum of $\alpha$s = 1, the mean will be either $-\infty$ (if $\alpha_0$ is negative) or $\infty$ (if $\alpha_0 is positive) 
+    => if we have a unit root, where sum of $\alpha$s = 1, the mean will be either $-\infty$ (if $\alpha_0$ is negative) or $\infty$ (if $\alpha_0$ is positive
+
+<img src="asymptotic mean-AR(p) without unit root.png" alt="asymptotic mean-AR(p) without unit root" style="zoom:50%;" />
+
+![AR(p) with a unit root-pos-a0](AR(p) with a unit root-pos-a0.png)
+
+![AR(p) with a unit root-neg-a0](AR(p) with a unit root-neg-a0.png)
+
+
 
 ### Bootstrapping
 
