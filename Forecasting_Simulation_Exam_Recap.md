@@ -1625,8 +1625,82 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 #### Code Snippets
 
+- **How to perform the Chow test for a single breakpoint**
+
+  ```R
+  # create 3 lagged  time series from x
+  # ar3 does not have a breakpoint
+  p <- 3
+  z <- ar3
+  x1 <- ar3[3:(length(ar3)-1)]
+  x2 <- ar3[2:(length(ar3)-2)]
+  x3 <- ar3[1:(length(ar3)-3)]
+  
+  # create a formula object from the time series, here AR(3) without intercept
+  fmla <- as.formula("z ~ 0 + x1 + x2 + x3")
+  
+  ### ---------------- breakpoint variant ------------------
+  # calculate the value for the test statistic 
+  fs<-Fstats(fmla, from=n1, to = n1, data=list(ar3))
+  
+  # determine the p-value (= probability of that value) using the standard F-distribution
+  PVAL <- 1 - pf(fs$Fstats/p, df1=p, df2=n-2*p) #0.864526
+  #0.864526 => H0 can not be rejected
+  
+  ### -------------------forecast variant ------------------
+  # uses Jacobs' function ChowF
+  
+  # calculate the value for the test statistic
+  n1 <- 900 # breakpoint is suspected here
+  fs<-ChowF(fmla, from=n1, to = n1, data=list(ar3))
+  
+  # determine the p-value (= probability of that value) using the standard F-distribution
+  PVAL <-1 - pf(fs$chowFstats, df1=n-n1, df2=n1-p)
+  #0.3733341 => H0 can not be rejected
+  ```
+
 - **How to perform the Chow test repeatedly to test an interval for a breakpoint**
 
+  ```R
+  # generate an AR(3) process with a visible structural break at position 954
+  set.seed(1)
+  m<-1003
+  ar3<-w<- rnorm(m) 
+  for (t in 4:(m-50)) {
+    ar3[t] <- ar3[t-1]-0.11*ar3[t-2]-0.07*ar3[t-3]+w[t]
+  }
+  #Breakpoint at t=954  
+  for (t in (m-49):m) {
+    ar3[t] <- 5+ 0.8*ar3[t-1]-0.11*ar3[t-2]-0.07*ar3[t-3]+w[t]
+  }
+  
+  # use the same formula as above as input
+  
+  ### -------------------- breakpoint test ----------------
+  fs<-Fstats(fmla, from=n1, to = (n-4), data=ts(ar3))
+  PVAL <- 1 - pf(fs$Fstats/p, df1=p, df2=n-2*p)
+  numberBreakpoints<-length(which(PVAL<=0.05)) #85
+  fs$breakpoint #950 
+  threshold<-qf(0.95, df1=p, df2=n-2*p)
+  plot(main = "Breakpoint test",fs$Fstats/p,ylim=c(0.9*min(fs$Fstats/p,threshold),max(fs$Fstats/p,threshold)*1.1),type="l")
+  abline(h=threshold,col="red")
+  
+  ### -------------------- forecast test ------------------
+  fs<-ChowF(fmla, from=n1, to = (n-1), data=list(ar3))
+  PVAL <- 1 - pf(fs$chowFstats, df1=n-n1, df2=n1-p)
+  numberBreakpoints<-length(which(PVAL<=0.05)) #71
+  fs$breakpoint #999 
+  threshold<-qf(0.95, df1=n-n1, df2=n1-p)
+  plot(main = "Forecast test",fs$chowFstats,ylim=c(0.9*min(fs$chowFstats,threshold),max(fs$chowFstats,threshold)*1.1),type="l") 
+  abline(h=threshold,col="red")
+  ```
+  
+  <img src="image-20200727190103623.png" alt="image-20200727190103623" style="zoom:80%;" />![image-20200727190118568](image-20200727190118568.png)
+  
+  
+  
+  <img src="image-20200727190135534.png" alt="image-20200727190135534" style="zoom:80%;" />
+  
   
 
 ### MA(q) Model
