@@ -786,11 +786,8 @@ lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
     mfb<-mean(predictions_fast_boot)
     qfb10<-quantile(predictions_fast_boot,probs=0.1) 
     qfb90<-quantile(predictions_fast_boot,probs=0.9) 
-    
     ```
-
     
-
 - **How to do bias-corrected bootstrapping**
 
   - bias correction is important for **small samples, because the bias term will be $\neq 0$** (refer to Chapter *Parameter Estimation of $\alpha$ (ML, OLS)* ) 
@@ -2269,13 +2266,18 @@ F-Test = 1.4789, df1 = 4, df2 = 29973, p-value = 0.2056
 
 <img src="bivariate_cointegrated series.png" alt="bivariate_cointegrated series" style="zoom:50%;" />
 
+​	--> = **the behaviour of the curves is somewhat similar over the entire time!** 
+
 + if the determinantal polynomial of a VAR process has a unit root (the determinant = 0 for z=1) -> some/all of the variables in the system are integrated 
-  + If there exists some linear combinations of some parameters of both nonstationary processes which results in a stationary process. This is called the cointegrating relation.  
+  + If there exists some **linear combinations of the non.stationary processes which results in a stationary process**, these equations are called the **cointegrating relations**.  
 + Cointegrating relation is a **mean reverting process**. (converges to a mean value) The long term forecast of the cointegrated series are linearly related. 
++ The occurrence of cointegration implies that **a long-run equilibrium exists** --> the cointegration relations are stable over time
+  + cointegration **is also motivated by econometrix theory** that says that i(1) variables like GDP, price level are connected to each other
 
 ### VECM
 
 + **Motivation**: Each component of a VAR(p) is I(d), differencing each component individually may distort the relationship between the orginal variables -> fitting a VAR model with cointegrated variables may be inadequdate -> check the rank of $\Pi$ of VECM model 
+  + **also:** to fit the coefficients correctly, we need a stationary model, and this is what the VECM model equation supplies in the case of cointegration!
 
 Given a VAR($p$) of I(1): 
 $X_t = A_0 + A_1 X_{t-1} + ... + A_p X_{t-p} + R$
@@ -2294,7 +2296,7 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 **Interpretation of VECM:**
 
 + if $\Pi=0$, all $\lambda(\Pi)=0$, rank=0 -> **no cointegration**; Non-stationary of I(1) vanishes by taking the differences -> we **fit $\Delta X_t$**
-+ if $\Pi$ has full rank, $k$, then VAR($p$) is stationary, cannot be I(1) -> **fit VAR model directly**
++ if $\Pi$ has full rank, $k$, then VAR($p$) is stationary, cannot be I(1) -> **fit VAR model directly** --> no cointegration
 + if rank$(\Pi) =m$, $0<m<k$ -> the case of cointegration, we write $\Pi=\alpha\beta'; (k \times k) =(k \times m)[(k \times m)']$ -> **fit VECM($p-1$) model**
   + in this case, rank of $\Pi$ represents the no. of cointegrating equation(s)
 
@@ -2313,14 +2315,14 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 + $H^*$ -> $A_0 \neq 0, B= \alpha \cdot \beta_1$: linear trend in levels, linear trend in cointegrating relations, drift in differences -> **(ecdet="trend")**
 `z.vecm<-my.ca.jo(z, type = "trace", spec = "transitory",ecdet="trend",K=2)`
 
-#### Checking the cointegrating rank and the presence of trend in the series
+#### 1. Checking the cointegrating rank and the presence of trend in the series
 
 + Check the hypotheses, $H^*_1$ and $H_1$ starting from rank =0 in an alternating order up to the full rank, $k$. 
 + Stop the test when the test statistic is smaller than the significant level (cannot reject the $H_0$) so we accept the $H_0$ which is under the assumption that the rank we are testing is the true rank.  
 
 > When the series has an obvious trend, skip $H_1^*$ and proceed to $H_1$ but we can't know whether the cointegrating relations have a trend, so test $H_1$ against $H^*$
 
-#### Checking whether the cointegrating relations are stationary with no trend
+#### 2. Checking whether the cointegrating relations are stationary with no trend
 
 **Testing $H_1$ against $H^*$**: 
 
@@ -2328,8 +2330,9 @@ e.g. $k=3, p=2$: `-(diag(3)-A1-A2)` while `A1, A2` is $3 \times 3$ matrices
 + teststat is chi-square distributed 
 + The likelihood ratio test statistic:
   $$T \sum_{j=1}^{r} \ln \left(\left(1-\lambda_{j}^{1}\right) /\left(1-\lambda_{j}^{*}\right)\right)$$
+  + $\approx 0$ if $\lambda_j^1 \approx\lambda_j^*$ , because $\ln(1) = 0$ 
   + where $T$ = number of fitted observations ($n-p$) and $r$ = true rank 
-  + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
+  + if there is no trend in cointegrating relations, $\lambda^*_j$ will be similar to $\lambda^1_j$ so we will log a value which is close to 1, $\ln(1) = 0$ so we'll sum up a value that is close to zero -> test statistic will be small hence cannot reject $H_0$  
 
 ##### Code Snippets
 
