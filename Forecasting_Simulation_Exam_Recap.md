@@ -1503,6 +1503,22 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 ### MA(q) Model
 
++ $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q}\\ \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
+
+  + linear combination of the current white noise and the past noise up to $q$ lag + a constant 
+  + $q$ is analogous to $p$ in an AR model, it determines the lag order!
+  
++ **it is a weighted moving average of the $w_t$ term** 
+
+     + moving average around $c_0$ which is the mean, with the weighted term of $\theta$s
+
+       -> a past error model (multiplied by some coefficients)
+       -> **made up of past white noises so always stationary!**
+
+     + but the coefficients of these $\theta$s do not sum up to 1!!!
+
++ short hand: $x_t = c_o + \theta(L) w_t$, where $\theta$ is a polynomial with degree $q$
+
 + MA(1) = AR($\infty$) if we restrict $\alpha_i = -\beta^i$ for $i>0$, $|\beta| < 1$ 
 
   + derivation: $x_t = \alpha_0+\beta x_{t-1}+\beta^2 x_{t-2}+ \dots + w_t$ — eqn (1)
@@ -1512,22 +1528,6 @@ lines(rep(0.05,h),lty=2,col='blue')
     + with backshift operator, eqn(1) without constant term becomes: $(1+\beta L+\beta^2L^2+\dots)x_t = w_t$
     + use geometric series formula: $\frac{x_t}{1-\beta L} = w_t \iff x_t = w_t -\beta w_{t-1} = w_t+\theta_1w_1$
   + this also implies that **MA(1) = AR model of infinite order with restrictions**
-
-+ $x_{t}=c_{0}+w_{t}+\theta_{1} \cdot w_{t-1}+\cdots+\theta_{q} \cdot w_{t-q}\\ \Rightarrow x_t = c_o + (1+\theta_1 L + ...+ \theta_q \cdot L^q) w_t$ 
-
-  + linear combination of the current white noise and the past noise up to $q$ lag + a constant 
-  + $q$ is analogous to $p$ in an AR model, it determines the lag order!
-
-+ **it is a weighted moving average of the $w_t$ term** 
-
-     + moving average around $c_0$ which is the mean, with the weighted term of $\theta$s
-
-       -> a past error model (multiplied by some coefficients)
-       -> made up of past white noises so always stationary!
-
-    + but the coefficients of these $\theta$s do not sum up to 1!!!
-
-+ short hand: $x_t = c_o + \theta(L) w_t$, where $\theta$ is a polynomial with degree $q$
 
 + **properties**:
 
@@ -2249,7 +2249,7 @@ w1 1.0710508 0.5493046
 
 
     - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
-
+    
     - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
         $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
         $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
@@ -2257,7 +2257,7 @@ w1 1.0710508 0.5493046
       - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
       
     - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
-
+    
         - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
           $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
           $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
