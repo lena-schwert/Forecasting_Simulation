@@ -8,8 +8,12 @@
     + consider plot(decompose)
       + the seasonal and random component should be oscillating around zero for an additive model
       + the seasonal and random component should be oscillating around one for a multiplicative model 
-
 - *Second exam 2018:* Holt-Winters Model explain components, give formula for xt and xt-hat (t+k), how is Maximum smoothing if the trend achieved?
+  - components: level, trend, seasonality, residuals
+  - formula for $x_t$ and $\hat x_{t+k|t}$ 
+  - How is maximum smoothing for the trend achieved?
+    - maximum smoothing = you basically do not consider this component!
+    - you set $\beta = 0$ 
 
 ## Recapping chapter 3
 
@@ -148,8 +152,9 @@
   + Write down formula 
   
   + probably refers to the covariance matrix
-    + then the solution would be:  ![image-20200726141746296](image-20200726141746296.png)
-  
+    
+  + then the solution would be:  ![image-20200726141746296](image-20200726141746296.png)
+    
   + Is xt1 and/or xt2 stationary?
   
     + check whether the determinant of the reverse characteristic polynomial is equal to zero or not
@@ -197,5 +202,6 @@
      - check the coefficients of the matrix –> the parameters outside of the diagonal matrix are relevant for Granger causality!
 
 - *first exam 2019:* Johansen-test: R command [ca.jo](http://ca.jo) and output test values and critical values r <= 2, r <= 1, r = 0… -> How many time series in z? Build VECM, what does rank tell about  cointegrating relations
+  
   - 
 

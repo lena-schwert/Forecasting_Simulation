@@ -1155,7 +1155,7 @@
     
   + SIC (Schwarz Information Criterion aka. Bayesian criterion)
     
-    + $S I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{ln(n-p)}{n-p} \cdot p*$
+    + $S I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{\ln(n-p)}{n-p} \cdot p*$
     
   + $p^{*}=\left\{\begin{array}{l}p+1, \text { if } \alpha_{0} \text { is estimated } \\ p, \text { if } \alpha_{0} \text { is not estimated }\end{array}\right.$
   
@@ -1273,7 +1273,7 @@ which.min(calc.infocrit(x=ar3,maxord=5,mean=F,crit="bic")) #4=>p=3 if n= 10000; 
 
   <img src="image-20200724130325781.png" alt="image-20200724130325781" style="zoom:67%;" />
 
-### Ljung-Box Test (=Checking model residuals for autocorrelation)
+### Ljung-Box Test (= Checking model residuals for autocorrelation)
 
 + **intuition:** we need to check the residuals for autocorrelation to know whether our model suits the data well (if it is good, we have truly random residuals)
 
@@ -2198,6 +2198,7 @@ w1 1.0710508 0.5493046
 - covariance of two variables $cov(x,y)= \sum_{i=1}^n(x-\bar{x})(y-\bar{y})/(n-1)$
 - correlation $corr(x,y)= \frac{cov(x,y)}{\sigma_x\sigma_y}$ 
 - standard error $\sigma_\mu = \frac{\sigma}{\sqrt{n}}$
+- **Box Cox Transformation**
 
 
 - **Exponential Smoothing**: $x_t = n_{t-1}+r_t$
@@ -2258,6 +2259,16 @@ w1 1.0710508 0.5493046
   - $x_t= \alpha_0 +\alpha_1x_{t-1}+\dots+\alpha_px_{t-p}+w_t$ 
   - rephrased to: $\Delta x_t = \alpha_0+\delta x_{t-1}+\sum_{i=1}^{p-1}\tilde\alpha_i\Delta x_{t-1} +w_t$ 
 
+- **AIC**
+
+    + $A I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{2}{n-p} \cdot p*$
+
+- **SIC/BIC**
+
+    + $S I C(p):=\ln \hat{\sigma}_{w}^{2}(p)+\frac{\ln(n-p)}{n-p} \cdot p*$
+
+    + $p^{*}=\left\{\begin{array}{l}p+1, \text { if } \alpha_{0} \text { is estimated } \\ p, \text { if } \alpha_{0} \text { is not estimated }\end{array}\right.$
+
 - **test statistics for the Chow tests**
 
     - **breakpoint variant:** $F = \frac{S-(S_1+S_2)}{S_1+S_2}\cdot \frac{n-2k}{k}$
@@ -2289,6 +2300,7 @@ w1 1.0710508 0.5493046
   - $i$ is the no. of lag
   - $X_t$, $X_{t-i}$, $A_0$ and $R_t$ is a $k$-dimension column vector 
   - $A_i$ is a $k \times k$ matrix 
+  - $R_t \sim (0,\Sigma_R)$ where $\Sigma_R= E[R_t\cdot R_t']$
 
 - **VECM (= vector error correction model)**: $\Delta X_{t}=A_{0}+\Pi X_{t-1}+\Gamma_{1} \Delta X_{t-1}+\cdots+\Gamma_{p-1} \Delta X_{t-p+1}+R_{t}$
 
