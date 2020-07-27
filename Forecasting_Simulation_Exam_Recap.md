@@ -812,6 +812,7 @@ for (t in 2:n) {
       }
       predictions_boot[i]<-pred[k+3] # here only save the last point 
     }
+    ```
 ```
 
 
@@ -962,7 +963,7 @@ for (t in 2:n) {
   summary(ur.df(d2x, type = "drift"))
   summary(ur.df(d1x, type = "trend"))
   summary(ur.df(x, type = "trend"))
-  ```
+```
 
   - general idea:  
     - If you find that the differenced time series is stationary, do the next test with the time series
@@ -2456,12 +2457,17 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
 - **random walk with drift**
 
   - $x_t = \vartheta+x_{t-1}+ w_t$ **this is only the first order!**
-  - $\mu=E[X_t]=x_0+\vartheta\cdot t$ 
+  - $\mu=E[x_t]=x_0+\vartheta\cdot t$ 
 
 - **AR(1) process**
 
   - $x_t = \alpha_0 +\alpha_1x_{t-1}+w_t$
-  - $\mu=E[X_t]=^{t\rightarrow \infty}\frac{\alpha_0}{1-\alpha_1}$
+  - $\mu=E[X_t]= \alpha_0\frac{1-\alpha_1^t}{1-\alpha_1}+\alpha_1^tx_o\xrightarrow{t\rightarrow\infty}\frac{\alpha_0}{1-\alpha_1}= \mu(t)$ 
+  - $\gamma = Cov[x_t,x_{t+k}]= \alpha^k\sigma^2\frac{1-\alpha^{2t}}{1-\alpha^2}\xrightarrow{t\rightarrow\infty}\frac{\alpha^k\sigma^2}{1-\alpha^2} = \gamma_k(t)$  
+  - $\rho_k(t) = \frac{\gamma_k(t)}{\gamma_0(t)}= \alpha^k$  
+  - **without intercept:**
+    - $x_t = \alpha^tx_0+\sum_{i=0}^{t-1}\alpha w_{t-i}$
+    - $\mu = E[x_t] = \alpha^tx_0 \xrightarrow{t\rightarrow\infty} \mu =0$
 
 - **AR(p) process** (= autoregressive)
 
