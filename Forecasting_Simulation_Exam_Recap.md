@@ -422,6 +422,14 @@
 
     –> mean will go to zero for large values of t
 
+#### AR(1) with a constant term vs. AR(1) without a constant term 
+
++ their properties differ only in the asymptotic mean: 
+
+![AR(1) without a constant](AR(1) without a constant.png)
+
+![AR(1) with a constant](AR(1) with a constant.png)
+
 #### Comparison to random walk model 
 
 + As compared to random walk with drift, we have a $\alpha$ coefficient for the past value, $x_{t-1}$; we don't have a long memory process, so there is no smooth upward & down trend now 
