@@ -562,6 +562,9 @@
   # put the model formula in lm()
   model_lm <- lm(z.diff ~ 1 + z.diff.lag.1+ z.diff.lag.2 + z.diff.lag.3 + z.diff.lag.4 + z.diff.lag.5 + z.diff.lag.6)
   summary(model_lm)
+  
+  # to retrieve the coefficients 
+  model_lm$coefficients # the first coefficients of lm is the intercept (if any)
   ```
 
 ### AR(p) model
@@ -698,7 +701,7 @@ lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
     - `statistic`: how to do the bootstrapping = a function that returns a vector, here: boot_k.ahead
     - `R`: number of repetitions, here: R
 
-- **How to do bootstrapping with `sample()`**
+- **How to do bootstrapping with `sample()`** -> faster than using `boot()`
 
   ```R
   # from Chap 3 Bootstrap.R
@@ -719,13 +722,46 @@ lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
     pred<-x[length(x)]
     # draw a random sample (with replacement) from the residuals
     w_p<- sample(fit$resid[-1], 1, replace=T) 
-    pred<-fit$ar*pred+w_p
+    pred<-fit$ar*pred+w_p # prediction based on the estimated parameter of the one time fit and bootstrapped residuals 
     predictions_boot[i]<-pred
   }
   
   # calculate the mean + standard deviation of the bootstrapped results
   mean(predictions_boot) # -0.3238181
   sd(predictions_boot) # 1.131557
+  ```
+
+  - A recommended procedure is to also bootstrap the AR(1) process to get a bootstrapped coefficient (but much slower!)
+    - bootstrapped coefficients within the bootstrapping procedure 
+    - basic bootstrapped only used the estimate coefficients of one time fit (do before the for loop -*refer code above*) in prediction 
+
+  ```R
+  predictions_boot2 <- 1:R
+  a_boot2 <- 1:R
+  resid_b<-fit$resid[-1]-mean(fit$resid[-1]) 
+  #centralized residuals -> subtract the mean of the residual from the residuals (mean of the residusal is not exactly = 0) -> in many many step ahead forecast we have a bias downward (in this case we have a negative mean)
+  
+  for (i in 1:R){
+    pred<-x[length(x)] # the last data of the series 
+    # we sample from the centralized residual here 
+    w_p<- sample(fit$resid[-1], 1, replace=T)
+    x_b<-1:n
+    x_b[1]<-x[1]
+    # use a loop to create a bootstrapped AR(1) model to get a bootstrapped estimate
+    for (t in 2:n) x_b[t] <- fit$ar*x_b[t-1]+w_p[t-1] #bootstrapped series
+    #aic=F, otherwise order can be 0 => fit_b$ar = NA
+    fit_b<-ar(x=x_b,method="ols",aic=F,order.max = 1, demean=F) #new fit
+    # use lm: fit_b <-lm(x[2:n]~x[1:n-1]-1) #this AR(1) is without intercept 
+    # pred <- fit_b$coefficients*pred+w_p
+    pred<-fit_b$ar*pred+w_p
+    predictions_boot2[i]<-pred # save predicted 1-step ahead forecast 
+    a_boot2[i]<-fit_b$ar
+  }
+  
+  mean(predictions_boot2) #-0.3045218
+  sd(predictions_boot2) #1.135483
+  mean(a_boot2) #0.202521 -> true a = 0.2
+  sd(a_boot2) #0.04375887
   ```
 
   - results in mean + sd are very similar to the approach above using `boot()` 
