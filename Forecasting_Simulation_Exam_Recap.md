@@ -813,7 +813,7 @@ for (t in 2:n) {
       }
       predictions_boot[i]<-pred[k+3] # here only save the last point 
     }
-  ```
+```
 
 
 ### Stationarity
@@ -1685,6 +1685,7 @@ lines(rep(0.05,h),lty=2,col='blue')
   + e.g. ARIMA(2,1,2) -> $(1-\alpha_1L - \alpha_2L^2)\Delta x_t=(1+\theta_1L+\theta_2L^2)w_t$ -> this ARMA(2,2) that has to be stationary 
     => $\alpha_1 + \alpha_2$ should not be equal to 1! 
     => $\Delta x_t = \alpha_1 \Delta x_{t-1} + \alpha_2 \Delta_{t-2}+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2} \\\rightarrow x_t=x_{t-1}+\alpha_1(x_{t-1}-x_{t-2})+\alpha_2(x_{t-2}-x_{t-3})+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2}$
+  + the lag order of the ARIMA for AR(p) part would be $p+d$ , in this case, we have lag order = 3 for AR(p) part as d=1 and p=2 
   
 + its **stationary can be checked with ADF** for an AR(k) if k is high enough -> rule of thumb: $k = \sqrt[4]{n}$ (valid for the finance domain)
 
@@ -1720,7 +1721,7 @@ x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.g
 + $(1-\alpha_{4,1}L^4) \cdot(1- \alpha_1L)x_t =w_t$ -> this is a seasonal model with 2 parameters
 
   + correspond to $\Rightarrow x_t = \alpha_1 \cdot x_{t-1} + \alpha_{4,1} \cdot x_{t-4} - \alpha_1 \cdot \alpha_{4,1} \cdot x_{t-5} + w_t$
-  + this a AR(5) model with 5 parameters -> more parameters to be fitted than the seasonal ARIMA model 
+  + if we use a AR(5) model then we’ll have 5 parameters -> more parameters to be fitted than the seasonal ARIMA model 
 
 + $(1-\alpha_{4,1}L^4)$ introduces stochastic seasonality -> there are other approaches as well e.g. seasonal dummies 
 
@@ -2286,6 +2287,63 @@ w1 1.0710508 0.5493046
 # sum(((0.5*w1+2*w2)-mean((0.5*w1+2*w2)))^2)/(n-1) = 4.607788
 ```
 
+### Seasonal Dummies 
+
++ Seasonal patterns may be modeled by deterministic seasonal dummy variables 
++ Model equation: $Y_t = X_t + \delta_1S_{1t}+\delta_2S_{2t}+\delta_3S_{3t}$ for seasonality = 4 
++ we can use `VAR` function with the `season` argument to include seasonal dummy in the model, analyze the summary of the fit 
+  + however t-value should be used with caution as there might be a unit root for the AR-parameters and for the deterministic seasonal paramters may not be asymptotically standard normal 
+
+```R
+# Chap7 Ex5
+> fit<-VAR(infInt.ts, type="const", p=1, season=4) #include season=4 to get seasonal dummies
+> summary(fit) #t values for seasonal dummies of Dp are much larger than for R
+
+VAR Estimation Results:
+========================= 
+Endogenous variables: Dp, R 
+Deterministic variables: const 
+Sample size: 106 
+Log Likelihood: 796.729 
+Roots of the characteristic polynomial:
+0.9696 0.119
+Call:
+VAR(y = infInt.ts, p = 1, type = "const", season = 4L)
+
+
+Estimation results for equation Dp: 
+=================================== 
+Dp = Dp.l1 + R.l1 + const + sd1 + sd2 + sd3 
+
+       Estimate Std. Error t value Pr(>|t|)    
+Dp.l1 -0.092323   0.096706  -0.955  0.34204    
+R.l1   0.230872   0.041509   5.562 2.23e-07 ***
+const -0.008302   0.002911  -2.851  0.00529 ** 
+sd1    0.015013   0.005040   2.979  0.00363 ** 
+sd2    0.025883   0.003356   7.712 9.39e-12 ***
+sd3    0.046656   0.002587  18.037  < 2e-16 ***
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+# Dp has a seasonal pattern 
+
+Estimation results for equation R: 
+================================== 
+R = Dp.l1 + R.l1 + const + sd1 + sd2 + sd3 
+
+       Estimate Std. Error t value Pr(>|t|)    
+Dp.l1 0.1227356  0.0855633   1.434    0.155    
+R.l1  0.9429287  0.0367258  25.675   <2e-16 ***
+const 0.0028557  0.0025759   1.109    0.270    
+sd1   0.0068657  0.0044594   1.540    0.127    
+sd2   0.0029005  0.0029694   0.977    0.331    
+sd3   0.0003834  0.0022886   0.168    0.867    
+---
+Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’ 1
+
+```
+
+
+
 ## Definitions (A-Z)
 
 - **Cholesky decomposition**
@@ -2580,8 +2638,10 @@ w1 1.0710508 0.5493046
 - `VAR()` 
 
   1. to estimate the order p of an VAR(p) process
-
   1. to fit a model = obtain the coefficients, given p
+
+  + `season=4` - input seasonal dummies with argument `season` 
+  + `ic=“SC”` or `ic=“AIC”` to use information criteria to estimate lag order $p$ 
 
 - `vars::restrict()`
 
