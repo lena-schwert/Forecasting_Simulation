@@ -605,22 +605,22 @@ ar10<-ar5<-ar1<-rw<-w<- rnorm(n, mean = 0, sd = 1)
 for (t in 2:n) {
     rw[t] <- rw[t-1]+w[t]
   }
-  for (t in 2:n) {
+for (t in 2:n) {
     ar1[t] <- 0.75*ar1[t-1]+w[t]
-  }
-  for (t in 6:n) {
+}
+for (t in 6:n) {
     ar5[t] <- 0.23*ar5[t-1]+0.1*ar5[t-2]+0.09*ar5[t-3]+0.13*ar5[t-4]+0.25*ar5[t-5]+w[t]
-  }
-  for (t in 11:n) {
+}
+for (t in 11:n) {
     ar10[t] <- 0.12*ar10[t-1]+0.06*ar10[t-2]+0.09*ar10[t-3]+0.03*ar10[t-4]+0.11*ar10[t-5]+0.17*ar10[t-6]+0.1*ar10[t-7]+0.09*ar10[t-8]+0.07*ar10[t-9]+0.05*ar10[t-10]+w[t]
-  }
+}
 
-  # delete the presample values (number depends on lag order) from the time series
+# delete the presample values (number depends on lag order) from the time series
 
-  rw <- -rw[-1]
-  ar1 <- ar1[-1]
-  ar5 <- ar5[-(1:5)]
-  ar10 <- ar10[-(1:10)]
+rw <- -rw[-1]
+ar1 <- ar1[-1]
+ar5 <- ar5[-(1:5)]
+ar10 <- ar10[-(1:10)]
 ```
 
 **Fit of stationary differenced AR(p) time series**
@@ -635,8 +635,6 @@ z.diff.lag.1<-diff(x)[2:(length(diff(x))-1)]
 z.diff.lag.2<-diff(x)[1:(length(diff(x))-2)]
 lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
 ```
-
-
 
 ### Bootstrapping
 
@@ -765,6 +763,33 @@ lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
   ```
 
   - results in mean + sd are very similar to the approach above using `boot()` 
+
+- **How to do fast bootstrapping without bias-correction**
+
+    ```R
+    # from Chapter 4 Bootstrap
+    
+    #bootstrapping without bias correction & without re-estimate of parameters
+    predictions_fast_boot <- 1:R
+    set.seed(1)
+    resid_b<-fit$resid-mean(fit$resid) # standardize residuals
+    pred<-rep(0,h+3)
+    
+    for (i in 1:R){
+      pred[1:3]<-ar3c[(length(ar3c)-2):length(ar3c)]
+      w_p<- sample(resid_b, h, replace=T)
+      for(j in 4:(h+3)){
+        pred[j]<-fit$coef[4]+fit$coef[1]*pred[j-1]+fit$coef[2]*pred[j-2]+fit$coef[3]*pred[j-3]+w_p[j-3]
+      }
+      predictions_fast_boot[i]<-pred[h+3]
+    }
+    mfb<-mean(predictions_fast_boot)
+    qfb10<-quantile(predictions_fast_boot,probs=0.1) 
+    qfb90<-quantile(predictions_fast_boot,probs=0.9) 
+    
+    ```
+
+    
 
 - **How to do bias-corrected bootstrapping**
 
@@ -1211,7 +1236,7 @@ lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
 
 <img src="exponential damping.png" alt="exponential damping" style="zoom:50%;" />
 
-  
+
 
 + complex roots with absolute value > 1 -> stochastic cycle with damped oscillations 
 
@@ -1798,6 +1823,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 + shorthand: $\alpha(L)x_t = \alpha_0 + \theta(L)w_t$
 
 + neither autocorrelation or partial autocorrelation can be used to find the order of the model 
+  
       + use cross validation to determine the lag oder p and q 
 
 ### ARIMA(p,d,q) Model
@@ -2015,9 +2041,30 @@ $i = p =$ no. of lags;  $k =$ no. of series in the system; first index of $\alph
 ##### Code Snippets
 
 1. fit VAR model with general setting (`type=both`) to estimate the lag order 
+
+   available criteria `ic = c("AIC", "HQ", "SC", "FPE")`
+
+   ```R
+   ord<-VAR(zt,type="both",ic="SC", lag.max=8
+   ```
+
 2. fit VAR model with the correct lag order and correct type of the simulated series (here multiple time series with a constant)
+
+   `type = c("const", "trend", "both", "none"`
+
+   ```R
+   fit<-VAR(zt, type="const", p=2)
+   ```
+
 3. retrieve the residuals of the fit -> residuals checking with `acf()` and `Ljung-Box` test; calculate the variance-covariance matrix 
+
 4. fit with restriction (to remove non-signficant estimates) -> to obtain more precise estimate
+
+   - with `thresh = 2.0`, the 5% significance level is chosen
+
+   ```R
+   fitRestrict<-restrict(fit, method = "ser", thresh = 2.0)
+   ```
 
 ```R
 #Chap7 Ex1.R 
@@ -2124,7 +2171,7 @@ for (h in h.min:h.max) { #ensure h>order
 plot(x,y,ylim=c(0,1), xaxs = "r", yaxs = "r") 
 lines(rep(0.05,h.max),lty=2,col='blue') # all points lie above the significant line -> all p-value > alpha
 
-# Calculate the variance-covariance matrix: \Sigma_R: 
+# Calculate the variance-covariance matrix: Sigma_R: 
 > t(resid) %*% resid/n # resid = (n-2)*3 -> 3*9998 x 9998*3 = 3x3 matrix  
            y1          y2          y3
 y1  1.0243100 -0.50789639  0.61590779
@@ -2638,7 +2685,7 @@ Signif. codes:  0 ‘***’ 0.001 ‘**’ 0.01 ‘*’ 0.05 ‘.’ 0.1 ‘ ’
   - $i$ is the no. of lag
   - $X_t$, $X_{t-i}$, $A_0$ and $R_t$ is a $k$-dimension column vector 
   - $A_i$ is a $k \times k$ matrix 
-  - $R_t \sim (0,\Sigma_R)$ where $\Sigma_R= E[R_t\cdot R_t']$
+  - $R_t \sim (0,\Sigma_R)$ where $\Sigma_R= E[R_t\cdot R_t']$ where $\Sigma_R = \frac{1}{n-p}\sum_{i=p+1}^nR_iR_i'$ 
 
 - **VECM (= vector error correction model)**: $\Delta X_{t}=A_{0}+\Pi X_{t-1}+\Gamma_{1} \Delta X_{t-1}+\cdots+\Gamma_{p-1} \Delta X_{t-p+1}+R_{t}$
 
