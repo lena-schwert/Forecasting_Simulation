@@ -548,6 +548,20 @@
   ### using ar function of method = "ml"
   > fit3<-ar(x,order.max=1,demean=F,method = "mle")
   > fit3$ar
+  
+  ### using lm(), e.g. for an AR(6) model, from Chap 4 HW3
+  # CAUTION: Indices must be this way, so that all parts of the model have the same length!
+  z.diff <- Apple.d1[7:length(Apple.d1)] # length 3016
+  z.diff.lag.1 <- Apple.d1[6:(length(Apple.d1)-1)] # length 3016
+  z.diff.lag.2 <- Apple.d1[5:(length(Apple.d1)-2)] # length 3016
+  z.diff.lag.3 <- Apple.d1[4:(length(Apple.d1)-3)] # length 3016
+  z.diff.lag.4 <- Apple.d1[3:(length(Apple.d1)-4)] # length 3016
+  z.diff.lag.5 <- Apple.d1[2:(length(Apple.d1)-5)] # length 3016
+  z.diff.lag.6 <- Apple.d1[1:(length(Apple.d1)-6)] # length 3016
+  
+  # put the model formula in lm()
+  model_lm <- lm(z.diff ~ 1 + z.diff.lag.1+ z.diff.lag.2 + z.diff.lag.3 + z.diff.lag.4 + z.diff.lag.5 + z.diff.lag.6)
+  summary(model_lm)
   ```
 
 ### AR(p) model
@@ -612,20 +626,11 @@ for (t in 2:n) {
   + shift the series according to ensure same amount of data points included 
 
 ```R
-### using lm(), e.g. for an AR(6) model, from Chap 4 HW3
-# CAUTION: Indices must be this way, so that all parts of the model have the same length!
-# Apple.d1 = is a differenced AR(6) stationary process 
-z.diff <- Apple.d1[7:length(Apple.d1)] # length 3016
-z.diff.lag.1 <- Apple.d1[6:(length(Apple.d1)-1)] # length 3016
-z.diff.lag.2 <- Apple.d1[5:(length(Apple.d1)-2)] # length 3016
-z.diff.lag.3 <- Apple.d1[4:(length(Apple.d1)-3)] # length 3016
-z.diff.lag.4 <- Apple.d1[3:(length(Apple.d1)-4)] # length 3016
-z.diff.lag.5 <- Apple.d1[2:(length(Apple.d1)-5)] # length 3016
-z.diff.lag.6 <- Apple.d1[1:(length(Apple.d1)-6)] # length 3016
-
-# put the model formula in lm()
-model_lm <- lm(z.diff ~ 1 + z.diff.lag.1+ z.diff.lag.2 + z.diff.lag.3 + z.diff.lag.4 + z.diff.lag.5 + z.diff.lag.6)
-summary(model_lm)
+# diff(x) is a differenced AR(2) stationary process 
+z.diff<-diff(x)[3:length(diff(x))]
+z.diff.lag.1<-diff(x)[2:(length(diff(x))-1)]
+z.diff.lag.2<-diff(x)[1:(length(diff(x))-2)]
+lm.d1x<-lm(z.diff~z.diff.lag.1+z.diff.lag.2+1)
 ```
 
 
