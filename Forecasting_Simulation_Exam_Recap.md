@@ -1539,7 +1539,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 
 + short hand: $x_t = c_o + \theta(L) w_t$, where $\theta$ is a polynomial with degree $q$
 
-+ MA(1) = AR($\infty$) if we restrict $\alpha_i = -\beta^i$ for $i>0$, $|\beta| < 1$ 
++ MA(1) = AR($\infty$) if we **restrict $\alpha_i = -\beta^i$ for $i>0$, $|\beta| < 1$**
 
   + derivation: $x_t = \alpha_0+\beta x_{t-1}+\beta^2 x_{t-2}+ \dots + w_t$ — eqn (1)
   + $x_{t-1} = \alpha_0+\beta x_{t-2}+\beta^2 x_{t-3}+ \dots + w_{t-1}$ — eqn(2)
@@ -1587,7 +1587,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 + a combination of a differenced AR(p) and a MA model 
   + $x_t$ follows an ARIMA(p,d,q) model if $(1-\alpha_1L)^dx_t = \Delta^dx_t$ is a stationary ARMA(p,q) time series 
     => this means the AR(p) part of the MA(p,q) should not have coefficients (exclude $\alpha_0$) sum up to 1 (–> unit root, time series is not stationary!)
-  + e.g. ARIMA(2,1,2) -> $(1-\alpha_1L - \alpha_2L^2)\Delta x_t=(1+\theta_1L+\theta_2L^2)w_t$ -> this MA(2,2) that has to be stationary 
+  + e.g. ARIMA(2,1,2) -> $(1-\alpha_1L - \alpha_2L^2)\Delta x_t=(1+\theta_1L+\theta_2L^2)w_t$ -> this ARMA(2,2) that has to be stationary 
     => $\alpha_1 + \alpha_2$ should not be equal to 1! 
     => $\Delta x_t = \alpha_1 \Delta x_{t-1} + \alpha_2 \Delta_{t-2}+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2} \\\rightarrow x_t=x_{t-1}+\alpha_1(x_{t-1}-x_{t-2})+\alpha_2(x_{t-2}-x_{t-3})+w_t+\theta_1w_{t-1} +\theta_2 w_{t-2}$
   
@@ -1612,7 +1612,7 @@ lines(rep(0.05,h),lty=2,col='blue')
 ```R
 # n = length of the series 
 # arima fit the differenced series AR(p), here we difference once, so input n-1 instead of n! 
-# CAUTION: ar=c(0.7,0.3) for instance will throw error, MA(p,q) need to be stationary! 
+# CAUTION: ar=c(0.7,0.3) for instance will throw error, ARMA(p,q) need to be stationary! 
 x<-arima.sim(n=(n-1),list(order=c(2,1,2), ar=c(0.7,-0.5), ma=c(0.4,0.6)), rand.gen=rnorm)
 ```
 
@@ -1945,7 +1945,7 @@ fitRestrict<-restrict(fit, method = "ser", thresh = 2.0)
 ##### Code Snippets 
 
 ```R
-# Chap7 Ex1
+# Chap7 Ex1 - Example b) VAR(2), three series
 #Test for Granger causality
 ###########################
 #H0: restrictions due to Granger causality hold
