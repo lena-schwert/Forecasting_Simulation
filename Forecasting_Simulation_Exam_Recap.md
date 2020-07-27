@@ -578,14 +578,15 @@
 #### Code snippets
 
 - **How to create AR(p) time series with a for-loop**
+```R
+# Lena's example
 
-  ```R
-  # Lena's example
-  # alle examples are without an intercept
-  set.seed(42)
-  n <- 1000
-  ar10<-ar5<-ar1<-rw<-w<- rnorm(n, mean = 0, sd = 1)
-  
+# all examples are without an intercept
+
+set.seed(42)
+n <- 1000
+ar10<-ar5<-ar1<-rw<-w<- rnorm(n, mean = 0, sd = 1)
+
 for (t in 2:n) {
     rw[t] <- rw[t-1]+w[t]
   }
@@ -598,15 +599,14 @@ for (t in 2:n) {
   for (t in 11:n) {
     ar10[t] <- 0.12*ar10[t-1]+0.06*ar10[t-2]+0.09*ar10[t-3]+0.03*ar10[t-4]+0.11*ar10[t-5]+0.17*ar10[t-6]+0.1*ar10[t-7]+0.09*ar10[t-8]+0.07*ar10[t-9]+0.05*ar10[t-10]+w[t]
   }
-  
+
   # delete the presample values (number depends on lag order) from the time series
+
   rw <- -rw[-1]
   ar1 <- ar1[-1]
   ar5 <- ar5[-(1:5)]
   ar10 <- ar10[-(1:10)]
-  ```
-
-  
+```
 
 ### Bootstrapping
 
@@ -684,9 +684,10 @@ for (t in 2:n) {
     a3_hat_c <- a3_hat - bias_boot[3] 
     a0_hat_c <- a0_hat - bias_boot[4] 
     ```
-
+```
+  
     - To do k-step ahead forecast:  
-
+    
     ```R
     k<-5 # 5-step ahead forecast 
     R<-10^4
@@ -717,7 +718,7 @@ for (t in 2:n) {
       }
       predictions_boot[i]<-pred[k+3] # here only save the last point 
     }
-    ```
+  ```
 
 
 ### Stationarity
