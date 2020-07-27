@@ -16,11 +16,20 @@
 
 *Chapter 3*
 
-- White Noise, Random Walk and AR(1) process in a nutshell 
+- White Noise, Random Walk and AR(p) process in a nutshell 
 
   - **WN has no memory** -> no memory of its previous value at all! -> most jagged series 
-  - **AR(1) process has short term memory** -> has moderate memory of its previous values at each next step 
   - **RW has long term memory** -> highly correlated to its previous value at each next step -> smoothest among the three processes 
+    - because either $\alpha_1 = 1$ or $\sum_{i=1}^p\alpha_i=1$, the random walk process captures all information from previous steps
+  - **AR(p) process has short term memory** -> has moderate memory of its previous values at each next step 
+    - because either $0<\alpha_1 < 1$ or $\sum_{i=1}^p\alpha_i<1$, the AR(p) process does not capture all the information from before
+    - also, AR(p) models with higher lag orders have "longer memory" as showed in the ACF plot than AR(p) models with low lag orders
+
+  –> **the intuition about the difference in "memory"  is also evident from `acf()` plots!**
+
+  <img src="image-20200727125711979.png" alt="image-20200727125711979" style="zoom:80%;" />
+
+  <img src="image-20200727125730447.png" alt="image-20200727125730447" style="zoom:80%;" />
 
 - **Why is there a deterministic trend in a random walk with drift**? 
 
@@ -30,7 +39,11 @@
 - Random Walk vs. Random Walk with drift 
   
   - a constant drift in Random Walk lead to a linear trend over time, since this trend is deterministic -> same covariance, autocorrrelation  as Random Walk without drift but the expected value has an additional linear trend 
-  
+
+- **drift vs. intercept vs. trend**
+
+  <img src="image-20200727132351475.png" alt="image-20200727132351475" style="zoom:80%;" />
+
 - **Why does differencing actually work to make a non-stationary time series stationary?**
   
   - insight from Chap 4 HW 3 (week 10): e.g.for a random walk, the absolute values are very different over time, but the **differences between subsequent values are not!**
@@ -302,6 +315,9 @@
     - how to conclude this null hypothesis? -> hypothesis testing with significant level of 5% (the dashed line) 
       - How would you calculate it? -> It shows the allowed bound of our null hypothesis! - it's $1.96/\sqrt{n} $!
     - if we have a plot with lag=40, considering 5% significant level, then only at 40*0.05 = 2 lags should cross this dashed line
+  
+  <img src="image-20200727125843078.png" alt="image-20200727125843078" style="zoom:80%;" />
+  
 - **How to check whether the mean is significantly different from zero:**
   - if $1.96 \times \sigma/\sqrt{n}$ is larger than the mean of the series 
   - `1.96*sd(w)/n^0.5 > mean(w)`
@@ -372,6 +388,7 @@
 
   ```R
   # random walk with lag 1 without intercept
+  # needs one presample value
   for (t in 2:1000) x[t] <- x[t-1]+w[t]
   ```
 
@@ -557,6 +574,20 @@
 ![AR(p) with a unit root-neg-a0](AR(p) with a unit root-neg-a0.png)
 
 
+
+#### Code snippets
+
+- **How to create AR(p) time series with a for-loop**
+
+  ```R
+  # taken exemplarily from Chap 4 Ex 3.R
+  n<-1000 # set length
+  ar6<-ar3<-ar1<-w<- rnorm(n) # initialize objects
+  
+  # create random
+  ```
+
+  
 
 ### Bootstrapping
 
@@ -2204,7 +2235,7 @@ w1 1.0710508 0.5493046
 - covariance of two variables $cov(x,y)= \sum_{i=1}^n(x-\bar{x})(y-\bar{y})/(n-1)$
 - correlation $corr(x,y)= \frac{cov(x,y)}{\sigma_x\sigma_y}$ 
 - standard error $\sigma_\mu = \frac{\sigma}{\sqrt{n}}$
-- **Box Cox Transformation**
+- **Box Cox Transformation**: $$x_t = B(y_t, \lambda)=\left\{\begin{array}{ll} ln \left(y_{t}\right) & \text { if } \lambda=0 \\ \left(y_{t}^{\lambda}-1\right) / \lambda & \text { otherwise } \end{array}\right.$$
 
 
 - **Exponential Smoothing**: $x_t = n_{t-1}+r_t$
@@ -2216,20 +2247,21 @@ w1 1.0710508 0.5493046
 
 - **Holt-Winters model**
 
-- **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
 
-- $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
-    $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
-    $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
-  
-  - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
-  
-- **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
+    - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
 
-    - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
-      $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
-      $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
-    - forecast: $\hat{x}_{t+k \mid t}=(n_{t}+k \cdot v_{t})s_{t-p+[(k-1) \bmod p]+1}$
+    - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
+        $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
+        $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+      
+      - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
+      
+    - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
+
+        - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
+          $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
+          $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+        - forecast: $\hat{x}_{t+k \mid t}=(n_{t}+k \cdot v_{t})s_{t-p+[(k-1) \bmod p]+1}$
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}\iff \nabla x_t = (1-L)x_t$ 
 

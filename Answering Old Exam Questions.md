@@ -40,8 +40,8 @@
   - What properties can be derived? 
     - autocorrelation
     - whether autocorrelation is time dependent or not
-
   
+    –> whether there is significant autocorrelation in the residuals (= is there non-zero corealtion between the original time series and lagged versions of it?)
 
 - *second exam 2019:* show which plot is rw and which one an ar. One looked a lot like white  noise but is the AR(1), the other one is the RW - identify
 
