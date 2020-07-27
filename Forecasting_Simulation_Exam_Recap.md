@@ -580,11 +580,30 @@
 - **How to create AR(p) time series with a for-loop**
 
   ```R
-  # taken exemplarily from Chap 4 Ex 3.R
-  n<-1000 # set length
-  ar6<-ar3<-ar1<-w<- rnorm(n) # initialize objects
+  # Lena's example
+  # alle examples are without an intercept
+  set.seed(42)
+  n <- 1000
+  ar10<-ar5<-ar1<-rw<-w<- rnorm(n, mean = 0, sd = 1)
   
-  # create random
+for (t in 2:n) {
+    rw[t] <- rw[t-1]+w[t]
+  }
+  for (t in 2:n) {
+    ar1[t] <- 0.75*ar1[t-1]+w[t]
+  }
+  for (t in 6:n) {
+    ar5[t] <- 0.23*ar5[t-1]+0.1*ar5[t-2]+0.09*ar5[t-3]+0.13*ar5[t-4]+0.25*ar5[t-5]+w[t]
+  }
+  for (t in 11:n) {
+    ar10[t] <- 0.12*ar10[t-1]+0.06*ar10[t-2]+0.09*ar10[t-3]+0.03*ar10[t-4]+0.11*ar10[t-5]+0.17*ar10[t-6]+0.1*ar10[t-7]+0.09*ar10[t-8]+0.07*ar10[t-9]+0.05*ar10[t-10]+w[t]
+  }
+  
+  # delete the presample values (number depends on lag order) from the time series
+  rw <- -rw[-1]
+  ar1 <- ar1[-1]
+  ar5 <- ar5[-(1:5)]
+  ar10 <- ar10[-(1:10)]
   ```
 
   
@@ -2247,21 +2266,20 @@ w1 1.0710508 0.5493046
 
 - **Holt-Winters model**
 
+- **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
 
-    - **additive model** $x_t=n_{t-1}+v_{t-1}+s_{t-p}+r_t$
-    
-    - $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
-        $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
-        $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
-      
-      - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
-      
-    - **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
-    
-        - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
-          $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
-          $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
-        - forecast: $\hat{x}_{t+k \mid t}=(n_{t}+k \cdot v_{t})s_{t-p+[(k-1) \bmod p]+1}$
+- $n_{t}=\alpha \cdot\left(x_{t}-s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
+    $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
+    $s_{t}=\gamma \cdot\left(x_{t}-n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+  
+  - forecast: $\hat{x}_{t+k \mid t}=n_{t}+k \cdot v_{t}+s_{t-p+[(k-1) \bmod p]+1}$
+  
+- **multiplicative model** $x_t=(n_{t-1}+v_{t-1})s_{t-p}+r_t$
+
+    - $n_{t}=\alpha \cdot\left(x_{t}/s_{t-p}\right)+(1-\alpha) \cdot\left(n_{t-1}+v_{t-1}\right)$
+      $v_{t}=\beta \cdot\left(n_{t}-n_{t-1}\right)+(1-\beta) \cdot v_{t-1}$
+      $s_{t}=\gamma \cdot\left(x_{t}/n_{t}\right)+(1-\gamma) \cdot s_{t-p}$
+    - forecast: $\hat{x}_{t+k \mid t}=(n_{t}+k \cdot v_{t})s_{t-p+[(k-1) \bmod p]+1}$
 
 - **difference operator** $\nabla x_t = x_t-x_{t-1}\iff \nabla x_t = (1-L)x_t$ 
 
