@@ -1,6 +1,6 @@
 # Forecasting_Simulation
 
-This is Jia Yans (giant316) and my recap + summary for the Forecasting course by Prof. Jacobs (summer term 2020, held online).
+This is Jia Yans (giant316) and mine recap + summary for the Forecasting course by Prof. Jacobs (summer term 2020, held online).
 
 The document is written in Markdown for text + Latex for math equation and you see that the images (mostly screenshots) are not include in the markdown file, but as separate image files.
 
